@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Sprites>
+  <whiteboosterbasic path="objects/auspicioushelper/channelbooster/" start="loop">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="loop" path="whitewhole" delay="0.1" frames="0"/>
+    <Loop id="inside" path="whitewhole" delay="0.1" frames="0"/>
+    <Loop id="spin" path="booster/booster" delay="0.06" frames="18-25"/>
+    <Anim id="pop" path="booster/booster" delay="0.08" frames="9-17"/>
+  </whiteboosterbasic>
+  <blackboosterbasic path="objects/auspicioushelper/channelbooster/" start="loop">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="loop" path="blackwhole" delay="0.1" frames="0"/>
+    <Loop id="inside" path="blackwhole" delay="0.1" frames="0"/>
+    <Loop id="spin" path="booster/booster" delay="0.06" frames="18-25"/>
+    <Anim id="pop" path="booster/booster" delay="0.08" frames="9-17"/>
+  </blackboosterbasic>
+  <noneboosterbasic path="objects/auspicioushelper/channelbooster/" start="loop">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="loop" path="none" delay="0.1" frames="0"/>
+    <Loop id="inside" path="none" delay="0.1" frames="0"/>
+    <Loop id="spin" path="booster/booster" delay="0.06" frames="18-25"/>
+    <Anim id="pop" path="booster/booster" delay="0.08" frames="9-17"/>
+  </noneboosterbasic>
+</Sprites>
