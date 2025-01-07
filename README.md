@@ -1,2 +1,2 @@
 # auspicioushelper
-Replace with your mod's readme!
+I do not reccomend using this yet. Proceed with caution.
