@@ -27,7 +27,16 @@ public class ChannelSwitch:ChannelBaseEntity {
 
   public ChannelSwitch(EntityData data, Vector2 offset):base(data.Position+offset){
     Collider = new Hitbox(16f, 24f, -8f, -12f);
-    Add(new PlayerCollider(OnPlayer));
+    if(data.Bool("player_toggle",true)){
+      Add(new PlayerCollider(OnPlayer));
+    }
+    if(data.Bool("throwable_toggle",false)){
+      Add(new HoldableCollider(OnHoldable, new Hitbox(20f, 28f, -10f, -14f)));
+    }
+    if(data.Bool("seeker_toggle",false)){
+      
+      Add(new SeekerCollider(OnSeeker, new Hitbox(24f, 32f, -12f, -16f)));
+    }
     Add(sprite = GFX.SpriteBank.Create("coreFlipSwitch"));
     channel = data.Int("channel",0);
     onOnly = data.Bool("on_only",false);
@@ -59,7 +68,7 @@ public class ChannelSwitch:ChannelBaseEntity {
     }
   }
   
-  public void OnPlayer(Player player){
+  public void hit(){
     if(usable() && cooldown<=0f){
       DebugConsole.Write("Hit switch!");
       ChannelState.SetChannel(channel,on?offVal:onVal);
@@ -70,6 +79,16 @@ public class ChannelSwitch:ChannelBaseEntity {
       cooldown = 1f;
     }
   }
+  public void OnPlayer(Player player){
+    hit();
+  }
+  public void OnHoldable(Holdable h){
+    hit();
+  }
+  public void OnSeeker(Seeker s){
+    hit();
+  }
+
   public override void Update(){
     base.Update();
     if(cooldown>0) cooldown-=Engine.DeltaTime;

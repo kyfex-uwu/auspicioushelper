@@ -13,6 +13,9 @@ channelswitch.placements = {
       channel = 0,
       on_only=false,
       off_only=false,
+      player_toggle=true,
+      throwable_toggle=false,
+      seeker_toggle=false,
       on_value=1,
       off_value=0
     }

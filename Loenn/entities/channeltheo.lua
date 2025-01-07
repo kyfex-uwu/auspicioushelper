@@ -11,7 +11,9 @@ channeltheo.placements = {
     name = "Channel Theo",
     data = {
       channel = 0,
-      switch_thrown_momentum = false
+      switch_thrown_momentum = false,
+      swap_thrown_positions = false,
+      swap_thrown_positions_nodie = false
     }
   }
 }
