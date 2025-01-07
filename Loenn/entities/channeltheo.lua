@@ -13,7 +13,8 @@ channeltheo.placements = {
       channel = 0,
       switch_thrown_momentum = false,
       swap_thrown_positions = false,
-      swap_thrown_positions_nodie = false
+      swap_thrown_positions_nodie = false,
+      take_velocity = false
     }
   }
 }

@@ -70,7 +70,7 @@ public class ChannelSwitch:ChannelBaseEntity {
   
   public void hit(){
     if(usable() && cooldown<=0f){
-      DebugConsole.Write("Hit switch!");
+      //DebugConsole.Write("Hit switch!");
       ChannelState.SetChannel(channel,on?offVal:onVal);
       Level level = SceneAs<Level>();
       Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
