@@ -202,7 +202,12 @@ public class ChannelBooster : ChannelBaseEntity{
   }
   public static void PlayerdieHandler(On.Celeste.Booster.orig_PlayerDied orig, Booster self){
     if (self==boosterOfSins || self.Depth == 9+10){
-      lastUsed.PlayerDied();
+      try{
+        lastUsed.PlayerDied();
+      }catch(Exception ex){
+        DebugConsole.Write($"thing happened {ex}"); 
+        //this happens very rarely when dying on a new map with weird state from an old one. No consequence.
+      }
     } else {
       orig(self);
     }

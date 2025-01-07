@@ -1,6 +1,7 @@
 
 
 
+using System;
 using Celeste;
 using Celeste.Mod.auspicioushelper;
 using Celeste.Mod.Entities;
@@ -43,7 +44,7 @@ public class ChannelJelly : Glider, IChannelUser {
   }
   public void setChVal(int val){
     csidx = ChannelState.readChannel(channel) & 1;
-    if(cs==state[csidx]) return;
+    //if(cs==state[csidx]) return;
     cs = state[csidx];
     
     //Grabability
@@ -52,6 +53,7 @@ public class ChannelJelly : Glider, IChannelUser {
       sprite.Color = Color.White;
     } else {
       Hold.PickupCollider = null;
+      fallingSfx.Stop();
       //dDebugConsole.Write($"{Scene.Tracker.GetEntities<Player>().Count}");
       foreach(Player p in Scene.Tracker.GetEntities<Player>()){
         if(p.Holding == Hold){
@@ -82,6 +84,8 @@ public class ChannelJelly : Glider, IChannelUser {
       return;
     }
     sprite.Rotation = Calc.Approach(sprite.Rotation, 0, 3.14f * Engine.DeltaTime);
+    sprite.Scale.Y = Calc.Approach(sprite.Scale.Y, 1, Engine.DeltaTime * 2f);
+    sprite.Scale.X = Calc.Approach(sprite.Scale.X, (float)Math.Sign(sprite.Scale.X) * 1, Engine.DeltaTime * 2f);
     if(cs  == JellyState.fallable){
       if(platform.HasPlayerRider()) cs=JellyState.falling;
     }
