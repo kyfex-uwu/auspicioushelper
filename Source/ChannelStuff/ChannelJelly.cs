@@ -41,6 +41,8 @@ public class ChannelJelly : Glider, IChannelUser {
         _=>JellyState.normal,
       };
     }
+    Hold.OnPickup = OnPickupHook;
+    Hold.OnRelease = OnReleaseHook;
   }
   public void setChVal(int val){
     csidx = ChannelState.readChannel(channel) & 1;
@@ -77,6 +79,7 @@ public class ChannelJelly : Glider, IChannelUser {
     scene.Add(platform = new JumpThru(Position, platformWidth, false));
     ChannelState.watch(this);
     setChVal(ChannelState.readChannel(channel) & 1);
+    //DebugConsole.Write("called added");
   }
   public override void Update(){
     if(cs == JellyState.normal){
@@ -99,5 +102,13 @@ public class ChannelJelly : Glider, IChannelUser {
       }
       platform.MoveTo(Position - new Vector2(platformWidth/2, 14));
     }
+  }
+  private void OnPickupHook(){
+    OnPickup();
+    platform.AddTag(Tags.Persistent);
+  }
+  private void OnReleaseHook(Vector2 force){
+    OnRelease(force);
+    platform.RemoveTag(Tags.Persistent);
   }
 }

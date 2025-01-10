@@ -17,6 +17,7 @@ public class ChannelSwitch:ChannelBaseEntity {
   public int offVal;
   public bool on;
   public float cooldown;
+  public float maxcd;
   Sprite sprite;
   public bool usable(){
     if(!onOnly || on){
@@ -43,6 +44,7 @@ public class ChannelSwitch:ChannelBaseEntity {
     offOnly = data.Bool("off_only",false);
     onVal = data.Int("on_value",1);
     offVal = data.Int("off_value",0);
+    maxcd = data.Float("cooldown",1f);
     //DebugConsole.Write("Constructed switch");
   }
   public override void Added(Scene scene){
@@ -76,7 +78,7 @@ public class ChannelSwitch:ChannelBaseEntity {
       Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
       level.Flash(Color.White * 0.15f, drawPlayerOver: true);
       Celeste.Freeze(0.05f);
-      cooldown = 1f;
+      cooldown = maxcd;
     }
   }
   public void OnPlayer(Player player){

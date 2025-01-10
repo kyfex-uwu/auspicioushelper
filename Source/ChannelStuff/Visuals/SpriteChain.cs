@@ -22,7 +22,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   public Queue<ActiveSprite> chain = new Queue<ActiveSprite>();
 
   public float dur;
-  public float ct;
+  public float ct=0;
   public float addfreq;
   public float travelspeed;
   public List<Vector2> nodes = new List<Vector2>();
@@ -46,19 +46,9 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   }
   public override void Update(){
     base.Update();
-    ct = (Engine.Scene as Level).TimeActive;
-    if(needsFill){
-      needsFill=false;
-      int n = (int)(dur/addfreq); 
-      //lol both methods maintain the right probability only on a point-wise basis :)
-      //both are not a proper random 
-      for(int i=0; i<n; i++){
-        chain.Enqueue(new ActiveSprite(ct-dur*addTimes.NextFloat()));
-      }
-    }
     if(loop) return;
 
-    ct = (Engine.Scene as Level).TimeActive;
+    ct += Engine.DeltaTime;
     float consumed = addTimes.NextFloat()*addfreq;
     while(consumed<Engine.DeltaTime){
       chain.Enqueue(new ActiveSprite(ct+consumed-Engine.DeltaTime));
@@ -70,6 +60,15 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   }
   public override void Added(Scene scene){
     needsFill=true;
+    if(needsFill){
+      needsFill=false;
+      int n = (int)(dur/addfreq); 
+      //lol both methods maintain the right probability only on a point-wise basis :)
+      //both are not a proper random 
+      for(int i=0; i<n; i++){
+        chain.Enqueue(new ActiveSprite(ct-dur*addTimes.NextFloat()));
+      }
+    }
   }
   public void registerMaterials(){
     ChannelBaseEntity.layerA.bgItemsDraw.Add(this);

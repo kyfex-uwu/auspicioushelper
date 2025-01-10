@@ -17,7 +17,8 @@ channelswitch.placements = {
       throwable_toggle=false,
       seeker_toggle=false,
       on_value=1,
-      off_value=0
+      off_value=0,
+      cooldown=1.0
     }
   }
 }

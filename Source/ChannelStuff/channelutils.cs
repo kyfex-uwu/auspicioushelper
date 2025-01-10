@@ -40,6 +40,17 @@ public static class ChannelState{
   public static void unwatchAll(){
     watching.Clear();
   }
+  public static void unwatchTemporary(){
+    foreach(var pair in watching){
+      var newlist = new List<IChannelUser>();
+      foreach(IChannelUser e in pair.Value){
+        if(e is Entity en && en.TagCheck(Tags.Persistent)){
+          newlist.Add(e);
+        }
+      }
+      watching[pair.Key] = newlist;
+    }
+  }
 
   public static void speedruntoolinteropload(){
     var stmodule = Everest.Modules.FirstOrDefault(m=>m.Metadata.Name == "SpeedrunTool");

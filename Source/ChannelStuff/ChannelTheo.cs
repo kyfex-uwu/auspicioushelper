@@ -17,14 +17,21 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
   public bool switchThrown;
   public bool swapPos;
   public bool swapPosCareful;
-  public bool takeVelocity;
+  public float playerfrac;
+  public float theofrac;
   public static Player lastPickup;
   public ChannelTheo(EntityData data, Vector2 offset):base(data, offset){
     channel = data.Int("channel",0);
     switchThrown = data.Bool("switch_thrown_momentum",false);
     swapPos = data.Bool("swap_thrown_positions",false);
     swapPosCareful = data.Bool("swap_thrown_positions_nodie",false);
-    takeVelocity = data.Bool("take_velocity",false);
+    if(data.Bool("take_velocity",false)){
+      playerfrac =0;
+      theofrac = 1;
+    } else {
+      playerfrac = data.Float("player_momentum_weight",1);
+      theofrac = data.Float("theo_momentum_weight",0);
+    };
     if(!hooked){
       hooked=true;
       On.Celeste.Player.Throw += PlayerThrowHook;
@@ -73,8 +80,8 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
     return orig(self, player);
   }
   public void OnPickupHook(){
-    if(lastPickup != null && takeVelocity && active){
-      lastPickup.Speed = Speed;
+    if(lastPickup != null && active){
+      lastPickup.Speed = lastPickup.Speed*playerfrac+Speed*theofrac;
     }
     base.OnPickup();
   }

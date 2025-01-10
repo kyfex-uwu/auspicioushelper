@@ -14,7 +14,8 @@ channeltheo.placements = {
       switch_thrown_momentum = false,
       swap_thrown_positions = false,
       swap_thrown_positions_nodie = false,
-      take_velocity = false
+      player_momentum_weight = 1.0,
+      theo_momentum_weight = 0.0
     }
   }
 }

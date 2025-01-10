@@ -37,7 +37,7 @@ public class auspicioushelperModule : EverestModule {
     }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
-        ChannelState.unwatchAll();
+        ChannelState.unwatchTemporary();
         DebugConsole.Write("Transitioned");
     } 
     public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
@@ -52,11 +52,12 @@ public class auspicioushelperModule : EverestModule {
         Session.load(false);
         ChannelState.unwatchAll();
 
-        MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
-        MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
+        //MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
+        //MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
     }
     public static void OnEnter(Session session, bool fromSave){
         Session.load(!fromSave);
+        ChannelState.unwatchAll();
         DebugConsole.Write("Entered Level");
     }
 

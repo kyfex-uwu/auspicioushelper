@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using Celeleste.Mods.auspicioushelper;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
@@ -23,7 +24,7 @@ public static class MaterialPipe {
   }
 
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
-    orig(self, scene); // Lmao this
+    orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
     SpriteBatch sb = Draw.SpriteBatch;
@@ -32,10 +33,23 @@ public static class MaterialPipe {
     if(dirty) layers.Sort((a, b) => a.depth.CompareTo(b.depth));
     dirty=false;
 
+    double curdepth = float.PositiveInfinity;
+    bool sorted = true;
     foreach(Entity e in scene.Entities.entities){
       if(e.Visible && (e is IMaterialObject en)){
         en.registerMaterials();
       }
+      if(curdepth<e.actualDepth) sorted=false;
+      curdepth=e.actualDepth;
+    }
+    //strawberries change their depth for the sole reason of making my life harder...;
+    if(!sorted){
+      //DebugConsole.Write("ENTITYLIST NOT SORTED (resorting, kms)");
+      //oh god whyyy are they not using a tree for this like this is literally the most tree-ish 
+      //problem ever. My head hurts my head hurts my head hurts my head hurts my head hurts
+      //yes let's just resort the entire list every time we change a single depth or add any entities
+      //truely a handsome and stylish methodology
+      scene.Entities.entities.Sort(EntityList.CompareDepth);
     }
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
