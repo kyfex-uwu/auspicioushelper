@@ -50,28 +50,32 @@ public class ChannelJelly : Glider, IChannelUser {
     cs = state[csidx];
     
     //Grabability
-    if(cs == JellyState.normal || cs == JellyState.normalWithPlatform){
-      Hold.PickupCollider = new Hitbox(20f, 22f, -10f, -16f);
-      sprite.Color = Color.White;
-    } else {
-      Hold.PickupCollider = null;
-      fallingSfx.Stop();
-      //dDebugConsole.Write($"{Scene.Tracker.GetEntities<Player>().Count}");
-      foreach(Player p in Scene.Tracker.GetEntities<Player>()){
-        if(p.Holding == Hold){
-          p.Drop();
-          sprite.Play("idle");
-          sprite.Update();
-        };
+    try{
+      if(cs == JellyState.normal || cs == JellyState.normalWithPlatform){
+        Hold.PickupCollider = new Hitbox(20f, 22f, -10f, -16f);
+        sprite.Color = Color.White;
+      } else {
+        Hold.PickupCollider = new Hitbox(-999f,-999f,0,0);
+        fallingSfx.Stop();
+        //dDebugConsole.Write($"{Scene.Tracker.GetEntities<Player>().Count}");
+        foreach(Player p in Scene.Tracker.GetEntities<Player>()){
+          if(p.Holding == Hold){
+            p.Drop();
+            sprite.Play("idle");
+            sprite.Update();
+          };
+        }
+        sprite.Color = new Color(200,200,150,255);
       }
-      sprite.Color = new Color(200,200,150,255);
-    }
 
-    if(cs != JellyState.normal){
-      platform.Position = Position - new Vector2(platformWidth/2, 14);
-      platform.Collidable = true;
-    } else {
-      platform.Collidable = false;
+      if(cs != JellyState.normal){
+        platform.Position = Position - new Vector2(platformWidth/2, 14);
+        platform.Collidable = true;
+      } else {
+        platform.Collidable = false;
+      }
+    } catch(Exception ex){
+      DebugConsole.Write(ex.ToString());
     }
   }
   public override void Added(Scene scene){

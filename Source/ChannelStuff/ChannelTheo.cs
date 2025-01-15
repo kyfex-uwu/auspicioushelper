@@ -21,6 +21,7 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
   public float theofrac;
   public static Player lastPickup;
   public ChannelTheo(EntityData data, Vector2 offset):base(data, offset){
+    
     channel = data.Int("channel",0);
     switchThrown = data.Bool("switch_thrown_momentum",false);
     swapPos = data.Bool("swap_thrown_positions",false);
@@ -36,8 +37,20 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
       hooked=true;
       On.Celeste.Player.Throw += PlayerThrowHook;
       On.Celeste.Holdable.Pickup += PickupHook;
+      On.Celeste.TheoCrystal.Die += OnDie;
     }
     Hold.OnPickup = OnPickupHook;
+  }
+  public static void OnDie(On.Celeste.TheoCrystal.orig_Die orig, TheoCrystal self){
+    if((self.Scene is Level L) && L.Transitioning){
+      self.RemoveSelf();
+    } else {
+      orig(self);
+    }
+  }
+  public override void Update(){
+    if((this.Scene is Level L) && L.Transitioning && !Hold.IsHeld) return;
+    base.Update();
   }
   public override void Added(Scene scene){
     base.Added(scene);
@@ -50,27 +63,24 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
   public static void PlayerThrowHook(On.Celeste.Player.orig_Throw orig, Player self){
     Holdable held = self.Holding;
     orig(self);
-    foreach(ChannelTheo t in self.Scene.Tracker.GetEntities<ChannelTheo>()){
-      if(t.Hold == held){
-        if(t.switchThrown && t.active){
-          Vector2 temp = self.Speed;
-          self.Speed = t.Speed;
-          t.Speed = temp;
+    if(self.Holding!=null && self.Holding.Entity is ChannelTheo t){
+      if(t.switchThrown && t.active){
+        Vector2 temp = self.Speed;
+        self.Speed = t.Speed;
+        t.Speed = temp;
+      }
+      if(t.swapPos && t.active){
+        Vector2 temp = self.Position;
+        self.Position = t.Position;
+        t.Position = temp;
+        if(Collide.Check(self, self.Scene.Tracker.GetEntities<Solid>())){
+          self.Die(self.Speed);
         }
-        if(t.swapPos && t.active){
-          Vector2 temp = self.Position;
-          self.Position = t.Position;
-          t.Position = temp;
-          if(Collide.Check(self, self.Scene.Tracker.GetEntities<Solid>())){
-            self.Die(self.Speed);
-          }
-        }
-        if(t.swapPosCareful && t.active){
-          float temp = self.Position.Y;
-          self.MoveToY(t.Position.Y);
-          t.MoveToY(temp);
-        }
-        break;
+      }
+      if(t.swapPosCareful && t.active){
+        float temp = self.Position.Y;
+        self.MoveToY(t.Position.Y);
+        t.MoveToY(temp);
       }
     }
   }
