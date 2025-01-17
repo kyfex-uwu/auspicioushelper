@@ -63,7 +63,7 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
   public static void PlayerThrowHook(On.Celeste.Player.orig_Throw orig, Player self){
     Holdable held = self.Holding;
     orig(self);
-    if(self.Holding!=null && self.Holding.Entity is ChannelTheo t){
+    if(held!=null && held.Entity is ChannelTheo t){
       if(t.switchThrown && t.active){
         Vector2 temp = self.Speed;
         self.Speed = t.Speed;
