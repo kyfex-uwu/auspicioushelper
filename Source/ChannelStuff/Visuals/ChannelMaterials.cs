@@ -12,7 +12,7 @@ public class ChannelMaterialsA:MaterialLayer{
   public List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public List<IMaterialObject> connectedBlocksDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
-  public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("StaticEffect")){
+  public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader")){
     DebugConsole.Write(shader == null? "Static shader is null":"Static shader found and registered");
     if(shader == null)return;
     bgtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);

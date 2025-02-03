@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Celeleste.Mods.auspicioushelper;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -33,7 +34,9 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.Booster.PlayerDied += ChannelBooster.PlayerdieHandler;
         On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
 
-        //DebugConsole.Open();   
+        //DebugConsole.Open();  
+
+        EntityBinder.addHooks(); 
     }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
@@ -52,8 +55,8 @@ public class auspicioushelperModule : EverestModule {
         Session.load(false);
         ChannelState.unwatchAll();
 
-        //MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
-        //MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
+        MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
+        MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
     }
     public static void OnEnter(Session session, bool fromSave){
         Session.load(!fromSave);

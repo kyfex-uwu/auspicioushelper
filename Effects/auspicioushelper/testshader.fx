@@ -14,19 +14,13 @@ float4 partAt(float2 pos) {
 uniform float time;
 uniform float2 cpos;
 
-float rand(float2 uv) {
-    return frac(sin(dot(uv.xy, float2(12.9898, 78.233)+time)) * 43758.5453);
-}
-float drand(float2 uv) {
-    return frac(sin(dot(uv.xy, float2(12.9898, 78.233))) * 43758.5453);
-}
 
 float4 matAt(float2 pos, float offsetx, float offsety){
     return floor(tex2D(materialSamp,float2(pos.x+offsetx/320.,pos.y+offsety/180.))*255);
 }
 
 float2 worldpos(float2 pos){
-    return pos*float2(320.,180.)+cpos;
+    return floor(pos*float2(320.,180.)+cpos);
 }
 
 ////////////////// K.jpg's Smooth Re-oriented 8-Point BCC Noise //////////////////
@@ -51,6 +45,14 @@ float3 mod(float3 x, float3 y){
 
 float4 mod(float4 x, float4 y){
 	return x - y * floor(x / y);
+}
+
+float drand(float3 co) {
+    co *= 1000.0;
+		co=mod(co,219.23);
+    float3 a = mod(co * float3(0.1031, 0.1030, 0.0973),1);
+    a += dot(a, a.yzx + 33.33);
+    return mod((a.x + a.y) * a.z,1);
 }
 
 // Gradient set is a normalized expanded rhombic dodecahedron
@@ -140,40 +142,37 @@ float os2noderivskew(float3 X) {
 
 
 
-
 float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
-    float4 matval = matAt(pos,0,0);
-    float2 wpos = worldpos(pos);
-    
-    //return particleTex.Sample(particleSampS,pos);
-    //return tex2D(materialSamp,pos)+tex2D(particleSamp,pos);
-    if(matval.a == 0) return float4(0,0,0,0);
-    //return float4(1,1,1,1);
+	float4 matval = matAt(pos,0,0);
+	float2 wpos = worldpos(pos);
+	
+	//return particleTex.Sample(particleSampS,pos);
+	//return tex2D(materialSamp,pos)+tex2D(particleSamp,pos);
+	if(matval.a == 0) return float4(0,0,0,0);
 
-    //float noise = os2noderivskew(float3(wpos/20,0));///10+float2(time*0.3,time*0.6),time/3.));
-    //return float4(noise, noise, noise, 1);
-    if(matval.r !=0 && matval.r != 1){
-        return float4(1,matval.r>1.001?1:0,0,1);
-    }
-    if(matval.r != 0){
-        if(
-            matAt(pos,1,0).r == 0 || matAt(pos,-1,0).r == 0 ||
-            matAt(pos, 0,1).r ==0 || matAt(pos, 0,-1).r ==0 ||
-            matAt(pos, 1,1).r ==0 || matAt(pos, 1,-1).r ==0 ||
-            matAt(pos,-1,-1).r ==0|| matAt(pos, -1,1).r ==0
-        ){
-            return float4(1,1,1,1);
-        }
-        float pixelTimingOffset = drand(float2(floor(wpos.x)/100,floor(wpos.y)));
-		float st = floor(time-pixelTimingOffset);
-		float staticValue = drand(float2(st, pixelTimingOffset));
-		if(staticValue>0.98){
-        	return float4(0.8,0.8,0.8,1);
+	//float noise = os2noderivskew(float3(wpos/20,0));///10+float2(time*0.3,time*0.6),time/3.));
+	//return float4(noise, noise, noise, 1);
+	float pto = drand(float3(floor(wpos.x),floor(wpos.y),1));
+	float st = floor(time-pto);
+	float sv = drand(float3(wpos.x,wpos.y,st));
+	float sr = drand(float3(wpos.x,wpos.y,time));
+	float4 bg=partAt(pos);
+	float sparks=(sv>0.98)*(1-mod(time-pto,1));
+	if(matval.r == 1.){
+		if(
+			matAt(pos,1,0).r !=1 || matAt(pos,-1,0).r !=1 ||
+			matAt(pos, 0,1).r !=1 || matAt(pos, 0,-1).r !=1 ||
+			matAt(pos, 1,1).r !=1 || matAt(pos, 1,-1).r !=1 ||
+			matAt(pos,-1,-1).r !=1|| matAt(pos, -1,1).r !=1
+		){
+				return float4(1,1,1,1);
 		}
-        float4 bg=partAt(pos);
-		return bg+float4(0.2,0.2,0.2,1);
-    }
-    return float4(0,0,0,0);
+		return float4(bg.xyz+0.3*sr+sparks,1);
+	}
+	if(matval.r>=16 && matval.r<=18){
+		return float4(bg.xyz+(matval.b-matval.g)*sr/255.+matval.g/255+sparks*(17-matval.r),1);
+	}
+	return float4(0,0,0,0);
 }
 
 technique BasicTech {

@@ -20,7 +20,7 @@ public static class auspicioushelperGFX {
     //-well I don't even know what this is doing <3
     if (graphicsDeviceService == null)  
       graphicsDeviceService = Engine.Instance.Content.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
-    ModAsset asset = Everest.Content.Get("Effects/auspicioushelper/StaticEffect.cso",true);
+    ModAsset asset = Everest.Content.Get("Effects/auspicioushelper/"+path+".cso",true);
     if (asset == null){
       DebugConsole.Write("Failed to fetch shader at "+path);
       return null;

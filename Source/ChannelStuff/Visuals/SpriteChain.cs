@@ -15,11 +15,14 @@ namespace Celeleste.Mods.auspicioushelper;
 public class SpriteAnimChain:Entity, IMaterialObject{
   public class ActiveSprite{
     public float addedTime;
-    public ActiveSprite(float t){
+    public uint h;
+    public ActiveSprite(float t, uint h){
       addedTime = t;
+      this.h=h;
     }
   }
   public Queue<ActiveSprite> chain = new Queue<ActiveSprite>();
+  public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(10,4);
 
   public float dur;
   public float ct=0;
@@ -46,12 +49,13 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   }
   public override void Update(){
     base.Update();
+    ogen.update(Engine.DeltaTime);
     if(loop) return;
 
     ct += Engine.DeltaTime;
     float consumed = addTimes.NextFloat()*addfreq;
     while(consumed<Engine.DeltaTime){
-      chain.Enqueue(new ActiveSprite(ct+consumed-Engine.DeltaTime));
+      chain.Enqueue(new ActiveSprite(ct+consumed-Engine.DeltaTime, ogen.getHandle()));
       consumed+=addTimes.NextFloat()*addfreq;
     }
     while(chain.Count>0 && ct-chain.Peek().addedTime>=dur){
@@ -66,7 +70,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
       //lol both methods maintain the right probability only on a point-wise basis :)
       //both are not a proper random 
       for(int i=0; i<n; i++){
-        chain.Enqueue(new ActiveSprite(ct-dur*addTimes.NextFloat()));
+        chain.Enqueue(new ActiveSprite(ct-dur*addTimes.NextFloat(), ogen.getHandle()));
       }
     }
   }
@@ -89,6 +93,13 @@ public class SpriteAnimChain:Entity, IMaterialObject{
       accpos+=(1+3*t+3*tt-3*ttt)*nodes[(k+2)%n];
       accpos+=(1*ttt)*nodes[(k+3)%n];
       accpos=accpos/6;
+      Vector2 accderiv = Vector2.Zero;
+      accderiv+=(-3+6*t-3*tt)*nodes[k%n];
+      accderiv+=(-12*t+9*tt)*nodes[(k+1)%n];
+      accderiv+=(3+6*t-9*tt)*nodes[(k+2)%n];
+      accderiv+=(3*tt)*nodes[(k+3)%n];
+      accderiv = accderiv.SafeNormalize();
+      accpos+=new Vector2(-accderiv.Y,accderiv.X)*ogen.sample(s.h);
       sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)Math.Round(accpos.X), (int)Math.Round(accpos.Y), 5, 5),Draw.Pixel.ClipRect, Color.White);
     }
   }

@@ -21,4 +21,8 @@
     <Loop id="spin" path="booster/booster" delay="0.06" frames="18-25"/>
     <Anim id="pop" path="booster/booster" delay="0.08" frames="9-17"/>
   </noneboosterbasic>
+  <genericboostermat path="objects/auspicioushelper/channelbooster/" start="sit">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="sit" path="bubblecircle" delay="1" frames="0"/>
+  </genericboostermat>
 </Sprites>

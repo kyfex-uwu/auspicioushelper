@@ -6,13 +6,15 @@ using System.Collections.Generic;
 using Celeste.Mods.auspicioushelper;
 using Monocle;
 using System.Collections;
+using Celeleste.Mods.auspicioushelper;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Celeste.Mod.auspicioushelper;
 
 
 [Tracked]
 [CustomEntity("auspicioushelper/ChannelBooster")]
-public class ChannelBooster : ChannelBaseEntity{
+public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
   private const float RespawnTime = 1f;
   public static Booster boosterOfSins = new Booster(new Vector2(0,-999999), false) {Depth = 9+10};
   public static ChannelBooster lastUsed = null;
@@ -45,9 +47,10 @@ public class ChannelBooster : ChannelBaseEntity{
   };
   public static readonly Vector2 playerOffset = new Vector2(0f, -2f);
   private Sprite sprite;
+  private Sprite innersprite;
   private Entity outline;
   private BloomPoint bloom;
-  private VertexLight light;
+  //private VertexLight light;
   private Coroutine dashRoutine;
   private DashListener dashListener;
   private ParticleType particleType;
@@ -67,12 +70,21 @@ public class ChannelBooster : ChannelBaseEntity{
       _=>"blackboosterbasic"
     };
   }
+  public static Color getMaterialColor(BoosterType t){
+    //state[currentState]==BoosterType.normal?:
+    return t switch{
+      BoosterType.reversed => new Color(18,180,255,255),
+      BoosterType.none => new Color(17,110,140,255),
+      _=>new Color(16,0,50,255)
+    };
+  }
   public BoosterType[] state = new BoosterType[2];
   public Sprite[] bgsprites = new Sprite[2];
   public int currentState;
   public bool dirty;
   public bool selfswitching;
   public EntityID id;
+  public Color iinnerColor;
 
 
 
@@ -80,7 +92,7 @@ public class ChannelBooster : ChannelBaseEntity{
     base.Depth = -8500;
     base.Collider = new Circle(10f, 0f, 2f);
     Add(new PlayerCollider(OnPlayer));
-    Add(light = new VertexLight(Color.White, 1f, 16, 32));
+    //Add(light = new VertexLight(Color.White, 1f, 16, 32));
     Add(bloom = new BloomPoint(0.1f, 16f));
     Add(dashRoutine = new Coroutine(removeOnComplete: false));
     Add(dashListener = new DashListener());
@@ -101,6 +113,8 @@ public class ChannelBooster : ChannelBaseEntity{
     for(int i=0; i<2; i++){
       Add(bgsprites[i] = auspicioushelperGFX.spriteBank.Create(getSpriteString(state[i])));
     }
+    Add(innersprite = auspicioushelperGFX.spriteBank.Create("genericboostermat"));
+    innersprite.Visible = false;
     channel = data.Int("channel",0);
     selfswitching = data.Bool("self_activating", false);
     id=_id;
@@ -215,6 +229,7 @@ public class ChannelBooster : ChannelBaseEntity{
   public void Respawn(bool remanifest, bool change){
     
     sprite.Position = Vector2.Zero;
+    innersprite.Position = Vector2.Zero;
     sprite.Play("loop", restart: true);
     sprite.Visible = true;
     outline.Visible = false;
@@ -266,6 +281,8 @@ public class ChannelBooster : ChannelBaseEntity{
       Collidable=true;
       Respawn(respawnTimer>0, true);
     }
+    innersprite.Color = getMaterialColor(state[currentState]);
+    iinnerColor = getMaterialColor(state[1-currentState]);
     respawnTimer = 0;
   }
   public override void Render(){
@@ -273,10 +290,25 @@ public class ChannelBooster : ChannelBaseEntity{
     Vector2 position = sprite.Position;
     sprite.Position = position.Floor();
     if (sprite.CurrentAnimationID != "pop" && sprite.Visible){
-        sprite.DrawOutline();
+      sprite.DrawOutline();
     }
     base.Render();
     sprite.Position = position;
+  }
+  public void registerMaterials(){
+    layerA.planDraw(this);
+  }
+  public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
+    if(respawnTimer<=0 && sprite.Visible){
+      innersprite.Position = sprite.Position.Floor();
+      innersprite.Render();
+    }
+    Vector2 pos = Position-new Vector2(2,2);
+    if(state[currentState]!=BoosterType.none)pos+=sprite.Position;
+    pos=pos.Floor();
+    sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle(
+      (int)pos.X,(int)pos.Y, 4,4
+    ),Draw.Pixel.ClipRect,iinnerColor);
   }
 }
 
