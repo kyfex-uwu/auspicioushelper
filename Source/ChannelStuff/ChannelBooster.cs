@@ -303,12 +303,12 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
       innersprite.Position = sprite.Position.Floor();
       innersprite.Render();
     }
-    Vector2 pos = Position-new Vector2(2,2);
-    if(state[currentState]!=BoosterType.none)pos+=sprite.Position;
-    pos=pos.Floor();
-    sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle(
-      (int)pos.X,(int)pos.Y, 4,4
-    ),Draw.Pixel.ClipRect,iinnerColor);
+    // Vector2 pos = Position-new Vector2(2,2);
+    // if(state[currentState]!=BoosterType.none)pos+=sprite.Position;
+    // pos=pos.Floor();
+    // sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle(
+    //   (int)pos.X,(int)pos.Y, 4,4
+    // ),Draw.Pixel.ClipRect,iinnerColor);
   }
 }
 

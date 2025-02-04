@@ -20,7 +20,6 @@ public class MaterialLayer{
   public bool both;
   public bool always;
   public bool diddraw;
-  public BlendState materialBlend = BlendState.Opaque;
   public MaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     if(!outonly){
@@ -60,7 +59,7 @@ public class MaterialLayer{
 
     MaterialPipe.gd.SetRenderTarget(both?mattex:outtex);
     MaterialPipe.gd.Clear(Color.Transparent);
-    sb.Begin(SpriteSortMode.Deferred, materialBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
     rasterMats(sb,c);
     sb.End();
     if(both){

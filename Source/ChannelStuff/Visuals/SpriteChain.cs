@@ -16,13 +16,15 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   public class ActiveSprite{
     public float addedTime;
     public uint h;
-    public ActiveSprite(float t, uint h){
+    public int tex;
+    public ActiveSprite(float t, uint h, int texindex){
       addedTime = t;
       this.h=h;
+      this.tex=texindex;
     }
   }
   public Queue<ActiveSprite> chain = new Queue<ActiveSprite>();
-  public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(10,4);
+  public NoiseSamplerOS2_2DLoop ogen;
 
   public float dur;
   public float ct=0;
@@ -32,6 +34,8 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   Random addTimes = new Random();
   bool needsFill=true;
   public bool loop;
+  public float tangm;
+  List<MTexture> textures;
 
   public SpriteAnimChain(EntityData data, Vector2 offset):base(data.Position+offset){
     int endstack = data.Bool("stack_ends",false)?2:1;
@@ -46,16 +50,23 @@ public class SpriteAnimChain:Entity, IMaterialObject{
     dur = (nodes.Count-(loop?0:3))*travelspeed;
     Depth = data.Int("depth",0);
     addfreq = data.Float("addfreq",1);
+    ogen = new NoiseSamplerOS2_2DLoop(6*data.Float("tangent_freq",1f),20);
+    tangm = data.Float("tangent_magnitude",16);
+    textures = GFX.Game.GetAtlasSubtextures(data.Attr("atlas_directory","particles/starfield/"));
+  }
+  public void addSprite(float time){
+    chain.Enqueue(new ActiveSprite(time, ogen.getHandle(),(int)(addTimes.NextFloat()*textures.Count)));
   }
   public override void Update(){
     base.Update();
     ogen.update(Engine.DeltaTime);
+    ct += Engine.DeltaTime;
+    //DebugConsole.Write(ogen.sample(0).ToString());
     if(loop) return;
 
-    ct += Engine.DeltaTime;
     float consumed = addTimes.NextFloat()*addfreq;
     while(consumed<Engine.DeltaTime){
-      chain.Enqueue(new ActiveSprite(ct+consumed-Engine.DeltaTime, ogen.getHandle()));
+      addSprite(ct+consumed-Engine.DeltaTime);
       consumed+=addTimes.NextFloat()*addfreq;
     }
     while(chain.Count>0 && ct-chain.Peek().addedTime>=dur){
@@ -70,7 +81,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
       //lol both methods maintain the right probability only on a point-wise basis :)
       //both are not a proper random 
       for(int i=0; i<n; i++){
-        chain.Enqueue(new ActiveSprite(ct-dur*addTimes.NextFloat(), ogen.getHandle()));
+        addSprite(ct-dur*addTimes.NextFloat());
       }
     }
   }
@@ -99,8 +110,9 @@ public class SpriteAnimChain:Entity, IMaterialObject{
       accderiv+=(3+6*t-9*tt)*nodes[(k+2)%n];
       accderiv+=(3*tt)*nodes[(k+3)%n];
       accderiv = accderiv.SafeNormalize();
-      accpos+=new Vector2(-accderiv.Y,accderiv.X)*ogen.sample(s.h);
-      sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)Math.Round(accpos.X), (int)Math.Round(accpos.Y), 5, 5),Draw.Pixel.ClipRect, Color.White);
+      accpos+=new Vector2(-accderiv.Y,accderiv.X)*(ogen.sample(s.h)*tangm);
+      textures[s.tex].DrawCentered(accpos);
+      //sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)Math.Round(accpos.X), (int)Math.Round(accpos.Y), 5, 5),Draw.Pixel.ClipRect, Color.White);
     }
   }
 }

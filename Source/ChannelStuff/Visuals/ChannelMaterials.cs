@@ -28,7 +28,7 @@ public class ChannelMaterialsA:MaterialLayer{
     MaterialPipe.gd.SetRenderTarget(bgtex);
     MaterialPipe.gd.Clear(Color.Transparent);
     MaterialPipe.gd.Textures[2]=bgtex;
-    sb.Begin(SpriteSortMode.Deferred, materialBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
     foreach(IMaterialObject b in bgItemsDraw){
       b.renderMaterial(this, sb, c);
     }

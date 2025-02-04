@@ -170,7 +170,7 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 		return float4(bg.xyz+0.3*sr+sparks,1);
 	}
 	if(matval.r>=16 && matval.r<=18){
-		return float4(bg.xyz+(matval.b-matval.g)*sr/255.+matval.g/255+sparks*(17-matval.r),1);
+		return float4((matval.b-matval.g)*sr/255.+matval.g/255+(bg.xyz+sparks)*(17-matval.r),1);
 	}
 	return float4(0,0,0,0);
 }

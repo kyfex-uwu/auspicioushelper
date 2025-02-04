@@ -25,6 +25,9 @@ public static class MaterialPipe {
 
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
+    if(GameplayRenderer.RenderDebug || Engine.Commands.Open){
+      return;
+    }
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
     SpriteBatch sb = Draw.SpriteBatch;

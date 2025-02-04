@@ -16,6 +16,9 @@ channelspritechain.placements = {
       seconds_per_node=1.8,
       addfreq=0.5,
       stack_ends=false,
+      tangent_freq=1.0,
+      tangent_magnitude=16.,
+      atlas_directory="particles/starfield/",
       loop=false
     }
   }

@@ -14,6 +14,7 @@ public class ChannelMover:Solid, IChannelUser, IMaterialObject{
   public float width;
   public float height;
   public float relspd;
+  public float asym;
   public float prog;
   public int channel {get; set;}
   public float dir;
@@ -24,14 +25,15 @@ public class ChannelMover:Solid, IChannelUser, IMaterialObject{
     p1 = data.Nodes[0]+offset;
     channel = data.Int("channel",0);
     relspd = 1/data.Float("move_time",1);
+    asym = data.Float("asymmetry",1f);
   }
   public void setChVal(int val){
-    dir = (val&1)==1?1:-1;
+    dir = (val&1)==1?1:-1*asym;
   }
   public override void Added(Scene scene){
     base.Added(scene);
     ChannelState.watch(this);
-    dir = (ChannelState.readChannel(channel) &1)==1?1:-1;
+    dir = (ChannelState.readChannel(channel) &1)==1?1:-1*asym;
     Position = dir==1?p1:p0;
     prog = dir == 1?1:0;
   }

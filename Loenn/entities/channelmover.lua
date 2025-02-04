@@ -16,6 +16,7 @@ channelmover.placements = {
       height = 8,
       channel = 0,
       move_time=1.8,
+      asymmetry=1.0,
       safe=false
     }
   }
