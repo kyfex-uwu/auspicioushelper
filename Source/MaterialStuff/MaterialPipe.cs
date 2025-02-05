@@ -22,10 +22,10 @@ public static class MaterialPipe {
   public static void deregisterPipe(){
     On.Celeste.GameplayRenderer.Render-= GameplayRender;
   }
-
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
-    orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
-    if(GameplayRenderer.RenderDebug || Engine.Commands.Open){
+    //orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
+    if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
+      orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
       return;
     }
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
@@ -65,7 +65,6 @@ public static class MaterialPipe {
     
     float ndepth = layers.Count>0?layers[0].depth:float.NegativeInfinity;
     int ldx = 0;
-
     begin(self.Camera, sb, t);
     foreach(Entity e in scene.Entities.entities){
       if(e.Visible && !e.TagCheck(Tags.HUD) && e.actualDepth>=ndepth){
