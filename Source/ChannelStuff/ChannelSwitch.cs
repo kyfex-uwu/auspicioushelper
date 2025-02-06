@@ -27,6 +27,7 @@ public class ChannelSwitch:ChannelBaseEntity {
   }
 
   public ChannelSwitch(EntityData data, Vector2 offset):base(data.Position+offset){
+    Depth=5;
     Collider = new Hitbox(16f, 24f, -8f, -12f);
     if(data.Bool("player_toggle",true)){
       Add(new PlayerCollider(OnPlayer));
@@ -45,7 +46,7 @@ public class ChannelSwitch:ChannelBaseEntity {
     onVal = data.Int("on_value",1);
     offVal = data.Int("off_value",0);
     maxcd = data.Float("cooldown",1f);
-    //DebugConsole.Write("Constructed switch");
+    DebugConsole.Write("Constructed switch");
   }
   public override void Added(Scene scene){
     base.Added(scene);
@@ -76,7 +77,7 @@ public class ChannelSwitch:ChannelBaseEntity {
       ChannelState.SetChannel(channel,on?offVal:onVal);
       Level level = SceneAs<Level>();
       Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
-      level.Flash(Color.White * 0.15f, drawPlayerOver: true);
+      level.Flash(Color.White * 0.15f, drawPlayerOver: false);
       Celeste.Freeze(0.05f);
       cooldown = maxcd;
     }

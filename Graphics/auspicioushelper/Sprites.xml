@@ -25,4 +25,9 @@
     <Justify x="0.5" y="0.5"/>
     <Loop id="sit" path="bubblecircle" delay="1" frames="0"/>
   </genericboostermat>
+  <conditionalstrawb path="objects/auspicioushelper/conditionalstrawb/" start="idle">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="idle" path="silverwinged/wings" delay=".08" frames="0-8,0-8,0-7,9"/>
+    <Anim id="collect" path="silverwinged/wings" delay=".16" frames="7-9"/>
+  </conditionalstrawb>
 </Sprites>

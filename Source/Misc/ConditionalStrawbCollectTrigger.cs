@@ -11,7 +11,7 @@ namespace Celeleste.Mods.auspicioushelper;
 public class ConditionalStrawbCollectTrigger:Trigger {
   public string idstr;
   public ConditionalStrawbCollectTrigger(EntityData data, Vector2 offset):base(data, offset){
-    idstr=data.Attr("idstr");
+    idstr=data.Attr("strawberry_id");
   }
   public override void OnStay(Player player){
     base.OnStay(player);

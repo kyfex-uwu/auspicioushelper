@@ -26,8 +26,8 @@ channelclearcontroller.fieldInformation = {
 }
 function channelclearcontroller.sprite(room, entity)
   color = {1, 1, 1, 1}
-  local sprite = drawableSpriteStruct.fromTexture("util/rect", nil)
-  sprite:useRelativeQuad(0, 0, 8,8) 
+  local sprite = drawableSprite.fromTexture("util/rect", nil)
+  sprite.useRelativeQuad(-4, -4, 8,8) 
   sprite.color = color 
   return sprite
 end

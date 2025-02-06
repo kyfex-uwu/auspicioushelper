@@ -17,8 +17,8 @@ beamblocker.placements = {
 }
 function beamblocker.sprite(room, entity)
   color = {1, 1, 1, 1}
-  local sprite = drawableSpriteStruct.fromTexture("util/rect", nil)
-  sprite:useRelativeQuad(0, 0, entity.width, entity.height) 
+  local sprite = drawableSprite.fromTexture("util/rect", nil)
+  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
   sprite.color = color 
   return sprite
 end

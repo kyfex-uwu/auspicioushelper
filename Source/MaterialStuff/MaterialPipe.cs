@@ -23,7 +23,7 @@ public static class MaterialPipe {
     On.Celeste.GameplayRenderer.Render-= GameplayRender;
   }
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
-    //orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
+    orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
     if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
       orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
       return;
@@ -82,6 +82,8 @@ public static class MaterialPipe {
       rlayer(self.Camera, sb, t, layers[ldx++]);
     }
     //sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)self.Camera.Position.X,(int)self.Camera.Position.Y,10,10),Draw.Pixel.ClipRect,Color.White);
+    gd.SamplerStates[0]=SamplerState.LinearClamp;
+    gd.SamplerStates[1]=SamplerState.LinearClamp;
     sb.End();
   }
 

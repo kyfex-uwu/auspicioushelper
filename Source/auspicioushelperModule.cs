@@ -29,6 +29,7 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         Everest.Events.Player.OnDie += OnDie;
         Everest.Events.Level.OnEnter += OnEnter;
+        //Everest.Events.Level.OnLoadLevel += EverestOnLoadLevel;
 
         On.Celeste.Booster.PlayerBoosted += ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied += ChannelBooster.PlayerdieHandler;
@@ -36,7 +37,7 @@ public class auspicioushelperModule : EverestModule {
 
         //DebugConsole.Open();  
 
-        EntityBinder.addHooks(); 
+        //EntityBinder.addHooks(); 
     }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
@@ -54,6 +55,12 @@ public class auspicioushelperModule : EverestModule {
     public static void OnDie(Player player){
         Session.load(false);
         ChannelState.unwatchAll();
+        if(ConditionalStrawb.carryingDeathless is ConditionalStrawb s){
+            Engine.Scene = new LevelExit(LevelExit.Mode.GoldenBerryRestart, player.level.Session){
+                GoldenStrawberryEntryLevel = s.id.Level
+            };
+            ConditionalStrawb.carryingDeathless = null;
+        }
 
         MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
         MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
@@ -62,6 +69,14 @@ public class auspicioushelperModule : EverestModule {
         Session.load(!fromSave);
         ChannelState.unwatchAll();
         DebugConsole.Write("Entered Level");
+    }
+    public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
+        //trash is called after constructors
+        DebugConsole.Write("here");
+        //ChannelState.unwatchAll();
+        if(fromLoader){
+            Session.load(t != Player.IntroTypes.Transition && t!= Player.IntroTypes.Respawn);
+        }
     }
 
     public override void LoadContent(bool firstLoad){

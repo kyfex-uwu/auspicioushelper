@@ -94,6 +94,9 @@ public static class ChannelState{
             watch(e_);
           }
         }
+        foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
+          watch(t);
+        }
       };
 
       try {
