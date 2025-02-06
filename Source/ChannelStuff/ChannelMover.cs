@@ -16,14 +16,14 @@ public class ChannelMover:Solid, IChannelUser, IMaterialObject{
   public float relspd;
   public float asym;
   public float prog;
-  public int channel {get; set;}
+  public string channel {get; set;}
   public float dir;
   public ChannelMover(EntityData data, Vector2 offset):base(data.Position,data.Width, data.Height, data.Bool("safe",false)){
     width = data.Width;
     height = data.Height;
     p0 = data.Position+offset;
     p1 = data.Nodes[0]+offset;
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     relspd = 1/data.Float("move_time",1);
     asym = data.Float("asymmetry",1f);
   }
@@ -54,6 +54,6 @@ public class ChannelMover:Solid, IChannelUser, IMaterialObject{
     ChannelBaseEntity.layerA.planDraw(this);
   }
   public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
-    sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle((int) Position.X, (int) Position.Y,(int) width, (int) height), Draw.Pixel.ClipRect, new Color(1,0,channel%256,255));
+    sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle((int) Position.X, (int) Position.Y,(int) width, (int) height), Draw.Pixel.ClipRect, new Color(1,0,0,255));
   }
 }

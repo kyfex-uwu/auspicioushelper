@@ -24,7 +24,7 @@ public class ChannelBlock:ChannelBaseEntity, IMaterialObject {
   Solid solid;
   public ChannelBlock(EntityData data, Vector2 offset):base(data.Position+offset){
     Depth=-9000;
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     inverted = data.Bool("inverted",false);
     safe = data.Bool("safe",false);
     width = data.Width;
@@ -58,7 +58,7 @@ public class ChannelBlock:ChannelBaseEntity, IMaterialObject {
   }
   public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
     if(curstate == SolidState.there){
-      sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)Position.X, (int)Position.Y, (int)width, (int)height), Draw.Pixel.ClipRect, new Color(1,0,channel%256,255));
+      sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)Position.X, (int)Position.Y, (int)width, (int)height), Draw.Pixel.ClipRect, new Color(1,0,0,255));
     }
   }
 }

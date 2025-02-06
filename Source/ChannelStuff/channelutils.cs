@@ -11,14 +11,14 @@ using System.Reflection;
 
 namespace Celeste.Mods.auspicioushelper;
 public static class ChannelState{
-  public static Dictionary<int, int> channelStates = new Dictionary<int, int>();
-  public static Dictionary<int, List<IChannelUser>> watching = new Dictionary<int, List<IChannelUser>>();
-  public static int readChannel(int ch){
+  public static Dictionary<string, int> channelStates = new Dictionary<string, int>();
+  public static Dictionary<string, List<IChannelUser>> watching = new Dictionary<string, List<IChannelUser>>();
+  public static int readChannel(string ch){
     int v=0;
     channelStates.TryGetValue(ch, out v);
     return v;
   }
-  public static void SetChannel(int ch, int state){
+  public static void SetChannel(string ch, int state){
     if(readChannel(ch) == state) return;
     channelStates[ch] = state;
     // foreach(ChannelBaseEntity b in Engine.Scene.Tracker.GetEntities<ChannelBaseEntity>()){

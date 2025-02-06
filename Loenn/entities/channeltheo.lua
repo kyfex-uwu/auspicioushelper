@@ -10,7 +10,7 @@ channeltheo.placements = {
   {
     name = "Channel Theo",
     data = {
-      channel = 0,
+      channel = "",
       switch_thrown_momentum = false,
       swap_thrown_positions = false,
       swap_thrown_positions_nodie = false,
@@ -21,7 +21,7 @@ channeltheo.placements = {
 }
 channeltheo.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   }
 }
 function channeltheo.sprite(room, entity)

@@ -39,7 +39,7 @@ public class ChannelSwitch:ChannelBaseEntity {
       Add(new SeekerCollider(OnSeeker, new Hitbox(24f, 32f, -12f, -16f)));
     }
     Add(sprite = GFX.SpriteBank.Create("coreFlipSwitch"));
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     onOnly = data.Bool("on_only",false);
     offOnly = data.Bool("off_only",false);
     onVal = data.Int("on_value",1);

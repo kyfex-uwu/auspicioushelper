@@ -13,7 +13,7 @@ public class ChannelClearController:Entity {
     if(data.Bool("clear_all",false)){
       ChannelState.channelStates.Clear();
     }
-    ChannelState.SetChannel(data.Int("channel",0),data.Int("value",0));
+    ChannelState.SetChannel(data.Attr("channel",""),data.Int("value",0));
     RemoveSelf();
   }
 }

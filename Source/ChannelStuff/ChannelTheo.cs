@@ -12,7 +12,7 @@ namespace Celeste.Mod.auspicioushelper;
 [CustomEntity("auspicioushelper/ChannelTheo")]
 public class ChannelTheo:TheoCrystal, IChannelUser{
   public static bool hooked = false;
-  public int channel {get; set;}
+  public string channel {get; set;}
   public bool active=false;
   public bool switchThrown;
   public bool swapPos;
@@ -22,7 +22,7 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
   public static Player lastPickup;
   public ChannelTheo(EntityData data, Vector2 offset):base(data, offset){
     
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     switchThrown = data.Bool("switch_thrown_momentum",false);
     swapPos = data.Bool("swap_thrown_positions",false);
     swapPosCareful = data.Bool("swap_thrown_positions_nodie",false);

@@ -10,7 +10,7 @@ channelswitch.placements = {
   {
     name = "Channel Switch",
     data = {
-      channel = 0,
+      channel = "",
       on_only=false,
       off_only=false,
       player_toggle=true,
@@ -24,7 +24,7 @@ channelswitch.placements = {
 }
 channelswitch.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   }
 }
 function channelswitch.sprite(room, entity)

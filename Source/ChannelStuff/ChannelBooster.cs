@@ -115,7 +115,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     }
     Add(innersprite = auspicioushelperGFX.spriteBank.Create("genericboostermat"));
     innersprite.Visible = false;
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     selfswitching = data.Bool("self_activating", false);
     id=_id;
   }

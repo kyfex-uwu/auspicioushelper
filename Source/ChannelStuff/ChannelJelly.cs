@@ -26,11 +26,11 @@ public class ChannelJelly : Glider, IChannelUser {
   public JellyState[] state = new JellyState[2];
   public int csidx;
   public JellyState cs;
-  public int channel {get; set;}
+  public string channel {get; set;}
   const int platformWidth = 24;
   
   public ChannelJelly(EntityData data, Vector2 offset): base(data.Position+offset, false, false){
-    channel = data.Int("channel",0);
+    channel = data.Attr("channel","");
     for(int i=0; i<2; i++){
       state[i] = data.Attr("state"+i.ToString(),"normal") switch {
         "normal"=>JellyState.normal,

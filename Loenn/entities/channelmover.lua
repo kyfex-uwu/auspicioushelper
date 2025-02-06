@@ -14,7 +14,7 @@ channelmover.placements = {
     data = {
       width = 8,
       height = 8,
-      channel = 0,
+      channel = "",
       move_time=1.8,
       asymmetry=1.0,
       safe=false
@@ -23,7 +23,7 @@ channelmover.placements = {
 }
 channelmover.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   }
 }
 function channelmover.sprite(room, entity)

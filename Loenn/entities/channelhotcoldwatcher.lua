@@ -10,7 +10,7 @@ channelhotcoldwatcher.placements = {
   {
     name = "Channel Coremode Watcher",
     data = {
-      channel = 0,
+      channel = "",
       Hot_value = 0,
       Cold_value = 1
     }
@@ -18,7 +18,7 @@ channelhotcoldwatcher.placements = {
 }
 channelhotcoldwatcher.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   },
   Hot_value = {
     fieldType="integer"

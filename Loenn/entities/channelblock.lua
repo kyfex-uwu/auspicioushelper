@@ -12,7 +12,7 @@ channelblock.placements = {
     data = {
       width = 8,
       height = 8,
-      channel = 0,
+      channel = "",
       inverted = false,
       safe = false,
       alwayspresent = false
@@ -21,7 +21,7 @@ channelblock.placements = {
 }
 channelblock.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   }
 }
 function channelblock.sprite(room, entity)

@@ -11,7 +11,7 @@ channelBooster.placements = {
     data = {
       state0 = "normal",
       state1 = "normal",
-      channel = 0,
+      channel = "",
       self_activating = false
     }
   }
@@ -25,7 +25,7 @@ channelBooster.fieldInformation = {
     options = boosterTypes
   },
   channel = {
-    fieldType="integer"
+    fieldType="string"
   },
   self_activating = {
     fieldType="boolean"

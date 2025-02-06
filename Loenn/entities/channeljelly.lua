@@ -11,7 +11,7 @@ channelJelly.placements = {
     data = {
       state0 = "normal",
       state1 = "normal",
-      channel = 0
+      channel = ""
     }
   }
 }
@@ -24,7 +24,7 @@ channelJelly.fieldInformation = {
     options = jellyTypes
   },
   channel = {
-    fieldType="integer"
+    fieldType="string"
   }
 }
 

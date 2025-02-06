@@ -10,7 +10,7 @@ channelclearcontroller.placements = {
   {
     name = "Channel Clear Controller",
     data = {
-      channel = 0,
+      channel = "",
       value = 0,
       clear_all = false
     }
@@ -18,7 +18,7 @@ channelclearcontroller.placements = {
 }
 channelclearcontroller.fieldInformation = {
   channel = {
-    fieldType="integer"
+    fieldType="string"
   },
   value = {
     fieldType="integer"
