@@ -30,7 +30,13 @@ public static class ChannelState{
       }
     }
   }
+  public static void unwatchNow(IChannelUser b){
+    if (watching.TryGetValue(b.channel, out var list)) {
+      list.Remove(b);
+    }
+  }
   public static void watch(IChannelUser b){
+    //DebugConsole.Write("watching new thing");
     if (!watching.TryGetValue(b.channel, out var list)) {
       list = new List<IChannelUser>();
       watching[b.channel] = list;

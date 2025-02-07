@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Collections.Generic;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
@@ -7,7 +8,16 @@ using Microsoft.Xna.Framework;
 namespace Celeste.Mod.auspicioushelper;
 
 public class auspicioushelperModuleSession : EverestModuleSession {
+  public class EntityDataId{
+    public EntityData data;
+    public EntityID id;
+    public EntityDataId(EntityData d, EntityID id){
+      data = d;
+      this.id = id;
+    }
+  }
   public Dictionary<string,int> channelData = new Dictionary<string, int>();
+  public List<EntityDataId> PersistentFollowers = new List<EntityDataId>();
 
   public void save(){
     DebugConsole.Write("Saving channel state");

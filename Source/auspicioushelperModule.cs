@@ -34,6 +34,7 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.Booster.PlayerBoosted += ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied += ChannelBooster.PlayerdieHandler;
         On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
+        On.Celeste.Player.ctor += ConditionalStrawb.playerCtorHook;
 
         //DebugConsole.Open();  
 
@@ -55,12 +56,7 @@ public class auspicioushelperModule : EverestModule {
     public static void OnDie(Player player){
         Session.load(false);
         ChannelState.unwatchAll();
-        if(ConditionalStrawb.carryingDeathless is ConditionalStrawb s){
-            Engine.Scene = new LevelExit(LevelExit.Mode.GoldenBerryRestart, player.level.Session){
-                GoldenStrawberryEntryLevel = s.id.Level
-            };
-            ConditionalStrawb.carryingDeathless = null;
-        }
+        ConditionalStrawb.handleDie(player);
 
         MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
         MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
@@ -96,6 +92,7 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.Booster.PlayerBoosted -= ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied -= ChannelBooster.PlayerdieHandler;
         On.Celeste.Booster.PlayerReleased -= ChannelBooster.PlayerreleaseHandler;
+        On.Celeste.Player.ctor -= ConditionalStrawb.playerCtorHook;
 
         DebugConsole.Close();
     }

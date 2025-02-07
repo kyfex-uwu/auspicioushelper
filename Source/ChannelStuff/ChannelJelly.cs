@@ -115,4 +115,9 @@ public class ChannelJelly : Glider, IChannelUser {
     OnRelease(force);
     platform.RemoveTag(Tags.Persistent);
   }
+  public override void Removed(Scene scene){
+      base.Removed(scene);
+      platform.RemoveSelf();
+  }
+  
 }

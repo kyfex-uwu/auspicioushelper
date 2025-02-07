@@ -16,4 +16,8 @@ public class ChannelTracker : Component, IChannelUser{
   public void setChVal(int val){
     onChannelChange(val);
   }
+  public override void EntityRemoved(Scene scene){
+      base.EntityRemoved(scene);
+      ChannelState.unwatchNow(this);
+  }
 }

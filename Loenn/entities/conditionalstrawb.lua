@@ -25,6 +25,7 @@ entity.placements = {
       deathless=false,
       winged=false,
       wingedfollower=false,
+      persist_on_death=false,
       sprites=""
     }
   }

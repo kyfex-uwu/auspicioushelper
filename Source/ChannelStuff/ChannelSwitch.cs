@@ -46,7 +46,7 @@ public class ChannelSwitch:ChannelBaseEntity {
     onVal = data.Int("on_value",1);
     offVal = data.Int("off_value",0);
     maxcd = data.Float("cooldown",1f);
-    DebugConsole.Write("Constructed switch");
+    //DebugConsole.Write("Constructed switch");
   }
   public override void Added(Scene scene){
     base.Added(scene);
