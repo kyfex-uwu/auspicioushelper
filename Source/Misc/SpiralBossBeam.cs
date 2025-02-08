@@ -14,6 +14,7 @@ public class SpiralBossBeam:Entity {
   float angle;
   float dt;
   float nrad;
+  float nradkill=14;
   float mfrad;
   float far;
   int frame;
@@ -91,11 +92,12 @@ public class SpiralBossBeam:Entity {
     }
   }
   public void handlePlayer(){
+    if(far<nradkill) return;
     var dir = new Vector2((float)Math.Cos(angle),(float)Math.Sin(angle));
     var orth = new Vector2(-(float)Math.Sin(angle),(float)Math.Cos(angle));
-    Player p = base.Scene.CollideFirst<Player>(Position+dir*nrad,Position+dir*far)??
-      base.Scene.CollideFirst<Player>(Position+dir*nrad+orth*2,Position+dir*far+orth*2)??
-      base.Scene.CollideFirst<Player>(Position+dir*nrad-orth*2,Position+dir*far-orth*2);
+    Player p = base.Scene.CollideFirst<Player>(Position+dir*nradkill,Position+dir*far)??
+      base.Scene.CollideFirst<Player>(Position+dir*nradkill+orth*2,Position+dir*far+orth*2)??
+      base.Scene.CollideFirst<Player>(Position+dir*nradkill-orth*2,Position+dir*far-orth*2);
     if(p!=null){
       p.Die(new Vector2(0,0));
     }
