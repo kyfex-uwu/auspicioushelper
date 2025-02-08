@@ -26,8 +26,10 @@ public static class MaterialPipe {
     orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
     if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
       orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
+      //DebugConsole.Write("default rend");
       return;
     }
+    //DebugConsole.Write("fancy rend");
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
     SpriteBatch sb = Draw.SpriteBatch;
@@ -106,12 +108,15 @@ public static class MaterialPipe {
     }
   }
   public static void addLayer(MaterialLayer l){
-    dirty = true;
+    l.removeNext=false;
     if(layers.Contains(l)) return; //we do not allow that, no sir
+    dirty = true;
     layers.Add(l);
+    l.enabled=true;
   }
   public static void removeLayer(MaterialLayer l){
     layers.Remove(l);
+    l.enabled=false;
   }
   public static Rectangle obtainInvertedRectangle(Camera c){
     Matrix m = Matrix.Invert(c.Matrix);
@@ -120,5 +125,17 @@ public static class MaterialPipe {
     return new Rectangle(
       (int)c1.X, (int)c1.Y, (int)(c2.X-c1.X), (int)(c2.Y-c2.Y)
     );
+  }
+  public static void redoLayers(){
+    var newLayers = new List<MaterialLayer>();
+    foreach(MaterialLayer l in layers){
+      if(!l.removeNext) newLayers.Add(l);
+      else l.enabled = false;
+      l.removeNext=true;
+    }
+    layers=newLayers;
+    // foreach(MaterialController c in Engine.Instance.scene.Tracker.GetEntities<MaterialController>()){
+    //   DebugConsole.Write("fish");
+    // }
   }
 }

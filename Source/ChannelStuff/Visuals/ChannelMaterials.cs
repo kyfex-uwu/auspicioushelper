@@ -9,8 +9,7 @@ using Monocle;
 //I have become the c# abstraction-enraptured person lmao like actually what is this haha
 //OK to be sort of fair I intended to do a custom rasterMats for this but decided not.
 public class ChannelMaterialsA:MaterialLayer{
-  public List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
-  public List<IMaterialObject> connectedBlocksDraw = new List<IMaterialObject>();
+  private List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
   public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader")){
     DebugConsole.Write(shader == null? "Static shader is null":"Static shader found and registered");
@@ -22,7 +21,10 @@ public class ChannelMaterialsA:MaterialLayer{
   }
   public override bool checkdo()
   {
-    return connectedBlocksDraw.Count+willDraw.Count>0 || diddraw;
+    return willDraw.Count>0 || diddraw;
+  }
+  public void planDrawBG(IMaterialObject t){
+    if(enabled) bgItemsDraw.Add(t);
   }
   public override void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     MaterialPipe.gd.SetRenderTarget(bgtex);

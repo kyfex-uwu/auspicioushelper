@@ -35,7 +35,6 @@ public static class auspicioushelperGFX {
   }
   public static void loadContent(){
     spriteBank = new SpriteBank(GFX.Game, "Graphics/auspicioushelper/Sprites.xml");
-    MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
     MaterialPipe.registerPipe();
   }
 }

@@ -86,7 +86,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
     }
   }
   public void registerMaterials(){
-    ChannelBaseEntity.layerA.bgItemsDraw.Add(this);
+    ChannelBaseEntity.layerA.planDrawBG(this);
   }
   public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
     // well since this is initially for towercollab there's no need to do culling (forgive me I am so sorry like)

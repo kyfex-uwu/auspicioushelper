@@ -20,6 +20,8 @@ public class MaterialLayer{
   public bool both;
   public bool always;
   public bool diddraw;
+  public bool enabled;
+  public bool removeNext;
   public MaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     if(!outonly){
@@ -33,7 +35,7 @@ public class MaterialLayer{
     independent = _independent;
   }
   public void planDraw(IMaterialObject obj){
-    willDraw.Add(obj);
+    if(enabled)willDraw.Add(obj);
   }
   public virtual void render(Camera c, SpriteBatch sb){
     render(c, sb, null);
@@ -75,6 +77,6 @@ public class MaterialLayer{
     diddraw = true;
   }
   public virtual bool checkdo(){
-    return always || willDraw.Count>0 || diddraw;
+    return enabled && (always || willDraw.Count>0 || diddraw);
   }
 }

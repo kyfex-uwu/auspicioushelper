@@ -29,21 +29,20 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         Everest.Events.Player.OnDie += OnDie;
         Everest.Events.Level.OnEnter += OnEnter;
-        //Everest.Events.Level.OnLoadLevel += EverestOnLoadLevel;
+        Everest.Events.Level.OnLoadLevel += EverestOnLoadLevel;
 
         On.Celeste.Booster.PlayerBoosted += ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied += ChannelBooster.PlayerdieHandler;
         On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
         On.Celeste.Player.ctor += ConditionalStrawb.playerCtorHook;
 
-        //DebugConsole.Open();  
+        DebugConsole.Open();  
 
         //EntityBinder.addHooks(); 
     }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
         ChannelState.unwatchTemporary();
-        DebugConsole.Write("Transitioned");
     } 
     public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
         orig(self, player);
@@ -57,9 +56,6 @@ public class auspicioushelperModule : EverestModule {
         Session.load(false);
         ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
-
-        MaterialPipe.removeLayer(ChannelBaseEntity.layerA);
-        MaterialPipe.addLayer(ChannelBaseEntity.layerA = new ChannelMaterialsA());
     }
     public static void OnEnter(Session session, bool fromSave){
         Session.load(!fromSave);
@@ -68,11 +64,7 @@ public class auspicioushelperModule : EverestModule {
     }
     public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
         //trash is called after constructors
-        DebugConsole.Write("here");
-        //ChannelState.unwatchAll();
-        if(fromLoader){
-            Session.load(t != Player.IntroTypes.Transition && t!= Player.IntroTypes.Respawn);
-        }
+        MaterialPipe.redoLayers();
     }
 
     public override void LoadContent(bool firstLoad){
