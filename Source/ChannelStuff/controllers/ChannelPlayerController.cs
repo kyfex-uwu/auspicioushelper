@@ -27,6 +27,9 @@ public class ChannelPlayerWatcher:Entity{
       case "dash":
         Add(new DashListener((Vector2 d)=>activate()));
         break;
+      case "jump":
+        Add(new JumpListener(()=>activate()));
+        break;
       default: break;
     }
     op = data.Attr("operation","") switch {
