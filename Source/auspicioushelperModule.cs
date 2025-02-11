@@ -60,6 +60,7 @@ public class auspicioushelperModule : EverestModule {
     public static void OnEnter(Session session, bool fromSave){
         Session.load(!fromSave);
         ChannelState.unwatchAll();
+        JumpListener.releaseHooks();
         DebugConsole.Write("Entered Level");
     }
     public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
@@ -80,6 +81,7 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.ChangeRespawnTrigger.OnEnter -= ChangerespawnHandler;
         Everest.Events.Player.OnDie -= OnDie;
         Everest.Events.Level.OnEnter -= OnEnter;
+        Everest.Events.Level.OnLoadLevel -= EverestOnLoadLevel;
 
         On.Celeste.Booster.PlayerBoosted -= ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied -= ChannelBooster.PlayerdieHandler;
