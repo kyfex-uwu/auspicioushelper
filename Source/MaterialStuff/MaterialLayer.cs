@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Celeleste.Mods.auspicioushelper;
 using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
+using Celeste.Mod;
 
 namespace Celeste.Mods.auspicioushelper;
 
@@ -57,6 +58,11 @@ public class MaterialLayer{
     EffectParameter camPosUniform = shader.Parameters["cpos"];
     if(camPosUniform != null){
       camPosUniform.SetValue(c.Position);
+    } 
+    EffectParameter photoSensitive = shader.Parameters["quiet"];
+    if(photoSensitive != null){
+      DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
+      photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
     } 
 
     MaterialPipe.gd.SetRenderTarget(both?mattex:outtex);

@@ -13,6 +13,7 @@ float4 partAt(float2 pos) {
 
 uniform float time;
 uniform float2 cpos;
+uniform float quiet;
 
 
 float4 matAt(float2 pos, float offsetx, float offsety){
@@ -158,6 +159,11 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 	float sr = drand(float3(wpos.x,wpos.y,time));
 	float4 bg=partAt(pos);
 	float sparks=(sv>0.98)*(1-mod(time-pto,1));
+	float qb = quiet;
+	return float4(quiet,1,0,1);
+	if(qb !=0.){
+		//return float4(1,0,0,1);
+	}
 	if(matval.r == 1.){
 		if(
 			matAt(pos,1,0).r !=1 || matAt(pos,-1,0).r !=1 ||
@@ -166,6 +172,12 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 			matAt(pos,-1,-1).r !=1|| matAt(pos, -1,1).r !=1
 		){
 				return float4(1,1,1,1);
+		}
+		if(quiet==1){
+			float sro=drand(float3(wpos.x,wpos.y,st));
+			float srn=drand(float3(wpos.x,wpos.y,st+1));
+			float t=time-st;
+			//return float4(bg.xyz,1);
 		}
 		return float4(bg.xyz+0.3*sr+sparks,1);
 	}
