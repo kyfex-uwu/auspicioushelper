@@ -1,16 +1,18 @@
 
 using System;
 using Celeste;
+using Celeste.Mod.auspicioushelper;
 using Monocle;
 
 
 namespace Celeste.Mods.auspicioushelper;
 [Tracked]
 public class JumpListener:Component{
-  public Action OnJump;
+  public Action<int> OnJump;
   public int flags;
-  public JumpListener(Action jumpcallback, int flags=15):base(true,false){
+  public JumpListener(Action<int> jumpcallback, int flags=15):base(true,false){
     if(!setup)setupHooks();
+    this.flags=flags;
     OnJump=jumpcallback;
   }
   public static void setupHooks(){
@@ -28,8 +30,9 @@ public class JumpListener:Component{
     setup=false;
   }
   public static void alertJumpListeners(int type){
+    DebugConsole.Write("jump "+type.ToString());
     foreach(JumpListener l in Engine.Scene.Tracker.GetComponents<JumpListener>()){
-      if((l.flags & type)!=0 && l.OnJump!= null) l.OnJump();
+      if((l.flags & type)!=0 && l.OnJump!= null) l.OnJump(type);
     }
   }
   public static void JumpHook(On.Celeste.Player.orig_Jump orig, Player p, bool vfx, bool sfx){

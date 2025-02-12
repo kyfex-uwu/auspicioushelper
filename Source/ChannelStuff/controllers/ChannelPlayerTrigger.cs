@@ -28,7 +28,7 @@ public class ChannelPlayerTrigger:Trigger{
         Add(new DashListener((Vector2 d)=>activate()));
         break;
       case "jump":
-        Add(new JumpListener(activate));
+        Add(new JumpListener((int t)=>activate()));
         break;
       default: break;
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Sprites>
+  <auspicioushelper_example1 path="objects/auspicioushelper/" start="case0">
+    <Justify x="0.5" y="0.5"/>
+    <Loop id="case0" path="channelbooster/whitewhole" delay="0.1" frames="0"/>
+    <Loop id="case1" path="channelbooster/booster/booster" delay="0.06" frames="18-25"/>
+    <Loop id="case2" path="channelbooster/blackwhole" delay="0.1" frames="0"/>
+  </auspicioushelper_example1>
+</Sprites>

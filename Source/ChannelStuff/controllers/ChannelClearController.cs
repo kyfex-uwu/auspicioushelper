@@ -13,6 +13,13 @@ public class ChannelClearController:Entity {
     if(data.Bool("clear_all",false)){
       ChannelState.channelStates.Clear();
     }
+    string s=data.Attr("clear_prefix","");
+    if(s!=""){
+      //List<string> toRemove = new List<string>();
+      foreach(string ch in ChannelState.channelStates.Keys){
+        if(ch.StartsWith(s)) ChannelState.channelStates[ch]=0;
+      }
+    }
     ChannelState.SetChannel(data.Attr("channel",""),data.Int("value",0));
     RemoveSelf();
   }

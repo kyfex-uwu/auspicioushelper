@@ -53,6 +53,7 @@ public class MaterialLayer{
     }
     EffectParameter timeUniform = shader.Parameters["time"];
     if(timeUniform != null){
+      //DebugConsole.Write((Engine.Scene as Level).TimeActive.ToString());
       timeUniform.SetValue((Engine.Scene as Level).TimeActive);
     } 
     EffectParameter camPosUniform = shader.Parameters["cpos"];

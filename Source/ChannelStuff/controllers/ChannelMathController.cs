@@ -33,16 +33,16 @@ public class ChannelMathController:Entity{
     runEveryFrame = d.Bool("every_frame",false);
     debug = d.Bool("debug",false);
     var bin=Convert.FromBase64String(d.Attr("compiled_operations",""));
-    int version = BitConverter.ToInt32(bin);
+    int version = BitConverter.ToUInt16(bin);
     if(version!=1){
       DebugConsole.Write("Invalid version for mathcontroller");
       return;
     }
-    int numUsing = BitConverter.ToInt32(bin, 4);
-    int numReg = BitConverter.ToInt32(bin,8);
-    int opsOffset = BitConverter.ToInt32(bin,12);
-    int opsLength = BitConverter.ToInt32(bin,16);
-    int coffset = 20;
+    int numUsing = BitConverter.ToUInt16(bin, 2);
+    int numReg = BitConverter.ToUInt16(bin,4);
+    int opsOffset = BitConverter.ToUInt16(bin,6);
+    uint opsLength = BitConverter.ToUInt32(bin,8);
+    int coffset = 12;
     for(int i=0; i<numUsing; i++){
       int len = bin[coffset++];
       usedChannels.Add(Encoding.ASCII.GetString(bin,coffset,len));

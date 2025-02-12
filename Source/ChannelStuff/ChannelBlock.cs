@@ -36,6 +36,10 @@ public class ChannelBlock:ChannelBaseEntity, IMaterialObject {
     base.Added(scene);
     scene.Add(solid = new Solid(Position, width, height, safe));
     solid.Collidable = curstate == SolidState.there;
+    //Add(sprite=GFX.SpriteBank.Create("auspicioushelper_example1"));
+    //sprite.Position=new Vector2(10,10);
+    //DebugConsole.Write(sprite.ToString());
+    //DebugConsole.Write(sprite.CurrentAnimationID);
   }
   public override void setChVal(int val){
     curstate = (val&1) != (inverted?1:0)?SolidState.there:SolidState.gone;

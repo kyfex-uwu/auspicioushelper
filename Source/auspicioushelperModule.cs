@@ -12,6 +12,8 @@ public class auspicioushelperModule : EverestModule {
 
     public override Type SessionType => typeof(auspicioushelperModuleSession);
     public static auspicioushelperModuleSession Session => (auspicioushelperModuleSession) Instance._Session;
+    public override Type SettingsType => typeof(auspicioushelperModuleSettings);
+    public static auspicioushelperModuleSettings Settings => (auspicioushelperModuleSettings) Instance._Settings;
 
     public auspicioushelperModule() {
         Instance = this;
@@ -36,7 +38,7 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
         On.Celeste.Player.ctor += ConditionalStrawb.playerCtorHook;
 
-        DebugConsole.Open();  
+        //DebugConsole.Open();  
 
         //EntityBinder.addHooks(); 
     }

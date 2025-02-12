@@ -12,7 +12,8 @@ channelclearcontroller.placements = {
     data = {
       channel = "",
       value = 0,
-      clear_all = false
+      clear_all = false,
+      clear_prefix=""
     }
   }
 }
