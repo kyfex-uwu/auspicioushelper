@@ -4,7 +4,7 @@ using Celeste;
 using Monocle;
 
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 [Tracked]
 public class JumpListener:Component{
   public Action OnJump;

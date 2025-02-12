@@ -24,7 +24,7 @@ public static class MaterialPipe {
   }
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orig(self, scene); // Lmao this (ok friend we are calling the original function, don't panic don't panic don't panic)
-    if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
+    if(true || GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
       orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
       //DebugConsole.Write("default rend");
       return;
