@@ -15,7 +15,10 @@ entity.placements = {
       attached = false,
       edge_type = "loop",
       xml_spritename = "auspicioushelper_example1",
-      cases=3
+      cases=3,
+      offsetX=0,
+      offsetY=0,
+      depth=2
     }
   }
 }
@@ -24,6 +27,15 @@ entity.fieldInformation = {
     options = edge_types
   },
   cases = {
+    fieldType="integer"
+  },
+  offsetX = {
+    fieldType="integer"
+  },
+  offsetY = {
+    fieldType="integer"
+  },
+  depth = {
     fieldType="integer"
   }
 }

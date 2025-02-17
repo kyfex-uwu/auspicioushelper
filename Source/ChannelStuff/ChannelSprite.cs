@@ -16,16 +16,16 @@ public class ChannelSprite:ChannelBaseEntity{
   public enum edgeTypes{
     loop, clamp, hide,
   }
-  edgeTypes ty;
+  edgeTypes ty; 
   public ChannelSprite(EntityData d, Vector2 offset):base(d.Position+offset){
     channel=d.Attr("channel","");
     Add(sprite=GFX.SpriteBank.Create(d.Attr("xml_spritename")));
+    sprite.Position.X=d.Int("offsetX",0);
+    sprite.Position.Y=d.Int("offsetY",0);
     if(d.Bool("attached",false)){
-      StaticMover staticMover = new StaticMover() {
-          SolidChecker = solid => solid.CollideRect(new Rectangle((int) X, (int) Y - 1, 8,8)),
-          OnMove = move
-      };
-      Add(staticMover);
+      Add(new StaticMover{
+        SolidChecker = checkSolid
+      });
     }
     num = d.Int("cases",1);
     ty=d.Attr("edge_type","") switch {
@@ -33,6 +33,10 @@ public class ChannelSprite:ChannelBaseEntity{
       "clamp"=>edgeTypes.clamp,
       _=>edgeTypes.hide,
     };
+    Depth=d.Int("depth",2);
+  }
+  private bool checkSolid(Solid solid){
+    return Collide.CheckPoint(solid, Position);
   }
   public override void setChVal(int val){
     if(val<0 || val>=num){
@@ -48,8 +52,8 @@ public class ChannelSprite:ChannelBaseEntity{
     sprite.Play("case"+val.ToString());
   }
   public override void Added(Scene scene){
+    base.Added(scene);
     setChVal(ChannelState.readChannel(channel));
-    ChannelState.watch(this);
   }
   public void move(Vector2 amount){
     DebugConsole.Write(amount.ToString());

@@ -42,9 +42,13 @@ public class auspicioushelperModule : EverestModule {
 
         //EntityBinder.addHooks(); 
     }
+    public static void tinyCleanup(){
+        PortalGateH.collideLim.Clear();
+    }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
         ChannelState.unwatchTemporary();
+        tinyCleanup();
     } 
     public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
         orig(self, player);
@@ -58,6 +62,7 @@ public class auspicioushelperModule : EverestModule {
         Session.load(false);
         ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
+        tinyCleanup();
     }
     public static void OnEnter(Session session, bool fromSave){
         Session.load(!fromSave);
@@ -72,7 +77,7 @@ public class auspicioushelperModule : EverestModule {
 
     public override void LoadContent(bool firstLoad){
         base.LoadContent(firstLoad);
-        ChannelState.speedruntoolinteropload();
+        SpeedrunToolIop.speedruntoolinteropload();
         auspicioushelperGFX.loadContent();
         MaterialPipe.setup();
     }

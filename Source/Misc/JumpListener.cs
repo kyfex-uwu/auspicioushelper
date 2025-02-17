@@ -30,7 +30,6 @@ public class JumpListener:Component{
     setup=false;
   }
   public static void alertJumpListeners(int type){
-    DebugConsole.Write("jump "+type.ToString());
     foreach(JumpListener l in Engine.Scene.Tracker.GetComponents<JumpListener>()){
       if((l.flags & type)!=0 && l.OnJump!= null) l.OnJump(type);
     }
