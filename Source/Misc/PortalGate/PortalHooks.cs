@@ -39,7 +39,7 @@ public static class portalHooks{
     if(self is Hitbox h){
       Rectangle r = new Rectangle((int)self.AbsoluteLeft, (int)self.AbsoluteTop, 
       (int)self.AbsoluteRight-(int)self.AbsoluteLeft, (int)self.AbsoluteBottom-(int)self.AbsoluteTop);
-      if(r.Width<=0)DebugConsole.Write(r.ToString()+" "+PortalGateH.collideLim[h.Entity]);
+      //if(r.Width<=0)DebugConsole.Write(r.ToString()+" "+PortalGateH.collideLim[h.Entity]);
       return r;
     }
     return orig(self);
@@ -65,11 +65,13 @@ public static class portalHooks{
 
 
     On.Celeste.Actor.MoveHExact+=PortalGateH.ActorMoveHHook;
+    On.Celeste.Actor.MoveVExact+=PortalGateH.ActorMoveVHook;
   }
   
   public static void unsetupHooks(){
     setup=false;
     On.Celeste.Actor.MoveHExact-=PortalGateH.ActorMoveHHook;
+    On.Celeste.Actor.MoveVExact-=PortalGateH.ActorMoveVHook;
     absoluteLeftHook.Dispose();
     absoluteRightHook.Dispose();
     boundsHook.Dispose();

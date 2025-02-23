@@ -14,7 +14,10 @@ entity.placements = {
     data = {
       width = 4,
       height = 8,
-      flipped = false
+      right_facing_f0=false,
+      right_facing_f1=true,
+      color_hex="#FFFA",
+      attached=false
     }
   }
 }

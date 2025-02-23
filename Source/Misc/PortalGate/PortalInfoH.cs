@@ -16,18 +16,26 @@ public class PortalIntersectInfoH{
   Vector2 pmul;
   public bool end;
   public PortalIntersectInfoH(bool end, PortalGateH p, Actor a){
-    this.pmul = p.flipped?new Vector2(-1,1):new Vector2(1,1);
     this.p=p;
     this.a=a;
     ce = end;
+    pmul = p.flipped?new Vector2(-1,1):new Vector2(1,1);
     facesign = Math.Sign(a.CenterX-p.getpos(end).X)>=0;
   }
-  public void addOthersider(){
+  public PortalOthersider addOthersider(){
     a.Scene.Add(m=new PortalOthersider(a.Position, this));
     m.Center=getOthersiderPos();
+    m.Scene = a.Scene;
+    return m;
   }
   public Vector2 getOthersiderPos(){
     return pmul*(a.Center-p.getpos(ce))+p.getpos(!ce);
+  }
+  public Vector2 calcspeed(Vector2 speed, bool newend){
+    Vector2 rel = speed-p.getspeed(!newend);
+    if(p.flipped) rel.X*=-1;
+    rel+=p.getspeed(newend);
+    return rel;
   }
   public void swap(){
     ce = !ce;
@@ -35,14 +43,13 @@ public class PortalIntersectInfoH{
     Vector2 temp = a.Center;
     a.Center=m.Center;
     m.Center=temp;
-    a.MoveHExact(0);
-    Vector2 DelSpeed = p.getspeed(ce)-p.getspeed(!ce);
-    //DebugConsole.Write("swapend "+a.Position.ToString()+" "+PortalGateH.collideLim[a]);
-    DebugConsole.Write(p.getspeed(true).ToString()+" "+p.getspeed(false).ToString());
+    PortalGateH.evalEnt(a);
+    PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
+
     if(a is Player pl){
-      pl.Speed += DelSpeed;
+      pl.Speed = calcspeed(pl.Speed,ce);
     } else if(a is Glider g){
-      g.Speed += DelSpeed;
+      g.Speed += calcspeed(g.Speed,ce);
     }
     facesign = Math.Sign(a.CenterX-p.getpos(ce).X)>=0;
   }
@@ -52,10 +59,12 @@ public class PortalIntersectInfoH{
     m.Center=getOthersiderPos();
     if(facesign != nsign)swap();
     end = (Math.Sign((facesign?a.Left:a.Right)-p.getpos(ce).X)>=0)==facesign;
+    if(end)DebugConsole.Write("ended");
     return end;
   }
   public bool applyDummyPush(Vector2 amount){
-    bool hblock = a.MoveHExact((int)amount.X);
+    if(!m.propegateMove) return false;
+    bool hblock = amount.X==0?false:a.MoveHExact((int)amount.X);
     
     return true;
   }
