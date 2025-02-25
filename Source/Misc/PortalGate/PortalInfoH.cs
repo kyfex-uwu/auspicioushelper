@@ -21,6 +21,7 @@ public class PortalIntersectInfoH{
     ce = end;
     pmul = p.flipped?new Vector2(-1,1):new Vector2(1,1);
     facesign = Math.Sign(a.CenterX-p.getpos(end).X)>=0;
+    DebugConsole.Write("started");
   }
   public PortalOthersider addOthersider(){
     a.Scene.Add(m=new PortalOthersider(a.Position, this));
@@ -38,8 +39,9 @@ public class PortalIntersectInfoH{
     return rel;
   }
   public void swap(){
+    m.Center = getOthersiderPos();
     ce = !ce;
-    //DebugConsole.Write("swap "+a.Position.ToString()+" "+m.Position.ToString());
+    DebugConsole.Write("swap "+a.Position.ToString()+" "+m.Position.ToString());
     Vector2 temp = a.Center;
     a.Center=m.Center;
     m.Center=temp;
@@ -48,8 +50,9 @@ public class PortalIntersectInfoH{
 
     if(a is Player pl){
       pl.Speed = calcspeed(pl.Speed,ce);
+      if(p.flipped)pl.LiftSpeed=new Vector2(-pl.LiftSpeed.X,pl.LiftSpeed.Y);
     } else if(a is Glider g){
-      g.Speed += calcspeed(g.Speed,ce);
+      g.Speed = calcspeed(g.Speed,ce);
     }
     facesign = Math.Sign(a.CenterX-p.getpos(ce).X)>=0;
   }
@@ -68,5 +71,26 @@ public class PortalIntersectInfoH{
     
     return true;
   }
-
+  public bool getAbsoluteRects(Hitbox h, out FloatRect r1, out FloatRect r2){
+    Vector2 ipos = ce?p.npos:p.Position;
+    Vector2 opos = ce?p.Position:p.npos;
+    Vector2 del = opos-ipos;
+    bool inr=ce?p.n2dir:p.n1dir;
+    bool outr=ce?p.n1dir:p.n2dir;
+    float overlap;
+    if(inr){
+      overlap = Math.Max(0,ipos.X-h.AbsoluteLeft);
+      r1=new FloatRect(h.AbsoluteLeft+overlap,h.AbsoluteTop,h.Width-overlap, h.height);
+    } else {
+      overlap = Math.Max(0,h.AbsoluteRight-ipos.X);
+      r1=new FloatRect(h.AbsoluteLeft,h.AbsoluteTop,h.Width-overlap,h.height);
+    }
+    r2 = new FloatRect(outr?opos.X:opos.X-overlap,h.AbsoluteTop+del.Y,overlap,h.height);
+    return overlap>0;
+  }
+  public bool reinterpertPush(int moveH, out int other){
+    int delx = (int)Math.Abs(p.Position.X-p.npos.X);
+    other = moveH>0? moveH+delx:moveH-delx;
+    return Math.Abs(moveH)>Math.Abs(other);
+  }
 }

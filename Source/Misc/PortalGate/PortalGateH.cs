@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Celeleste.Mods.auspicioushelper;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -15,7 +16,7 @@ namespace Celeste.Mod.auspicioushelper;
 public class PortalGateH:Entity{
   private MTexture texture = GFX.Game["util/lightbeam"];
   public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(20, 70, 100);
-  public static Dictionary<Actor, PortalIntersectInfoH> intersections = new Dictionary<Actor, PortalIntersectInfoH>();
+  public static Dictionary<Entity, PortalIntersectInfoH> intersections = new Dictionary<Entity, PortalIntersectInfoH>();
   public static Dictionary<Entity, Vector2> collideLim = new Dictionary<Entity, Vector2>();
   public class SurroundingInfoH {
     public PortalGateH left=null;
@@ -159,17 +160,21 @@ public class PortalGateH:Entity{
         }
       });
     }
+    Add(new DashListener((Vector2 dir)=>{
+      DebugConsole.Write("hiu\n\n\n\n");
+    }));
   }
   public static bool ActorMoveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor a, int moveH, Collision onCollide, Solid pusher){
     if(a is PortalOthersider m){
       //DebugConsole.Write("dummy "+moveH.ToString());
-      if(m.Scene == null){
+      return false;
+      /*if(m.Scene == null){
         DebugConsole.Write("Moving removed entity");
         return true;
       }
       //DebugConsole.Write(a.Collider.Bounds.ToString()+collideLim[m].ToString());
       m.info.applyDummyPush(new Vector2(moveH, 0));
-      return orig(a,moveH,onCollide,pusher);
+      return orig(a,moveH,onCollide,pusher);*/
     } else {
       SurroundingInfoH s = evalEnt(a);
       PortalIntersectInfoH info=null;
@@ -184,20 +189,23 @@ public class PortalGateH:Entity{
         collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
       }
       //DebugConsole.Write(collideLim[a].ToString()+" "+moveH.ToString()+ " "+intersections.Count);
-      int res = moveH;
+      /*int res = moveH;
       if(info != null){
         //DebugConsole.Write("Moving Dummy");
         res = info.m.tryMoveH(moveH,onCollide,pusher);
-      }
-      
-      bool val = orig(a,res,onCollide,pusher);
-
+      }*/
+      DebugConsole.Write(moveH.ToString()+" "+(pusher!=null?pusher.ToString():"nukk")+" "+a.Position.ToString());
+      bool val = orig(a,moveH,(CollisionData c)=>{
+        DebugConsole.Write(c.Hit.ToString()+" "+c.TargetPosition.ToString()+a.Position.ToString()+" "+c.Direction.ToString()+" "+c.Moved.ToString() );
+      },pusher);
+      DebugConsole.Write(val.ToString());
       if(info != null && info.finish()) intersections.Remove(a); 
-      return val || (res != moveH);
+      return val;
     }
   }
-  public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){
+  /*public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){
     if(a is PortalOthersider m){
+      return false;
       if(m.Scene == null){
         DebugConsole.Write("Moving removed entity");
         return true;
@@ -218,7 +226,7 @@ public class PortalGateH:Entity{
         return orig(a,moveV,onCollide,pusher);
       }
     }
-  }
+  }*/
   public Vector2 getpos(bool node){
     return node?npos:Position;
   }
