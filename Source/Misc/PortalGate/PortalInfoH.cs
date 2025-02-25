@@ -11,7 +11,7 @@ public class PortalIntersectInfoH{
   public Actor a;
   public PortalOthersider m;
   public PortalGateH p;
-  bool ce; //true if real thing is on node side
+  public bool ce; //true if real thing is on node side
   bool facesign = false;
   Vector2 pmul;
   public bool end;

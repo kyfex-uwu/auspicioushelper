@@ -58,8 +58,10 @@ public class PortalGateH:Entity{
     return s;
   }
   public void movePortalPos(Vector2 amount){
-    Vector2 oldp=Position;
-    Position+=amount;
+    if(s1!=null)s1.Collidable=false;
+    Vector2 op=Position;
+    Vector2 hp=Position+Vector2.UnitX*amount.X;
+    Vector2 np = Position+amount;
     v1s[0]+=amount/Math.Max(Engine.DeltaTime,0.005f);
     //DebugConsole.Write("\n Adding Speed "+amount.ToString()+" "+v1s[0].ToString());
 
@@ -74,21 +76,55 @@ public class PortalGateH:Entity{
       
       Split into vertical and horizontal phase for each entity; (1) is of no concern for vertical
     */
+    int mdir = Math.Sign(amount.X);
+    int ymdir = Math.Sign(amount.Y);
     foreach(Actor a in Scene.Tracker.GetEntities<Actor>()){
-      if(!a.Active) continue;
+      if(!a.Active || !(a.Collider is Hitbox h)) continue;
       PortalIntersectInfoH info = null;
       if(intersections.TryGetValue(a,out info)){
       } else{
         if(top1<=a.Top && bottom1>=a.Bottom){
-          if((n1dir && a.Left<=x1)||(!n1dir && a.Right>=x1)){
+          if((n1dir && a.Left<=np.X && a.Left>=op.X)||(!n1dir && a.Right>=np.X && a.Right<=op.X)){
             intersections[a]= info = new PortalIntersectInfoH(false, this,a);
             PortalOthersider mn = info.addOthersider();
           }
         }
       }
       if(info == null || info.p!=this) continue;
+      // info.getAbsoluteRects(h, out var notusingthisone, out var r);
+      // if(info.ce){
+      //   //What is on this side of the portal is r2
+      // }
+      bool anotherHit;
+      for(int i=0; i!=amount.X; i+=mdir){
+        Position=op+Vector2.UnitX*i;
+        Solid solid = a.CollideFirst<Solid>();
+        if(solid!=null){
+          if(info.ce){ //center is on other side; "slamming" case
+            anotherHit = a.MoveHExact(-mdir*hmult,a.SquishCallback,solid);
+            a.LiftSpeed = info.calcspeed(solid.LiftSpeed,true);
+          } else { //center is on this side; "extruding" case
+            anotherHit = a.MoveHExact(mdir,a.SquishCallback,solid);
+          }
+        }
+      }
       
+      for(int i=0; i!=amount.Y; i+=ymdir){
+        Position=hp+Vector2.UnitY*i;
+        Solid solid = a.CollideFirst<Solid>();
+        if(solid!=null){
+          if(info.ce){ //center is on other side; "slamming" case
+            anotherHit = a.MoveVExact(-ymdir,a.SquishCallback,solid);
+            a.LiftSpeed = info.calcspeed(solid.LiftSpeed,true);
+          } else { //center is on this side; "extruding" case
+            anotherHit = a.MoveVExact(ymdir,a.SquishCallback,solid);
+          }
+        }
+      }
+      if(info.finish())intersections.Remove(a);
     }
+    Position=np;
+    if(s1!=null)s1.Collidable=true;
   }
   public void movePortalNpos(Vector2 amount){
 
@@ -119,6 +155,7 @@ public class PortalGateH:Entity{
   public Solid s1=null;
   public Solid s2=null;
   public bool flipped;
+  public int hmult;
   public bool n1dir;
   public bool n2dir;
   public List<uint> handles = new List<uint>();
@@ -133,6 +170,7 @@ public class PortalGateH:Entity{
     color = Util.hexToColor(d.Attr("color_hex","#FFFA"));
     DebugConsole.Write(color.ToString()+" "+x1.ToString()+" "+x2.ToString());
     flipped = n1dir==n2dir;
+    hmult = flipped?-1:1;
     
     for(int i=0; i<height; i+=2){
       handles.Add(ogen.getHandle());
