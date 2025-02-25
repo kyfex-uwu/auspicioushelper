@@ -21,7 +21,7 @@ public class PortalIntersectInfoH{
     ce = end;
     pmul = p.flipped?new Vector2(-1,1):new Vector2(1,1);
     facesign = Math.Sign(a.CenterX-p.getpos(end).X)>=0;
-    DebugConsole.Write("started");
+    //DebugConsole.Write("started");
   }
   public PortalOthersider addOthersider(){
     a.Scene.Add(m=new PortalOthersider(a.Position, this));
@@ -46,10 +46,13 @@ public class PortalIntersectInfoH{
     a.Center=m.Center;
     m.Center=temp;
     PortalGateH.evalEnt(a);
-    PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
+    //PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
 
     if(a is Player pl){
+      DebugConsole.Write("Old player speed: "+pl.Speed.ToString());
       pl.Speed = calcspeed(pl.Speed,ce);
+      DebugConsole.Write("new Player speed: "+pl.Speed.ToString());
+      DebugConsole.Write(calcspeed(Vector2.Zero,ce).ToString()+" = "+p.getspeed(ce).ToString()+"+"+p.getspeed(!ce));
       if(p.flipped)pl.LiftSpeed=new Vector2(-pl.LiftSpeed.X,pl.LiftSpeed.Y);
     } else if(a is Glider g){
       g.Speed = calcspeed(g.Speed,ce);
@@ -62,7 +65,7 @@ public class PortalIntersectInfoH{
     m.Center=getOthersiderPos();
     if(facesign != nsign)swap();
     end = (Math.Sign((facesign?a.Left:a.Right)-p.getpos(ce).X)>=0)==facesign;
-    if(end)DebugConsole.Write("ended");
+    //if(end)DebugConsole.Write("ended");
     return end;
   }
   public bool applyDummyPush(Vector2 amount){
@@ -88,9 +91,23 @@ public class PortalIntersectInfoH{
     r2 = new FloatRect(outr?opos.X:opos.X-overlap,h.AbsoluteTop+del.Y,overlap,h.height);
     return overlap>0;
   }
-  public bool reinterpertPush(int moveH, out int other){
-    int delx = (int)Math.Abs(p.Position.X-p.npos.X);
-    other = moveH>0? moveH+delx:moveH-delx;
-    return Math.Abs(moveH)>Math.Abs(other);
+  public int reinterpertPush(int moveH, Solid pusher){
+    if(!(a.Collider is Hitbox h) || !(pusher.Collider is Hitbox o)){
+      DebugConsole.Write("Should not happen; Actor or solid collider not hitbox!");
+      return moveH;
+    }else{
+      getAbsoluteRects(a.Collider as Hitbox,out var r1,out var r2);
+      float absl = o.AbsoluteLeft; float abst = o.AbsoluteTop;
+      bool hits1 = r1.CollideExRect(absl, abst, o.width,o.height);
+      bool hits2 = r2.CollideExRect(absl, abst, o.width,o.height);
+      //DebugConsole.Write(hits1.ToString()+" "+hits2.ToString());
+      if(hits1) return moveH;
+      if(!hits2){
+        DebugConsole.Write("really weird if things get here");
+      }
+      int nmoveH = moveH+(int)(moveH<0? a.Right-r2.x-r2.w:a.Left-r2.x);
+      //DebugConsole.Write("Rectified push "+moveH.ToString()+"--->"+nmoveH.ToString());
+      return nmoveH;
+    }
   }
 }

@@ -8,7 +8,7 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
-public class PortalOthersider:Actor{
+public class PortalOthersider:Entity{
   public PortalIntersectInfoH info;
   public bool propegateMove=true;
   public int mulMoveH = 1;

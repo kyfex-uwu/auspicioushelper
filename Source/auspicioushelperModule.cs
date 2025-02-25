@@ -43,7 +43,7 @@ public class auspicioushelperModule : EverestModule {
         //EntityBinder.addHooks(); 
     }
     public static void tinyCleanup(){
-        PortalGateH.collideLim.Clear();
+        PortalGateH.intersections.Clear();
     }
     public void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();

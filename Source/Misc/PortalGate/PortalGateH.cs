@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Celeleste.Mods.auspicioushelper;
+using Celeste.Editor;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,7 +18,7 @@ public class PortalGateH:Entity{
   private MTexture texture = GFX.Game["util/lightbeam"];
   public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(20, 70, 100);
   public static Dictionary<Entity, PortalIntersectInfoH> intersections = new Dictionary<Entity, PortalIntersectInfoH>();
-  public static Dictionary<Entity, Vector2> collideLim = new Dictionary<Entity, Vector2>();
+  //public static Dictionary<Entity, Vector2> collideLim = new Dictionary<Entity, Vector2>();
   public class SurroundingInfoH {
     public PortalGateH left=null;
     public PortalGateH right=null;
@@ -33,11 +34,8 @@ public class PortalGateH:Entity{
       right = p; rightl = node?p.x2:p.x1; rightn = node;
     }
   }
-  public static Dictionary<Entity,SurroundingInfoH> portalInfos = new Dictionary<Entity, SurroundingInfoH>();
+  //public static Dictionary<Entity,SurroundingInfoH> portalInfos = new Dictionary<Entity, SurroundingInfoH>();
   public static SurroundingInfoH evalEnt(Actor a){
-    if(a is PortalOthersider o){
-      return null;
-    }
     SurroundingInfoH s = new SurroundingInfoH{actor=a};
     foreach(PortalGateH p in a.Scene.Tracker.GetEntities<PortalGateH>()){
       if(p.top1<=a.Top && p.bottom1>=a.Bottom){
@@ -55,56 +53,40 @@ public class PortalGateH:Entity{
         }
       }
     }
-    portalInfos[a]=s;
-    collideLim[a]=new Vector2(s.leftl,s.rightl);
+    // portalInfos[a]=s;
+    // collideLim[a]=new Vector2(s.leftl,s.rightl);
     return s;
-  }
-  public static void SceneUpdateHook(On.Monocle.Scene.orig_Update orig, Scene scene){
-    if(scene is Level){
-      collideLim.Clear();
-      portalInfos.Clear();
-      foreach(Actor a in scene.Tracker.GetEntities<Actor>()){
-        evalEnt(a);
-      }
-    }
-    orig(scene);
   }
   public void movePortalPos(Vector2 amount){
     Vector2 oldp=Position;
     Position+=amount;
-    v1s[0]=amount/Math.Max(Engine.DeltaTime,0.005f);
+    v1s[0]+=amount/Math.Max(Engine.DeltaTime,0.005f);
+    //DebugConsole.Write("\n Adding Speed "+amount.ToString()+" "+v1s[0].ToString());
 
+    /* 
+      Several cases to worry about:
+      1. The portal going to encounter and begin intersection with an actor (Goto 2)
+      2. The portal is intersecting an actor and is on its current side
+        -We must moveH the fake and propegate any hit to the real
+      3. The portal is intersecting an actor and is on its neglected side
+        -if it is moving towards its face, we must march moveH the fake and propegate any hit to the real
+      4. Handle any vertical splinching
+      
+      Split into vertical and horizontal phase for each entity; (1) is of no concern for vertical
+    */
     foreach(Actor a in Scene.Tracker.GetEntities<Actor>()){
       if(!a.Active) continue;
-      if(a is PortalOthersider o){
-        continue;
-      }
-      SurroundingInfoH s=null;
-      bool inOld = oldp.Y<=a.Top && oldp.Y+height>=a.Bottom && 
-        (n1dir?a.Right>=oldp.X:a.Left<=oldp.X);
-      //We use the old position since we may cross the player in 1 frame
-      bool inNew = top1<=a.Top && bottom1>=a.Bottom && 
-        (n1dir?a.Right>=oldp.X:a.Left<=oldp.X);
-      if(!inOld && !inNew) continue;
-      if(!portalInfos.TryGetValue(a,out s)){
-        s=evalEnt(a);
-      }
-      if(inOld && !inNew){
-        if((s.right == this &&s.rightn==false) || (s.left == this&&s.leftn==false)) evalEnt(a);
-        continue;
-      }
-
-      PortalIntersectInfoH info=null;
+      PortalIntersectInfoH info = null;
       if(intersections.TryGetValue(a,out info)){
-      } else if(a.Left+moveH<=s.leftl) {
-        intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
-        PortalOthersider mn = info.addOthersider();
-        collideLim[mn] = s.left.getSidedCollidelim(!s.leftn);
-      } else if(a.Right+moveH>=s.rightl){
-        intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
-        PortalOthersider mn = info.addOthersider();
-        collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
+      } else{
+        if(top1<=a.Top && bottom1>=a.Bottom){
+          if((n1dir && a.Left<=x1)||(!n1dir && a.Right>=x1)){
+            intersections[a]= info = new PortalIntersectInfoH(false, this,a);
+            PortalOthersider mn = info.addOthersider();
+          }
+        }
       }
+      if(info == null || info.p!=this) continue;
       
     }
   }
@@ -132,8 +114,8 @@ public class PortalGateH:Entity{
   public float x2{
     get=>npos.X;
   }
-  public Vector2[] v1s = {Vector2.Zero, Vector2.Zero};
-  public Vector2[] v2s = {Vector2.Zero, Vector2.Zero};
+  public Vector2[] v1s = {Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero};
+  public Vector2[] v2s = {Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero};
   public Solid s1=null;
   public Solid s2=null;
   public bool flipped;
@@ -180,49 +162,25 @@ public class PortalGateH:Entity{
         }
       });
     }
-    Add(new DashListener((Vector2 dir)=>{
-      DebugConsole.Write("hiu\n\n\n\n");
-    }));
   }
   
   public static bool ActorMoveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor a, int moveH, Collision onCollide, Solid pusher){
-    if(a is PortalOthersider m){
-      //DebugConsole.Write("dummy "+moveH.ToString());
-      return false;
-      /*if(m.Scene == null){
-        DebugConsole.Write("Moving removed entity");
-        return true;
-      }
-      //DebugConsole.Write(a.Collider.Bounds.ToString()+collideLim[m].ToString());
-      m.info.applyDummyPush(new Vector2(moveH, 0));
-      return orig(a,moveH,onCollide,pusher);*/
-    } else {
-      SurroundingInfoH s = evalEnt(a);
-      PortalIntersectInfoH info=null;
-      if(intersections.TryGetValue(a,out info)){
-      } else if(a.Left+moveH<=s.leftl) {
-        intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
-        PortalOthersider mn = info.addOthersider();
-        collideLim[mn] = s.left.getSidedCollidelim(!s.leftn);
-      } else if(a.Right+moveH>=s.rightl){
-        intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
-        PortalOthersider mn = info.addOthersider();
-        collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
-      }
-      //DebugConsole.Write(collideLim[a].ToString()+" "+moveH.ToString()+ " "+intersections.Count);
-      /*int res = moveH;
-      if(info != null){
-        //DebugConsole.Write("Moving Dummy");
-        res = info.m.tryMoveH(moveH,onCollide,pusher);
-      }*/
-      DebugConsole.Write(moveH.ToString()+" "+(pusher!=null?pusher.ToString():"nukk")+" "+a.Position.ToString());
-      bool val = orig(a,moveH,(CollisionData c)=>{
-        DebugConsole.Write(c.Hit.ToString()+" "+c.TargetPosition.ToString()+a.Position.ToString()+" "+c.Direction.ToString()+" "+c.Moved.ToString() );
-      },pusher);
-      DebugConsole.Write(val.ToString());
-      if(info != null && info.finish()) intersections.Remove(a); 
-      return val;
+    SurroundingInfoH s = evalEnt(a);
+    PortalIntersectInfoH info=null;
+    if(intersections.TryGetValue(a,out info)){
+    } else if(a.Left+moveH<=s.leftl) {
+      intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
+      PortalOthersider mn = info.addOthersider();
+      //collideLim[mn] = s.left.getSidedCollidelim(!s.leftn);
+    } else if(a.Right+moveH>=s.rightl){
+      intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
+      PortalOthersider mn = info.addOthersider();
+      //collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
     }
+    if(pusher!=null && info!=null) moveH = info.reinterpertPush(moveH,pusher);
+    bool val = orig(a,moveH,onCollide,pusher);
+    if(info != null && info.finish()) intersections.Remove(a); 
+    return val;
   }
   /*public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){
     if(a is PortalOthersider m){
@@ -253,7 +211,13 @@ public class PortalGateH:Entity{
   }
   public Vector2 getspeed(bool node){
     Vector2[] s=node?v2s:v1s;
-    return Vector2.Max(s[0],s[1]);
+    float mX=0;
+    float mY=0;
+    foreach(Vector2 v in s){
+      if(Math.Abs(v.X)>Math.Abs(mX)) mX=v.X;
+      if(Math.Abs(v.Y)>Math.Abs(mY)) mY=v.Y;
+    }
+    return new Vector2(mX,mY);
   }
   public Vector2 getSidedCollidelim(bool node){
     Vector2 b = new Vector2(float.NegativeInfinity,float.PositiveInfinity);
@@ -276,7 +240,7 @@ public class PortalGateH:Entity{
       float alpha = Math.Min(1,Math.Max(0,ogen.sample(handles[i]))+0.2f);
       if(alpha<0) continue;
       float length = ogen.sample(handles[i+1])*10+20;
-      texture.Draw(Position+new Vector2(0,i+2), offset, color*alpha, new Vector2(wrec1 * length, 8), 0);
+      texture.Draw(Position+new Vector2(0,i), offset, color*alpha, new Vector2(wrec1 * length, 8), 0);
       texture.Draw(npos+new Vector2(0,i), offset, color*alpha, new Vector2(wrec2 * length, 8), 0);
     }
   }
@@ -292,5 +256,6 @@ public class PortalGateH:Entity{
       v1s[0]=Vector2.Zero;
       v2s[0]=Vector2.Zero;
     }
+    //DebugConsole.Write((getspeed(false)-getspeed(true)).ToString()+" = "+getspeed(false));
   }
 }
