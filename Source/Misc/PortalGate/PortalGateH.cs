@@ -70,23 +70,43 @@ public class PortalGateH:Entity{
     orig(scene);
   }
   public void movePortalPos(Vector2 amount){
-    float oldx=x1;
+    Vector2 oldp=Position;
     Position+=amount;
     v1s[0]=amount/Math.Max(Engine.DeltaTime,0.005f);
 
-    /*foreach(Actor a in Scene.Tracker.GetEntities<Actor>()){
+    foreach(Actor a in Scene.Tracker.GetEntities<Actor>()){
       if(!a.Active) continue;
       if(a is PortalOthersider o){
         continue;
       }
       SurroundingInfoH s=null;
-      if(portalInfos.TryGetValue(a,out s)){
-        if(((n1dir? s.left:s.right) == this) && ((n1dir?s.leftn:s.rightn)==false)) evalEnt(a);
-      } else {
+      bool inOld = oldp.Y<=a.Top && oldp.Y+height>=a.Bottom && 
+        (n1dir?a.Right>=oldp.X:a.Left<=oldp.X);
+      //We use the old position since we may cross the player in 1 frame
+      bool inNew = top1<=a.Top && bottom1>=a.Bottom && 
+        (n1dir?a.Right>=oldp.X:a.Left<=oldp.X);
+      if(!inOld && !inNew) continue;
+      if(!portalInfos.TryGetValue(a,out s)){
         s=evalEnt(a);
       }
+      if(inOld && !inNew){
+        if((s.right == this &&s.rightn==false) || (s.left == this&&s.leftn==false)) evalEnt(a);
+        continue;
+      }
 
-    }*/
+      PortalIntersectInfoH info=null;
+      if(intersections.TryGetValue(a,out info)){
+      } else if(a.Left+moveH<=s.leftl) {
+        intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
+        PortalOthersider mn = info.addOthersider();
+        collideLim[mn] = s.left.getSidedCollidelim(!s.leftn);
+      } else if(a.Right+moveH>=s.rightl){
+        intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
+        PortalOthersider mn = info.addOthersider();
+        collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
+      }
+      
+    }
   }
   public void movePortalNpos(Vector2 amount){
 
@@ -164,6 +184,7 @@ public class PortalGateH:Entity{
       DebugConsole.Write("hiu\n\n\n\n");
     }));
   }
+  
   public static bool ActorMoveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor a, int moveH, Collision onCollide, Solid pusher){
     if(a is PortalOthersider m){
       //DebugConsole.Write("dummy "+moveH.ToString());
