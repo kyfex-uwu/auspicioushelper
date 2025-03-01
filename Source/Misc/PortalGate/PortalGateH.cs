@@ -82,46 +82,54 @@ public class PortalGateH:Entity{
       if(!a.Active || !(a.Collider is Hitbox h)) continue;
       PortalIntersectInfoH info = null;
       if(intersections.TryGetValue(a,out info)){
+        //DebugConsole.Write("Fetched intersection");
       } else{
         if(top1<=a.Top && bottom1>=a.Bottom){
           if((n1dir && a.Left<=np.X && a.Left>=op.X)||(!n1dir && a.Right>=np.X && a.Right<=op.X)){
             intersections[a]= info = new PortalIntersectInfoH(false, this,a);
             PortalOthersider mn = info.addOthersider();
+            //DebugConsole.Write("Started intersection");
           }
         }
       }
       if(info == null || info.p!=this) continue;
-      // info.getAbsoluteRects(h, out var notusingthisone, out var r);
-      // if(info.ce){
-      //   //What is on this side of the portal is r2
-      // }
+
       bool anotherHit;
+      info.rectify = false;
       for(int i=0; i!=amount.X; i+=mdir){
         Position=op+Vector2.UnitX*i;
         Solid solid = a.CollideFirst<Solid>();
         if(solid!=null){
+          solid.Collidable = false;
           if(info.ce){ //center is on other side; "slamming" case
             anotherHit = a.MoveHExact(-mdir*hmult,a.SquishCallback,solid);
             a.LiftSpeed = info.calcspeed(solid.LiftSpeed,true);
           } else { //center is on this side; "extruding" case
             anotherHit = a.MoveHExact(mdir,a.SquishCallback,solid);
           }
+          solid.Collidable = true;
         }
       }
-      
+    
       for(int i=0; i!=amount.Y; i+=ymdir){
         Position=hp+Vector2.UnitY*i;
         Solid solid = a.CollideFirst<Solid>();
         if(solid!=null){
+          solid.Collidable = false;
           if(info.ce){ //center is on other side; "slamming" case
             anotherHit = a.MoveVExact(-ymdir,a.SquishCallback,solid);
             a.LiftSpeed = info.calcspeed(solid.LiftSpeed,true);
           } else { //center is on this side; "extruding" case
             anotherHit = a.MoveVExact(ymdir,a.SquishCallback,solid);
           }
+          solid.Collidable = true;
         }
       }
-      if(info.finish())intersections.Remove(a);
+      info.rectify = true;
+      if(info.finish()){
+        intersections.Remove(a);
+        //DebugConsole.Write("Finished intersection"+(a.Left<=op.X).ToString());
+      }
     }
     Position=np;
     if(s1!=null)s1.Collidable=true;
@@ -215,35 +223,25 @@ public class PortalGateH:Entity{
       PortalOthersider mn = info.addOthersider();
       //collideLim[mn] = s.right.getSidedCollidelim(!s.rightn);
     }
-    if(pusher!=null && info!=null) moveH = info.reinterpertPush(moveH,pusher);
+    if(pusher!=null && info!=null){
+      DebugConsole.Write("Having Pusher "+moveH.ToString());
+      moveH = info.reinterpertPush(moveH,pusher);
+      onCollide = (CollisionData d)=>{
+        DebugConsole.Write("COllide"+d.Moved.ToString()+" "+d.Hit.ToString());
+      };
+    }
     bool val = orig(a,moveH,onCollide,pusher);
     if(info != null && info.finish()) intersections.Remove(a); 
     return val;
   }
-  /*public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){
-    if(a is PortalOthersider m){
-      return false;
-      if(m.Scene == null){
-        DebugConsole.Write("Moving removed entity");
-        return true;
-      }
-      m.info.applyDummyPush(new Vector2(0, moveV));
+  public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){
+    var s  = evalEnt(a);
+    if(intersections.TryGetValue(a,out var info)){
       return orig(a,moveV,onCollide,pusher);
     } else {
-      evalEnt(a);
-      if(intersections.TryGetValue(a,out var info)){
-        int res = info.m.tryMoveV(moveV,onCollide,pusher);
-        bool val = res!=moveV;
-        bool val2 = orig(a,res,onCollide,pusher);
-        if(val2){
-          info.m.Center = info.getOthersiderPos();
-        }
-        return val || val2;
-      } else {
-        return orig(a,moveV,onCollide,pusher);
-      }
+      return orig(a,moveV,onCollide,pusher);
     }
-  }*/
+  }
   public Vector2 getpos(bool node){
     return node?npos:Position;
   }

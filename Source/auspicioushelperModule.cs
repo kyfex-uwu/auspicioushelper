@@ -49,6 +49,7 @@ public class auspicioushelperModule : EverestModule {
         Session.save();
         ChannelState.unwatchTemporary();
         tinyCleanup();
+        portalHooks.unsetupHooks();
     } 
     public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
         orig(self, player);

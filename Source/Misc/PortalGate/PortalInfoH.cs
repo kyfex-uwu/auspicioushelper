@@ -15,6 +15,7 @@ public class PortalIntersectInfoH{
   bool facesign = false;
   Vector2 pmul;
   public bool end;
+  public bool rectify;
   public PortalIntersectInfoH(bool end, PortalGateH p, Actor a){
     this.p=p;
     this.a=a;
@@ -49,10 +50,7 @@ public class PortalIntersectInfoH{
     //PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
 
     if(a is Player pl){
-      DebugConsole.Write("Old player speed: "+pl.Speed.ToString());
       pl.Speed = calcspeed(pl.Speed,ce);
-      DebugConsole.Write("new Player speed: "+pl.Speed.ToString());
-      DebugConsole.Write(calcspeed(Vector2.Zero,ce).ToString()+" = "+p.getspeed(ce).ToString()+"+"+p.getspeed(!ce));
       if(p.flipped)pl.LiftSpeed=new Vector2(-pl.LiftSpeed.X,pl.LiftSpeed.Y);
     } else if(a is Glider g){
       g.Speed = calcspeed(g.Speed,ce);
@@ -61,10 +59,10 @@ public class PortalIntersectInfoH{
   }
   public bool finish(){
     float center = a.CenterX;
-    bool nsign = Math.Sign(a.CenterX - p.getpos(ce).X)>=0;
+    int signedface = Math.Sign(a.CenterX - p.getpos(ce).X)*(facesign?1:-1);
     m.Center=getOthersiderPos();
-    if(facesign != nsign)swap();
-    end = (Math.Sign((facesign?a.Left:a.Right)-p.getpos(ce).X)>=0)==facesign;
+    if(signedface == -1)swap();
+    end = Math.Sign((facesign?a.Left:a.Right)-p.getpos(ce).X)*(facesign?1:-1) == 1;
     //if(end)DebugConsole.Write("ended");
     return end;
   }
@@ -92,6 +90,7 @@ public class PortalIntersectInfoH{
     return overlap>0;
   }
   public int reinterpertPush(int moveH, Solid pusher){
+    if(!rectify) return moveH;
     if(!(a.Collider is Hitbox h) || !(pusher.Collider is Hitbox o)){
       DebugConsole.Write("Should not happen; Actor or solid collider not hitbox!");
       return moveH;
@@ -106,8 +105,11 @@ public class PortalIntersectInfoH{
         DebugConsole.Write("really weird if things get here");
       }
       int nmoveH = moveH+(int)(moveH<0? a.Right-r2.x-r2.w:a.Left-r2.x);
-      //DebugConsole.Write("Rectified push "+moveH.ToString()+"--->"+nmoveH.ToString());
+      DebugConsole.Write("Rectified push "+moveH.ToString()+"--->"+nmoveH.ToString());
       return nmoveH;
     }
   }
+  /*public bool checkShouldActive(){
+    if(a.)
+  }*/
 }

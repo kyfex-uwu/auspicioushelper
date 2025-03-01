@@ -181,6 +181,7 @@ public static class portalHooks{
     }
   }
   public static void setupHooks(){
+    if(setup) return;
     setup=true;
     //On.Celeste.Actor.ctor+=ActorCtorHook;
     /*MethodInfo colliderAbsLeft = typeof(Collider).GetMethod(
@@ -210,9 +211,11 @@ public static class portalHooks{
     On.Monocle.Grid.Collide_Hitbox += GridCollideHitbox;
 
     On.Celeste.Actor.MoveHExact+=PortalGateH.ActorMoveHHook;
+    On.Celeste.Actor.MoveVExact+=PortalGateH.ActorMoveVHook;
   }
   
   public static void unsetupHooks(){
+    if(!setup) return;
     setup=false;
     On.Monocle.Hitbox.Render -= HitboxRender;
     On.Monocle.Hitbox.Intersects_float_float_float_float -= HitboxIsect;
@@ -225,6 +228,7 @@ public static class portalHooks{
     On.Monocle.Grid.Collide_Hitbox -= GridCollideHitbox;
 
     On.Celeste.Actor.MoveHExact-=PortalGateH.ActorMoveHHook;
+    On.Celeste.Actor.MoveVExact-=PortalGateH.ActorMoveVHook;
     //absoluteLeftHook.Dispose();
     //absoluteRightHook.Dispose();
     //boundsHook.Dispose();
