@@ -69,6 +69,7 @@ public class auspicioushelperModule : EverestModule {
         Session.load(!fromSave);
         ChannelState.unwatchAll();
         JumpListener.releaseHooks();
+        portalHooks.unsetupHooks();
         DebugConsole.Write("Entered Level");
     }
     public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
