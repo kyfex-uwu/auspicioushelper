@@ -2,6 +2,7 @@
 
 
 using System;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -47,6 +48,7 @@ public class PortalIntersectInfoH{
     a.Center=m.Center;
     m.Center=temp;
     PortalGateH.evalEnt(a);
+    facesign = Math.Sign(a.CenterX-p.getpos(ce).X)>=0;
     //PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
 
     if(a is Player pl){
@@ -54,8 +56,24 @@ public class PortalIntersectInfoH{
       if(p.flipped)pl.LiftSpeed=new Vector2(-pl.LiftSpeed.X,pl.LiftSpeed.Y);
     } else if(a is Glider g){
       g.Speed = calcspeed(g.Speed,ce);
+    } else {
+      //lifted striaght from chatgpt 先生 himself.
+      Type type = a.GetType();
+      FieldInfo field = type.GetField("Speed", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+      if (field != null && field.FieldType == typeof(Vector2)){
+        DebugConsole.Write("Dynamically setting speed field");
+          Vector2 speed = (Vector2)field.GetValue(a);
+          field.SetValue(a, calcspeed(speed, ce));
+          return;
+      }
+      PropertyInfo property = type.GetProperty("Speed", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+      if (property != null && property.CanWrite && property.PropertyType == typeof(Vector2)){
+          DebugConsole.Write("Dynamically setting speed property");
+          Vector2 speed = (Vector2)property.GetValue(a);
+          property.SetValue(a, calcspeed(speed, ce));
+          return;
+      }
     }
-    facesign = Math.Sign(a.CenterX-p.getpos(ce).X)>=0;
   }
   public bool finish(){
     float center = a.CenterX;
@@ -109,7 +127,13 @@ public class PortalIntersectInfoH{
       return nmoveH;
     }
   }
-  /*public bool checkShouldActive(){
-    if(a.)
-  }*/
+  public bool checkLeaves(int voffset=0){
+    float cpos = ce?p.npos.Y:p.Position.Y;
+    return a.Top+voffset<cpos || a.Bottom+voffset>cpos+p.height;
+  }
+  public bool checkLeavesHorizontal(){
+    bool inr=ce?p.n2dir:p.n1dir;
+    Vector2 ipos = ce?p.npos:p.Position;
+    return inr? ipos.X-a.Left<0 : a.Right-ipos.X<0;
+  }
 }

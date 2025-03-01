@@ -62,7 +62,14 @@ public class PortalOthersider:Entity{
   public override void Update(){
     base.Update();
     //DebugConsole.Write(info.getOthersiderPos().ToString());
-    if(info.end) RemoveSelf();
+    if(info.end){
+      RemoveSelf();
+      return;
+    } 
+    if(info.checkLeaves() || info.checkLeavesHorizontal()){
+      info.end = true;
+      PortalGateH.intersections.Remove(info.a);
+    }
   }
   /*public int tryMoveH(int moveH, Collision onCollide = null, Solid pusher = null){
     propegateMove = false;

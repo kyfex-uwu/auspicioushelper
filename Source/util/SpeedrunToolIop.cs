@@ -40,6 +40,7 @@ public static class SpeedrunToolIop{
         DebugConsole.Write($"Loading state");
         EntityID? lastUsed = ChannelBooster.lastUsed?.id;
         ChannelState.unwatchAll();
+        PortalGateH.intersections.Clear();
         foreach(Entity e in Engine.Instance.scene.Entities){
           if(e is IChannelUser e_){
             if(e_ is ChannelBooster b && b.id.ToString() == lastUsed.ToString()){
@@ -47,6 +48,20 @@ public static class SpeedrunToolIop{
               DebugConsole.Write("Found matching booster");
             }
             ChannelState.watch(e_);
+          }
+          if(e is PortalOthersider m){
+            m.RemoveSelf();
+          }
+          if(e is Actor a){
+            PortalGateH.SurroundingInfoH s = PortalGateH.evalEnt(a);
+            PortalIntersectInfoH info = null;
+            if(a.Left<s.leftl) {
+              PortalGateH.intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
+              PortalOthersider mn = info.addOthersider();
+            } else if(a.Right>s.rightl){
+              PortalGateH.intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
+              PortalOthersider mn = info.addOthersider();
+            }
           }
         }
         foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){

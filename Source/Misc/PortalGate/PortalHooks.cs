@@ -153,6 +153,7 @@ public static class portalHooks{
   private static bool HitboxIsectHb(On.Monocle.Hitbox.orig_Intersects_Hitbox orig, Hitbox h, Hitbox o){
     //We still need to test o - note that unwrapping h is a must
     //DebugConsole.Write("Hi IHB");
+    if(PortalGateH.intersections.Count == 0) return orig(h,o);
     if(PortalGateH.intersections.TryGetValue(h.Entity, out var info)){
       info.getAbsoluteRects(h, out var r1, out var r2);
       return o.Intersects(r1.x,r1.y,r1.w,r1.h) || o.Intersects(r2.x,r2.y,r2.w,r2.h);
@@ -212,6 +213,7 @@ public static class portalHooks{
 
     On.Celeste.Actor.MoveHExact+=PortalGateH.ActorMoveHHook;
     On.Celeste.Actor.MoveVExact+=PortalGateH.ActorMoveVHook;
+    On.Celeste.Actor.Update+=PortalGateH.ActorUpdateHook;
   }
   
   public static void unsetupHooks(){
@@ -229,6 +231,7 @@ public static class portalHooks{
 
     On.Celeste.Actor.MoveHExact-=PortalGateH.ActorMoveHHook;
     On.Celeste.Actor.MoveVExact-=PortalGateH.ActorMoveVHook;
+    On.Celeste.Actor.Update-=PortalGateH.ActorUpdateHook;
     //absoluteLeftHook.Dispose();
     //absoluteRightHook.Dispose();
     //boundsHook.Dispose();
