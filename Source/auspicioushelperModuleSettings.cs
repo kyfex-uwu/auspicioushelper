@@ -16,4 +16,11 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       if(value) DebugConsole.Open();
       else DebugConsole.Close();
     }}
+  private bool _tryQuietShader = false;
+  public bool UseQuietShader{
+    get=>_tryQuietShader;
+    set{
+      _tryQuietShader = value;
+    }
+  }
 }

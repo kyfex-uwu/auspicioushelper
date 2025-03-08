@@ -13,7 +13,6 @@ float4 partAt(float2 pos) {
 
 uniform float time;
 uniform float2 cpos;
-uniform float quiet;
 
 float4 matAt(float2 pos, float offsetx, float offsety){
     return floor(tex2D(materialSamp,float2(pos.x+offsetx/320.,pos.y+offsety/180.))*255);
@@ -155,7 +154,7 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 	float pto = drand(float3(floor(wpos.x),floor(wpos.y),1));
 	float st = floor(time-pto);
 	float sv = drand(float3(wpos.x,wpos.y,st));
-	float sr = drand(float3(wpos.x,wpos.y,time))*(1-quiet)+quiet*(os2noderivskew(float3(wpos.x,wpos.y,time*3)/1.5)*0.7+0.5);
+	float sr = 0.5;
 	float4 bg=partAt(pos);
 	float sparks=(sv>0.98)*(1-mod(time-pto,1));
 	if(matval.r == 1.){

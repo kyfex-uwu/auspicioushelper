@@ -37,7 +37,7 @@ public static class SpeedrunToolIop{
       if(registerfn == null)break;
 
       Action<Dictionary<Type, Dictionary<string, object>>, Level> loadState = (values, level)=>{
-        DebugConsole.Write($"Loading state");
+        DebugConsole.Write($"Loading auspicioushelper savestate stuff");
         EntityID? lastUsed = ChannelBooster.lastUsed?.id;
         ChannelState.unwatchAll();
         PortalGateH.intersections.Clear();
@@ -67,6 +67,7 @@ public static class SpeedrunToolIop{
         foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
           ChannelState.watch(t);
         }
+        DebugConsole.Write($"Finished successfully");
       };
 
       try {

@@ -11,13 +11,9 @@ using Monocle;
 public class ChannelMaterialsA:MaterialLayer{
   private List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
-  public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader")){
-    DebugConsole.Write(shader == null? "Static shader is null":"Static shader found and registered");
-    if(shader == null)return;
+  public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader2")){
+    quietShader = auspicioushelperGFX.LoadEffect("quietshader");
     bgtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
-    foreach (var param in shader.Parameters) {
-      DebugConsole.Write($"Parameter: {param.Name}, Type: {param.ParameterType}");
-    }
   }
   public override bool checkdo()
   {

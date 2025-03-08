@@ -289,9 +289,6 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     //Draw.Circle(Position+new Vector2(10,10), 15, Color.White, 1);
     Vector2 position = sprite.Position;
     sprite.Position = position.Floor();
-    if (sprite.CurrentAnimationID != "pop" && sprite.Visible){
-      sprite.DrawOutline();
-    }
     base.Render();
     sprite.Position = position;
   }

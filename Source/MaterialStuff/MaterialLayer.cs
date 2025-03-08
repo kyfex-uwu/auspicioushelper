@@ -17,18 +17,19 @@ public class MaterialLayer{
   public RenderTarget2D mattex;
   public RenderTarget2D outtex;
   public List<IMaterialObject> willDraw = new List<IMaterialObject>();
-  public Effect shader;
+  public Effect normalShader;
   public bool both;
   public bool always;
   public bool diddraw;
   public bool enabled;
   public bool removeNext;
+  public Effect quietShader = null;
   public MaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     if(!outonly){
       mattex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     }
-    shader=outshader;
+    normalShader=outshader;
     both=!outonly;
     always = alwaysdraw;
     depth = _depth;
@@ -48,13 +49,14 @@ public class MaterialLayer{
   }
   public virtual void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     //DebugConsole.Write("Rendering layer");
+    Effect shader = auspicioushelperModule.Settings.UseQuietShader? quietShader:normalShader;
     if(back != null){
       MaterialPipe.gd.Textures[2]=back;
     }
     EffectParameter timeUniform = shader.Parameters["time"];
     if(timeUniform != null){
       //DebugConsole.Write((Engine.Scene as Level).TimeActive.ToString());
-      timeUniform.SetValue((Engine.Scene as Level).TimeActive);
+      timeUniform.SetValue((Engine.Scene as Level).TimeActive+2);
     } 
     EffectParameter camPosUniform = shader.Parameters["cpos"];
     if(camPosUniform != null){
@@ -62,7 +64,7 @@ public class MaterialLayer{
     } 
     EffectParameter photoSensitive = shader.Parameters["quiet"];
     if(photoSensitive != null){
-      DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
+      //DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
       photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
     } 
 

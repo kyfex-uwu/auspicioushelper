@@ -22,7 +22,7 @@ public class PortalIntersectInfoH{
     this.a=a;
     ce = end;
     pmul = p.flipped?new Vector2(-1,1):new Vector2(1,1);
-    facesign = Math.Sign(a.CenterX-p.getpos(end).X)>=0;
+    facesign = ce?p.n2dir:p.n1dir;
     //DebugConsole.Write("started");
   }
   public PortalOthersider addOthersider(){
@@ -48,7 +48,7 @@ public class PortalIntersectInfoH{
     a.Center=m.Center;
     m.Center=temp;
     PortalGateH.evalEnt(a);
-    facesign = Math.Sign(a.CenterX-p.getpos(ce).X)>=0;
+    facesign = ce?p.n2dir:p.n1dir;
     //PortalGateH.collideLim[m]=p.getSidedCollidelim(!ce);
 
     if(a is Player pl){
