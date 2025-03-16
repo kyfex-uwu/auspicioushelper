@@ -199,7 +199,7 @@ public class PortalGateH:Entity{
         SolidChecker = (Solid solid)=>{
           bool c = solid.CollideRect(new Rectangle((int)Math.Floor(Position.X)-1, (int)Position.Y, 1, (int)height));
           bool d = solid.CollideRect(new Rectangle((int)Math.Floor(Position.X), (int)Position.Y, 1, (int)height));
-          if(c!=d)s1=solid;
+          if(c==n1dir && d!=n1dir)s1=solid;
           return c!=d;
         }
       });
@@ -208,7 +208,7 @@ public class PortalGateH:Entity{
         SolidChecker = (Solid solid)=>{
           bool c = solid.CollideRect(new Rectangle((int)Math.Floor(npos.X)-1, (int)npos.Y, 1, (int)height));
           bool d = solid.CollideRect(new Rectangle((int)Math.Floor(npos.X), (int)npos.Y, 1, (int)height));
-          if(c!=d)s2=solid;
+          if(c==n2dir && d!=n2dir)s2=solid;
           return c!=d;
         }
       });

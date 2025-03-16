@@ -38,6 +38,8 @@ public class auspicioushelperModule : EverestModule {
         On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
         On.Celeste.Player.ctor += ConditionalStrawb.playerCtorHook;
 
+        Everest.Events.AssetReload.OnAfterReload += OnReload;
+
         //DebugConsole.Open();  
 
         //EntityBinder.addHooks(); 
@@ -70,7 +72,15 @@ public class auspicioushelperModule : EverestModule {
         ChannelState.unwatchAll();
         JumpListener.releaseHooks();
         portalHooks.unsetupHooks();
+        MarkedRoomParser.parseMapdata(session.MapData);
         DebugConsole.Write("Entered Level");
+    }
+    public static void OnReload(bool silent){
+        DebugConsole.Write("reloaded");
+        //DebugConsole.Write(Engine.Instance.scene.ToString());
+        if(Engine.Instance.scene is LevelLoader l){
+            MarkedRoomParser.parseMapdata(l.Level.Session.MapData);
+        }
     }
     public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
         //trash is called after constructors
@@ -91,11 +101,13 @@ public class auspicioushelperModule : EverestModule {
         Everest.Events.Player.OnDie -= OnDie;
         Everest.Events.Level.OnEnter -= OnEnter;
         Everest.Events.Level.OnLoadLevel -= EverestOnLoadLevel;
+        Everest.Events.AssetReload.OnAfterReload -= OnReload;
 
         On.Celeste.Booster.PlayerBoosted -= ChannelBooster.PlayerboostHandler;
         On.Celeste.Booster.PlayerDied -= ChannelBooster.PlayerdieHandler;
         On.Celeste.Booster.PlayerReleased -= ChannelBooster.PlayerreleaseHandler;
         On.Celeste.Player.ctor -= ConditionalStrawb.playerCtorHook;
+
 
         DebugConsole.Close();
     }

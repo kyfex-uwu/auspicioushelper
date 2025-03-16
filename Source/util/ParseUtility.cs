@@ -14,11 +14,8 @@ public static class Util{
     uint mask = hex.Length>4?0xffu:0xfu;
     float mult = hex.Length>4?1f/255f:1f/15f;
     if(hex.Length %4 != 0){
-      DebugConsole.Write("Padding Alpha");
       rgba= (rgba<<shift)+mask;
     }
-    DebugConsole.Write(rgba.ToString());
-    DebugConsole.Write((rgba&mask).ToString()+" "+((float)((rgba>>(shift*3))&mask)*mult).ToString());
     return new Color(
       (float)((rgba>>(shift*3))&mask)*mult, 
       (float)((rgba>>(shift*2))&mask)*mult, 

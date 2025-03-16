@@ -45,7 +45,16 @@ public static class DebugConsole {
         if (consoleThread == null) throw new InvalidOperationException("Debug console not open.");
         messageQueue.Add(message);
     }
-
+    public static void Write(char[,] arr){
+        string res = "";
+        for(int i=0; i<arr.GetLength(0); i++){
+            if(i != 0) res+='\n';
+            for(int j=0; j<arr.GetLength(1); j++){
+                res+=arr[i,j];
+            }
+        }
+        Write(res);
+    }
     public static void Close() {
         if(!open) return;
         if (consoleThread == null) return;
