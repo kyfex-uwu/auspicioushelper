@@ -40,13 +40,12 @@ public class TemplateZipmover:Template{
       sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
       yield return 0.1f;
       float at = 0;
-      DebugConsole.Write(virtLoc.ToString());
+      //DebugConsole.Write(virtLoc.ToString());
       while(at<1f){
         yield return null;
         at = Calc.Approach(at, 1f, 2f * Engine.DeltaTime);
         progress = Ease.SineIn(at);
         virtLoc = Position+progress*movevec;
-        DebugConsole.Write(virtLoc.ToString());
         childRelposTo(virtLoc);
       }
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
