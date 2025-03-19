@@ -217,7 +217,12 @@ public class ConditionalStrawb:Entity, IStrawberry{
   public static void playerCtorHook(On.Celeste.Player.orig_ctor orig, Player p, Vector2 pos, PlayerSpriteMode s){
     orig(p,pos,s);
     foreach(var e in auspicioushelperModule.Session.PersistentFollowers){
-      if(e.data.Name == "auspicioushelper/ConditionalStrawb") ConditionalStrawb.restoreFollowerLikeJesus(p,e);
+      if(e.data.Name == "auspicioushelper/ConditionalStrawb") restoreFollowerLikeJesus(p,e);
     }
   }
+  public static HookManager hooks = new HookManager(()=>{
+    On.Celeste.Player.ctor += playerCtorHook;
+  }, void ()=>{
+    On.Celeste.Player.ctor -= playerCtorHook;
+  });
 }

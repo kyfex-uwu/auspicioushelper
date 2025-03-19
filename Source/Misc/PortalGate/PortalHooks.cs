@@ -133,8 +133,6 @@ public static class portalHooks{
     }
   }
   public static void setupHooks(){
-    if(setup) return;
-    setup=true;
     //On.Celeste.Actor.ctor+=ActorCtorHook;
     /*MethodInfo colliderAbsLeft = typeof(Collider).GetMethod(
         "get_AbsoluteLeft",
@@ -168,8 +166,6 @@ public static class portalHooks{
   }
   
   public static void unsetupHooks(){
-    if(!setup) return;
-    setup=false;
     On.Monocle.Hitbox.Render -= HitboxRender;
     On.Monocle.Hitbox.Intersects_float_float_float_float -= HitboxIsect;
     On.Monocle.Hitbox.Intersects_Hitbox -= HitboxIsectHb;
@@ -187,4 +183,5 @@ public static class portalHooks{
     //absoluteRightHook.Dispose();
     //boundsHook.Dispose();
   }
+  public static HookManager hooks = new HookManager(setupHooks,unsetupHooks,auspicioushelperModule.OnNewScreen);
 }

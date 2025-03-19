@@ -18,6 +18,8 @@ public class auspicioushelperModuleSession : EverestModuleSession {
   }
   public Dictionary<string,int> channelData = new Dictionary<string, int>();
   public List<EntityDataId> PersistentFollowers = new List<EntityDataId>();
+  public HashSet<string> collectedTrackedCassettes = new HashSet<string>();
+  public HashSet<int> openedGates = new HashSet<int>();
 
   public void save(){
     DebugConsole.Write("Saving channel state");

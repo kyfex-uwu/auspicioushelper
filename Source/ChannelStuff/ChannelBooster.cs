@@ -118,6 +118,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     channel = data.Attr("channel","");
     selfswitching = data.Bool("self_activating", false);
     id=_id;
+    hooks.enable();
   }
   public override void Added(Scene scene)
   {
@@ -307,5 +308,14 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     //   (int)pos.X,(int)pos.Y, 4,4
     // ),Draw.Pixel.ClipRect,iinnerColor);
   }
+  static HookManager hooks = new HookManager(()=>{
+    On.Celeste.Booster.PlayerBoosted += PlayerboostHandler;
+    On.Celeste.Booster.PlayerDied += PlayerdieHandler;
+    On.Celeste.Booster.PlayerReleased += PlayerreleaseHandler;
+  }, void ()=>{
+    On.Celeste.Booster.PlayerBoosted -= PlayerboostHandler;
+    On.Celeste.Booster.PlayerDied -= PlayerdieHandler;
+    On.Celeste.Booster.PlayerReleased -= PlayerreleaseHandler;
+  }, auspicioushelperModule.OnEnterMap);
 }
 

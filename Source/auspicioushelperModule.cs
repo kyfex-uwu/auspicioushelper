@@ -14,6 +14,8 @@ public class auspicioushelperModule : EverestModule {
     public static auspicioushelperModuleSession Session => (auspicioushelperModuleSession) Instance._Session;
     public override Type SettingsType => typeof(auspicioushelperModuleSettings);
     public static auspicioushelperModuleSettings Settings => (auspicioushelperModuleSettings) Instance._Settings;
+    public override Type SaveDataType => typeof(auspicioushelperModuleSaveData);
+    public static auspicioushelperModuleSaveData SaveData=> (auspicioushelperModuleSaveData) Instance._SaveData;
 
     public auspicioushelperModule() {
         Instance = this;
@@ -25,24 +27,21 @@ public class auspicioushelperModule : EverestModule {
         Logger.SetLogLevel(nameof(auspicioushelperModule), LogLevel.Info);
 #endif
     }
+    public static ActionList OnEnterMap = new ActionList();
+    public static ActionList OnNewScreen = new ActionList();
+    public static ActionList OnReset = new ActionList();
 
     public override void Load() {
         Everest.Events.Level.OnTransitionTo += OnTransition;
-        On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         Everest.Events.Player.OnDie += OnDie;
         Everest.Events.Level.OnEnter += OnEnter;
         Everest.Events.Level.OnLoadLevel += EverestOnLoadLevel;
-
-        On.Celeste.Booster.PlayerBoosted += ChannelBooster.PlayerboostHandler;
-        On.Celeste.Booster.PlayerDied += ChannelBooster.PlayerdieHandler;
-        On.Celeste.Booster.PlayerReleased += ChannelBooster.PlayerreleaseHandler;
-        On.Celeste.Player.ctor += ConditionalStrawb.playerCtorHook;
-
         Everest.Events.AssetReload.OnAfterReload += OnReload;
 
-        //DebugConsole.Open();  
-
-        //EntityBinder.addHooks(); 
+        On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
+        DebugConsole.Write("Loading");
+        ConditionalStrawb.hooks.enable();
+        //TrackedCassette.hooks.enable();
     }
     public static void tinyCleanup(){
         PortalGateH.intersections.Clear();
@@ -51,7 +50,9 @@ public class auspicioushelperModule : EverestModule {
         Session.save();
         ChannelState.unwatchTemporary();
         tinyCleanup();
-        portalHooks.unsetupHooks();
+
+        OnReset.run();
+        OnNewScreen.run();
     } 
     public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
         orig(self, player);
@@ -66,14 +67,20 @@ public class auspicioushelperModule : EverestModule {
         ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
         tinyCleanup();
+
+        OnReset.run();
     }
     public static void OnEnter(Session session, bool fromSave){
-        Session.load(!fromSave);
+        Session?.load(!fromSave);
         ChannelState.unwatchAll();
         JumpListener.releaseHooks();
         portalHooks.unsetupHooks();
         MarkedRoomParser.parseMapdata(session.MapData);
         DebugConsole.Write("Entered Level");
+
+        OnReset.run();
+        OnNewScreen.run();
+        OnEnterMap.run();
     }
     public static void OnReload(bool silent){
         DebugConsole.Write("reloaded");
@@ -97,18 +104,13 @@ public class auspicioushelperModule : EverestModule {
 
     public override void Unload() {
         Everest.Events.Level.OnTransitionTo -= OnTransition;
-        On.Celeste.ChangeRespawnTrigger.OnEnter -= ChangerespawnHandler;
         Everest.Events.Player.OnDie -= OnDie;
         Everest.Events.Level.OnEnter -= OnEnter;
         Everest.Events.Level.OnLoadLevel -= EverestOnLoadLevel;
         Everest.Events.AssetReload.OnAfterReload -= OnReload;
 
-        On.Celeste.Booster.PlayerBoosted -= ChannelBooster.PlayerboostHandler;
-        On.Celeste.Booster.PlayerDied -= ChannelBooster.PlayerdieHandler;
-        On.Celeste.Booster.PlayerReleased -= ChannelBooster.PlayerreleaseHandler;
-        On.Celeste.Player.ctor -= ConditionalStrawb.playerCtorHook;
-
-
+        HookManager.disableAll();
         DebugConsole.Close();
+        On.Celeste.ChangeRespawnTrigger.OnEnter -= ChangerespawnHandler;
     }
 }

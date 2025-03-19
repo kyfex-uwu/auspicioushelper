@@ -49,7 +49,7 @@ public class MaterialLayer{
   }
   public virtual void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     //DebugConsole.Write("Rendering layer");
-    Effect shader = auspicioushelperModule.Settings.UseQuietShader? quietShader:normalShader;
+    Effect shader = auspicioushelperModule.Settings.UseQuietShader && quietShader!=null? quietShader:normalShader;
     if(back != null){
       MaterialPipe.gd.Textures[2]=back;
     }
