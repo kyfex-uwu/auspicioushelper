@@ -68,18 +68,18 @@ public class Template:Entity, ITemplateChild{
       c.relposTo(loc, liftspeed);
     }
   }
-  public void addEnt(ITemplateChild c){
+  public void addEnt(ITemplateChild c, bool sceneadd=false){
     Entity ce = c as Entity;
     ce.Add(new ChildMarkerComponent(this));
-    Scene.Add(ce);
+    if(sceneadd)Scene.Add(ce);
     children.Add(c);
     c.parent = this;
   }
   public override void Added(Scene scene){
     base.Added(scene);
     if(t== null) return;
-    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset));
-    if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset));
+    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset),true);
+    if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset),true);
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.Position-t.origin;
     foreach(EntityParser.EWrap w in t.childEntities){

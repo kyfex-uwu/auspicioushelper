@@ -23,19 +23,46 @@ public static class EntityParser{
     }
   }
   static Dictionary<string, Types> parseMap = new Dictionary<string, Types>();
-  static Dictionary<string, Level.EntityLoader> specialcase = new Dictionary<string, Level.EntityLoader>();
+  static Dictionary<string, Level.EntityLoader> loaders = new Dictionary<string, Level.EntityLoader>();
   public static EWrap makeWrapper(EntityData e){
     Types etype;
     if(!parseMap.TryGetValue(e.Name, out etype)){
-      DebugConsole.Write(e.Name+" template wrapper not yet implemented");
-      parseMap[e.Name] = etype = Types.unable;
+      bool bad=true;
+      try {
+        if(Level.EntityLoaders.TryGetValue(e.Name, out var loader)){
+          Entity t = loader(null, null, Vector2.Zero, e);
+          if(t is Platform){
+            parseMap[e.Name] = Types.platformbasic;
+            DebugConsole.Write(e.Name +" registered as platformbasic");
+            bad=false;
+          }else if(t is Actor){
+            parseMap[e.Name] = Types.actor;
+            DebugConsole.Write(e.Name +" registered as actor");
+            bad=false;
+          }else{
+            parseMap[e.Name] = Types.basic;
+            DebugConsole.Write(e.Name +" registered as basic");
+            bad=false;
+          }
+          if(!bad){
+            loaders[e.Name] = loader;
+          }
+        }
+      } catch(Exception ex){
+        DebugConsole.Write(e.Name+" failed to be parsed for reason "+ex.ToString());
+      }
+      if(bad){
+        DebugConsole.Write("template wrapper generator not yet implemented for "+e.Name);
+        parseMap[e.Name] = etype = Types.unable;
+      }
     }
     if(etype == Types.unable) return null;
     return new EWrap(e,etype);
   }
   public static Entity create(EWrap d, Level l, LevelData ld, Vector2 simoffset, Template t){
     if(d.t == Types.unable) return null;
-    specialcase.TryGetValue(d.d.Name, out var loader);
+    
+    loaders.TryGetValue(d.d.Name, out var loader);
     if(loader == null && !Level.EntityLoaders.TryGetValue(d.d.Name, out loader)) return null;
     Entity e = loader(l,ld,simoffset,d.d);
     switch(d.t){
@@ -49,6 +76,9 @@ public static class EntityParser{
       case Types.actor:
         return e;
       case Types.basic:
+        if(e!=null){
+          return new Wrappers.BasicEnt(e,t,simoffset+d.d.Position-t.Position);
+        }
         return null;
       default:
         return null;
@@ -56,12 +86,12 @@ public static class EntityParser{
   }
   static EntityParser(){
     parseMap["dreamBlock"] = Types.platformbasic;
-    specialcase["dreamBlock"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
+    loaders["dreamBlock"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
     parseMap["jumpThru"] = Types.platformbasic;
-    specialcase["jumpThru"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
+    loaders["jumpThru"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
     parseMap["glider"] = Types.actor;
-    specialcase["glider"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
+    loaders["glider"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
     parseMap["seekerBarrier"] = Types.platformbasic;
-    specialcase["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
+    loaders["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
   }
 }
