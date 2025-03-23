@@ -15,7 +15,7 @@ public class BgTiles:BackgroundTiles, ITemplateChild{
     toffset = t.offset;
     Depth+=depthoffset;
   }
-  public void relposTo(Vector2 loc){
+  public void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
   }
 }
@@ -34,8 +34,8 @@ public class FgTiles:SolidTiles, ITemplateChild{
     }
     return false;
   }
-  public void relposTo(Vector2 loc){
-    MoveTo(loc+toffset);
+  public void relposTo(Vector2 loc, Vector2 liftspeed){
+    MoveTo(loc+toffset, liftspeed);
   }
 
   public override void MoveHExact(int move){
@@ -99,5 +99,17 @@ public class FgTiles:SolidTiles, ITemplateChild{
       entity.Collidable = collidable;
     }
     riders.Clear();
+  }
+  public override void Awake(Scene scene){
+    base.Awake(scene);
+    foreach (StaticMover smover in scene.Tracker.GetComponents<StaticMover>()){
+      if (smover.Platform == null && smover.IsRiding(this)){
+        staticMovers.Add(smover);
+        smover.Platform = this;
+        if (smover.OnAttach != null){
+          smover.OnAttach(this);
+        }
+      }
+    }
   }
 }

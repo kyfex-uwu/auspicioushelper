@@ -19,6 +19,7 @@ public class DieWater:Water{
     base.Added(scene);
     Collider c = Collider;
     Collider = new Hitbox(0,0,-100,-100);
+    c.Top+=3;
     Add(new PlayerCollider((Player p)=>{
       p.Die(Vector2.UnitY);
     },c));

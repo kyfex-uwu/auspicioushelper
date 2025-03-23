@@ -1,6 +1,7 @@
 
 
 
+using System;
 using System.Collections;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
@@ -46,6 +47,7 @@ public class TemplateZipmover:Template{
   public override void Update(){
     base.Update();
   }
+  Vector2 ownLiftspeed;
 
   private IEnumerator Sequence(){
     while(true){
@@ -60,8 +62,10 @@ public class TemplateZipmover:Template{
         yield return null;
         at = Calc.Approach(at, 1f, 2f * Engine.DeltaTime);
         progress = Ease.SineIn(at);
+        Vector2 old = virtLoc;
         virtLoc = Position+spos.getPos(progress);
-        childRelposTo(virtLoc);
+        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposTo(virtLoc,ownLiftspeed);
       }
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       SceneAs<Level>().Shake();
@@ -71,15 +75,17 @@ public class TemplateZipmover:Template{
         yield return null;
         at2 = Calc.Approach(at2, 1f, 0.5f * Engine.DeltaTime);
         progress = 1f - Ease.SineIn(at2);
+        Vector2 old = virtLoc;
         virtLoc = Position+spos.getPos(progress);
-        childRelposTo(virtLoc);
+        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposTo(virtLoc,ownLiftspeed);
       }
       yield return 0.5f;
     }
   }
-  public override void relposTo(Vector2 loc){
+  public override void relposTo(Vector2 loc,Vector2 liftspeed){
     Position = loc+toffset;
     virtLoc = Position+spos.getPos(progress);
-    childRelposTo(virtLoc);
+    childRelposTo(virtLoc,liftspeed+ownLiftspeed);
   }
 }

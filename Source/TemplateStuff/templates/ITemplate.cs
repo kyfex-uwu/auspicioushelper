@@ -12,9 +12,7 @@ namespace Celeste.Mod.auspicioushelper;
 public interface ITemplateChild{
   Template parent {get; set;}
   Template.Propagation prop {get;}
-  void relposTo(Vector2 loc){
-
-  }
+  void relposTo(Vector2 loc, Vector2 liftspeed);
   void addTo(Scene s){
 
   }
@@ -61,13 +59,13 @@ public class Template:Entity, ITemplateChild{
     this.depthoffset = depthoffset;
     this.Visible = false;
   }
-  public virtual void relposTo(Vector2 loc){
+  public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
-    childRelposTo(Position);
+    childRelposTo(Position, liftspeed);
   }
-  public void childRelposTo(Vector2 loc){
+  public void childRelposTo(Vector2 loc, Vector2 liftspeed){
     foreach(ITemplateChild c in children){
-      c.relposTo(loc);
+      c.relposTo(loc, liftspeed);
     }
   }
   public void addEnt(ITemplateChild c){

@@ -177,6 +177,7 @@ public class PortalGateH:Entity{
   public bool contain=true;
   public List<uint> handles = new List<uint>();
   public Color color;
+  
   public PortalGateH(EntityData d, Vector2 offset):base(d.Position+offset){
     portalHooks.hooks.enable();
     Depth=-9998;

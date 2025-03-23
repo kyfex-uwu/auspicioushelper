@@ -1,6 +1,7 @@
 
 
 
+using System;
 using System.Collections;
 using Celeste.Mod.Entities;
 using FMOD.Studio;
@@ -30,27 +31,28 @@ public class TemplateSwapblock:Template{
     dat=d;
     this.offset=offset;
   }
+  Vector2 ownLiftspeed;
   public override void Update(){
     base.Update();
     if(progress!=target){
-      speed = Calc.Approach(speed,maxspeed,maxspeed);
+      speed = Calc.Approach(speed,maxspeed,maxspeed*Engine.DeltaTime*6);
+      Vector2 old = virtLoc;
       virtLoc = Position+spos.towardsNextDist(speed*Engine.DeltaTime, out bool done);
       if(done && progress ==0){
         target = target%spos.numsegs;
       }
-      childRelposTo(virtLoc);
+      ownLiftspeed = (virtLoc-old).SafeNormalize()*speed;
+      childRelposTo(virtLoc,ownLiftspeed);
     } else {
       speed=0;
       Audio.Stop(movesfx);
+      ownLiftspeed = Vector2.Zero;
     }
   }
   public void activate(){
     movesfx = Audio.Play("event:/game/05_mirror_temple/swapblock_move", Center);
     target+=1;
-    if(spos.numsegs == 2){
-      target = target%2;
-      speed=0;
-    }
+    speed=Math.Max(speed,maxspeed/3);
   }
   public override void Added(Scene scene){
     base.Added(scene);
@@ -66,9 +68,9 @@ public class TemplateSwapblock:Template{
     spos = new SplineAccessor(spline, Vector2.Zero);
     Add(new DashListener((Vector2 dir)=>activate()));
   }
-  public override void relposTo(Vector2 loc){
+  public override void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
     virtLoc = Position+spos.getPos(progress);
-    childRelposTo(virtLoc);
+    childRelposTo(virtLoc,ownLiftspeed+liftspeed);
   }
 }

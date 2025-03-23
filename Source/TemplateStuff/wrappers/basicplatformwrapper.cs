@@ -19,9 +19,9 @@ public class BasicPlatform:Entity, ITemplateChild{
     parent = t;
     toffset = offset;
   }
-  public void relposTo(Vector2 loc){
+  public void relposTo(Vector2 loc, Vector2 liftspeed){
     if(p == null)return;
-    p.MoveTo(loc+toffset);
+    p.MoveTo(loc+toffset, liftspeed);
   }
   public void addTo(Scene scene){
     scene.Add(this);

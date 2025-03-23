@@ -61,5 +61,7 @@ public static class EntityParser{
     specialcase["jumpThru"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
     parseMap["glider"] = Types.actor;
     specialcase["glider"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
+    parseMap["seekerBarrier"] = Types.platformbasic;
+    specialcase["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
   }
 }
