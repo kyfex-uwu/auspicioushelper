@@ -15,6 +15,9 @@ public interface ITemplateChild{
   void relposTo(Vector2 loc){
 
   }
+  void addTo(Scene s){
+
+  }
   void parentChangesVis(bool visibility, Color tint){
 
   }
@@ -36,7 +39,7 @@ public interface ITemplateChild{
 public class Template:Entity, ITemplateChild{
   templateFiller t=null;
   public List<ITemplateChild> children = new List<ITemplateChild>();
-  int depthoffset;
+  public int depthoffset;
   public Template parent{get;set;} = null;
   [Flags]
   public enum Propagation
@@ -45,8 +48,9 @@ public class Template:Entity, ITemplateChild{
       Riding   = 1 << 0, 
       DashHit  = 1 << 1,
       Weight   = 1 << 2,
-      Inside = 1<<3,
-      All = Riding|DashHit|Weight|Inside
+      Shake = 1<<3,
+      Inside = 1<<4,
+      All = Riding|DashHit|Weight|Shake|Inside
   }
   public Propagation prop{get;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
@@ -78,6 +82,16 @@ public class Template:Entity, ITemplateChild{
     if(t== null) return;
     if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset));
     if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset));
+    Level l = SceneAs<Level>();
+    Vector2 simoffset = this.Position-t.origin;
+    foreach(EntityParser.EWrap w in t.childEntities){
+      Entity e = EntityParser.create(w,l,null,simoffset,this);
+      if(e is ITemplateChild c){
+        c.addTo(scene);
+        addEnt(c);
+      }
+      else scene.Add(e);
+    }
   }
   public bool hasRiders<T>() where T:Actor{
     foreach(ITemplateChild c in children){
@@ -86,6 +100,6 @@ public class Template:Entity, ITemplateChild{
     return false;
   }
   public override void Removed(Scene scene){
-      foreach(ITemplateChild c in children) (c as Entity).RemoveSelf();
+    foreach(ITemplateChild c in children) (c as Entity).RemoveSelf();
   }
 }

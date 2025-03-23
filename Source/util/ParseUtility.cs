@@ -22,4 +22,36 @@ public static class Util{
       (float)((rgba>>shift)&mask)*mult, 
       (float)(rgba&mask)*mult);
   }
+
+  public static int bsearchLast(float[] arr, float val){
+    int left = 0; 
+    int right = arr.Length;
+    while(right-left>1){
+      int middle = (left+right)/2;
+      if(arr[middle]>val){
+        right = middle;
+      } else {
+        left = middle;
+      }
+    }
+    return left;
+  }
+  public static int bsearchFirst(float[] arr, float val){
+    int left = -1; 
+    int right = arr.Length-1;
+    while(right-left>1){
+      int middle = (left+right+1)/2;
+      if(arr[middle]>=val){
+        right = middle;
+      } else {
+        left = middle;
+      }
+    }
+    return right;
+  }
+  public static float remap(float t, float low, float high){
+    t=t-low;
+    high = high-low;
+    return t/high;
+  }
 }

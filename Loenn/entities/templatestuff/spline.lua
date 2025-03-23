@@ -1,21 +1,32 @@
+
+
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/templateFiller"
-entity.depth = -10000
-entity.nodeLimits = {0,1}
+entity.name = "auspicioushelper/Spline"
+entity.depth = 2000
+entity.nodeLimits = {1,100}
+entity.nodeLineRenderType = "line"
+
+
 
 entity.placements = {
   {
-    name = "Template Filler",
+    name = "spline",
     data = {
-      width = 8,
-      height = 8,
-      template_name = ""
+      identifier = "",
+      spline_type = "basic",
+      last_node_knot = false
     }
   }
+}
+local types = {"linear","basic"}
+entity.fieldInformation = {
+  spline_type ={
+    options = types
+  },
 }
 function entity.sprite(room, entity)
   color = {1, 1, 1, 0.3}
@@ -26,8 +37,7 @@ function entity.sprite(room, entity)
 end
 
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+  return utils.rectangle(entity.x-4, entity.y-4, 8, 8)
 end
-
 
 return entity

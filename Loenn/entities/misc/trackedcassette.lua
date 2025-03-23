@@ -22,14 +22,6 @@ entity.placements = {
     }
   }
 }
-entity.fieldInformation = {
-  fly_value = {
-    fieldType="integer"
-  },
-  appear_chvalue = {
-    fieldType="integer"
-  }
-}
 function entity.sprite(room, entity)
   color = {1, 1, 1, 1}
   local sprite = drawableSprite.fromTexture("util/rect", nil)

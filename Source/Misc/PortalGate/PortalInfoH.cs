@@ -81,6 +81,10 @@ public class PortalIntersectInfoH{
     m.Center=getOthersiderPos();
     if(signedface == -1)swap();
     end = Math.Sign((facesign?a.Left:a.Right)-p.getpos(ce).X)*(facesign?1:-1) == 1;
+    if(end && a is Player){
+      bool right = ce?p.n2dir:p.n1dir;
+      RcbHelper.give(right,ce?p.npos.Y:p.Position.Y);
+    }
     //if(end)DebugConsole.Write("ended");
     return end;
   }

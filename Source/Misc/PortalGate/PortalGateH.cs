@@ -185,7 +185,7 @@ public class PortalGateH:Entity{
     n1dir = d.Bool("right_facing_f0",false);
     n2dir = d.Bool("right_facing_f1",true);
     color = Util.hexToColor(d.Attr("color_hex","#FFFA"));
-    DebugConsole.Write(color.ToString()+" "+x1.ToString()+" "+x2.ToString());
+    //DebugConsole.Write(color.ToString()+" "+x1.ToString()+" "+x2.ToString());
     flipped = n1dir==n2dir;
     hmult = flipped?-1:1;
     
@@ -213,6 +213,7 @@ public class PortalGateH:Entity{
         }
       });
     }
+    RcbHelper.hooks.enable();
   }
   
   public static bool ActorMoveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor a, int moveH, Collision onCollide, Solid pusher){
@@ -232,7 +233,9 @@ public class PortalGateH:Entity{
       moveH = info.reinterpertPush(moveH,pusher);
     }
     bool val = orig(a,moveH,onCollide,pusher);
-    if(info != null && info.finish()) intersections.Remove(a); 
+    if(info != null && info.finish()){
+      intersections.Remove(a);
+    } 
     return val;
   }
   public static bool ActorMoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor a, int moveV, Collision onCollide, Solid pusher){

@@ -3,17 +3,17 @@ local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/templateFiller"
-entity.depth = -10000
-entity.nodeLimits = {0,1}
+entity.name = "auspicioushelper/TemplateSwapblock"
+entity.depth = 2000
+entity.nodeLimits = {1,100}
+entity.nodeLineRenderType = "line"
 
 entity.placements = {
   {
-    name = "Template Filler",
+    name = "Template Swapblock",
     data = {
-      width = 8,
-      height = 8,
-      template_name = ""
+      template = "",
+      depthoffset=5
     }
   }
 }
@@ -26,8 +26,7 @@ function entity.sprite(room, entity)
 end
 
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+  return utils.rectangle(entity.x-2, entity.y-2, 4, 4)
 end
-
 
 return entity

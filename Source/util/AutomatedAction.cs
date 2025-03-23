@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -78,7 +79,7 @@ public class HookManager{
   Action setup;
   Action unsetup=null;
   Func<bool> condunsetup=null;
-  bool active;
+  public bool active {get; private set;}
   ActionList autoclean;
   ScheduledAction s;
   static List<HookManager> allhooks=new List<HookManager>();
@@ -92,11 +93,12 @@ public class HookManager{
     if(autoclean != null) s=new ScheduledAction(condDisable, "Hook Manager "+label);
     allhooks.Add(this);
   }
-  public void enable(){
-    if(active) return;
+  public HookManager enable(){
+    if(active) return this;
     active = true;
     setup();
     if(autoclean != null) autoclean.enroll(s);
+    return this;
   }
   public bool simpleDisable(){
     if(!active) return true;

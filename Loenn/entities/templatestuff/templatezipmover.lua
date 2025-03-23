@@ -12,9 +12,8 @@ entity.placements = {
   {
     name = "Template Zipmover",
     data = {
-      width = 8,
-      height = 8,
-      template = ""
+      template = "",
+      depthoffset=5,
     }
   }
 }
@@ -27,7 +26,7 @@ function entity.sprite(room, entity)
 end
 
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+  return utils.rectangle(entity.x-2, entity.y-2, 4, 4)
 end
 
 return entity

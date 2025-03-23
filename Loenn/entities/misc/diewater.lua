@@ -3,17 +3,15 @@ local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/templateFiller"
-entity.depth = -10000
-entity.nodeLimits = {0,1}
+entity.name = "auspicioushelper/DieWater"
+entity.depth = 2000
 
 entity.placements = {
   {
-    name = "Template Filler",
+    name = "Die water",
     data = {
       width = 8,
-      height = 8,
-      template_name = ""
+      height=8
     }
   }
 }
@@ -23,10 +21,6 @@ function entity.sprite(room, entity)
   sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
   sprite.color = color 
   return sprite
-end
-
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
 end
 
 

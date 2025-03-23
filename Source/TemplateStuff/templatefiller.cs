@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Celeste.Mod.Entities;
@@ -21,7 +22,9 @@ public class templateFiller:Entity{
   public VirtualMap<char> fgt;
   public VirtualMap<char> bgt;
   public Vector2 offset;
-  public templateFiller(EntityData d, Vector2 offset):base(d.Position+offset){
+  public Vector2 origin=>-offset+Position;
+  public List<EntityParser.EWrap> childEntities = new List<EntityParser.EWrap>();
+  public templateFiller(EntityData d, Vector2 offset):base(d.Position){
     this.Collider = new Hitbox(d.Width, d.Height);
     name = d.Attr("template_name","");
     tr = new Rectangle((int)d.Position.X/8, (int)d.Position.Y/8, d.Width/8,d.Height/8);

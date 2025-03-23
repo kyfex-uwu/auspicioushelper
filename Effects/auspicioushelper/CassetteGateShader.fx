@@ -5,7 +5,6 @@ sampler2D materialSamp : register(s1);
 
 uniform float time;
 uniform float2 cpos;
-uniform float quiet;
 
 float4 matAt(float2 pos, float offsetx, float offsety){
     return floor(tex2D(materialSamp,float2(pos.x+offsetx/320.,pos.y+offsety/180.))*255);
@@ -145,10 +144,10 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 	//float noise = os2noderivskew(float3(wpos/20,0));///10+float2(time*0.3,time*0.6),time/3.));
 	//return float4(noise, noise, noise, 1);
 	float pto = drand(float3(floor(wpos.x),floor(wpos.y),1));
-	float st = floor(time-pto);
-	float sv = drand(float3(wpos.x,wpos.y,st));
-	float sr = quiet*(os2noderivskew(float3(wpos.x,wpos.y,time*3)/1.5)*0.7+0.5);
-	float sparks=(sv>0.98)*(1-mod(time-pto,1));
+	//float st = floor(time-pto);
+	//float sv = drand(float3(wpos.x,wpos.y,st));
+	float sr = (os2noderivskew(float3(wpos.x+time,wpos.y+time*3,time)/10)*0.35+0.25)+(os2noderivskew(float3(wpos.x+time,wpos.y-time*3,time)/10)*0.35+0.25);
+	//float sparks=(sv>0.98)*(1-mod(time-pto,1));
   bool centers = matAt(pos,1,0).a==0 || matAt(pos,-1,0).a==0 ||
     matAt(pos, 0,1).a==0 || matAt(pos, 0,-1).a==0;
   bool diags = matAt(pos, 1,1).a==0 || matAt(pos, 1,-1).a==0 ||
@@ -157,7 +156,7 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
       return float4(1,1,1,1);
   }
   float alph = 0.2;
-  return float4((1-alph)*(float3(0,0,0)+0.3*sr+sparks)+alph,1);
+  return float4((1-alph)*(float3(0,0,0)+0.3*sr)+alph,1);
 
 }
 

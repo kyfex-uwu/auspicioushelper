@@ -9,7 +9,7 @@ namespace Celeste.Mod.auspicioushelper;
 public static class MarkedRoomParser{
 
   public static Dictionary<string, templateFiller> templates = new Dictionary<string, templateFiller>();
-  public static string sigstr = "AHtroom";
+  public static string sigstr = "zztemplates";
   public static void parseLeveldata(LevelData l, string prefix){
     var rects = new StaticCollisiontree();
     var handleDict = new Dictionary<int, string>();
@@ -28,7 +28,20 @@ public static class MarkedRoomParser{
         t.setTiles(l.Solids,l.Bg);
       }
     }
-
+    foreach(EntityData d in l.Entities){
+      //DebugConsole.Write(d.Name);
+      if(d.Name == "auspicioushelper/templateFiller") continue;
+      var hits = rects.collidePointAll(d.Position);
+      EntityParser.EWrap w = null;
+      if(hits.Count >0) w = EntityParser.makeWrapper(d);
+      if(w == null) continue;
+      foreach(int handle in hits){
+        string tid = handleDict[handle];
+        templates.TryGetValue(tid, out var temp);
+        if(temp == null) continue;
+        temp.childEntities.Add(w);
+      }
+    }
   }
   public static void parseMapdata(MapData m){
     templates.Clear();

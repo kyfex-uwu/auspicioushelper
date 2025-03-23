@@ -2,6 +2,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -30,6 +31,28 @@ public struct FloatRect{
   public FloatRect(Entity e){
     x=e.Left; y=e.Top; w=e.Width; h=e.Height;
   }
+  public void expandXto(float loc){
+    if(loc<x){
+      w+=x-loc;
+      x=loc;
+    }
+    if(loc>x+w){
+      w+=loc-(x+w);
+    }
+  }
+  public void expandYto(float loc){
+    if(loc<y){
+      h+=y-loc;
+      y=loc;
+    }
+    if(loc>y+h){
+      h+=loc-(y+h);
+    }
+  }
+  public void invertY(){
+    y=y+h;
+    h=-h;
+  }
   public bool CollidePoint(Vector2 p){
     return p.X>=x && p.Y>=y && p.X<x+w && p.Y<y+h;
   }
@@ -50,6 +73,33 @@ public struct FloatRect{
   }
   public bool CollideExRect(float ox, float oy, float ow, float oh){
     return x+w>ox && y+h>oy && x<ox+ow && y<oy+oh;
+  }
+  public bool CollideCollider(Collider c){
+    if(c is Hitbox h){
+      h.Collide(munane());
+    } else if(c is Circle cir){
+      return CollideCircle(cir.AbsolutePosition,cir.Radius);
+    } else if(c is Grid r){
+      r.Collide(munane());
+    } else if(c is ColliderList l){
+      foreach(Collider i in l.colliders){
+        if(CollideCollider(i)) return true;
+      }  
+      return false;
+    }else {
+      DebugConsole.Write("Forgor to implement floatrect colliding for "+c.ToString());
+      throw new NotImplementedException();
+    }
+    return false;
+  }
+  public Entity CollideFirst(List<Entity> li){
+    foreach(Entity e in li){
+      if(e.Collidable && CollideCollider(e.Collider)) return e;
+    }
+    return null;
+  }
+  public bool CollideEntitylist(List<Entity> e){
+    return CollideFirst(e)!=null;
   }
   public Rectangle munane(){
     return new Rectangle((int) x, (int) y, (int) w, (int) h);
