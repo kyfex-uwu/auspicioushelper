@@ -56,15 +56,18 @@ public struct FloatRect{
   public bool CollidePoint(Vector2 p){
     return p.X>=x && p.Y>=y && p.X<x+w && p.Y<y+h;
   }
-  public bool CollideLine(Vector2 a, Vector2 b){
-    Vector2 dir = b-a;
-    Vector2 t1 = tlc/dir;
-    Vector2 t2 = brc/dir;
+  public bool CollideRay(Vector2 p, Vector2 dir){
+    Vector2 t1 = (tlc-p)/dir;
+    Vector2 t2 = (brc-p)/dir;
     Vector2 maxs = Vector2.Max(t1,t2);
     Vector2 mins = Vector2.Min(t1,t2);
     float min = Math.Max(mins.X,mins.Y);
     float max = Math.Min(maxs.X,maxs.Y);
-    return min<max && (min<1 || max>0);
+    return min<max && min<1 && max>0;
+  }
+  public bool CollideLine(Vector2 a, Vector2 b){
+    Vector2 dir = b-a;
+    return CollideRay(a,dir);
   }
   public bool CollideCircle(Vector2 p, float r){
     p=p-center;
@@ -73,6 +76,10 @@ public struct FloatRect{
   }
   public bool CollideExRect(float ox, float oy, float ow, float oh){
     return x+w>ox && y+h>oy && x<ox+ow && y<oy+oh;
+  }
+  public bool CollideRectSweep(FloatRect o, Vector2 sweep){
+    FloatRect expanded = new FloatRect(x-o.w,y-o.h,w+o.w,h+o.h);
+    return expanded.CollideRay(o.tlc,sweep);
   }
   public bool CollideCollider(Collider c){
     if(c is Hitbox h){

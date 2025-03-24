@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Celeleste.Mods.auspicioushelper;
 using Celeste.Mod.auspicioushelper;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;

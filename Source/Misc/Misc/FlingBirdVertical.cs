@@ -5,7 +5,7 @@ using Celeste.Mod;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 [CustomEntity("auspicioushelper/VerticalFlingBird")]
 public class VerticalFlingBird:FlingBird{
   public static bool hooked = false;

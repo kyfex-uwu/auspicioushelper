@@ -5,7 +5,7 @@ using Celeste.Mods.auspicioushelper;
 using Monocle;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 public interface IMaterialObject{
   public void registerMaterials();

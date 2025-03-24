@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 [Tracked]
 [CustomEntity("auspicioushelper/SpriteAnimChain")]
 public class SpriteAnimChain:Entity, IMaterialObject{

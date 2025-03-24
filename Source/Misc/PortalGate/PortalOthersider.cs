@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -38,7 +39,12 @@ public class PortalOthersider:Entity{
       for(int i=0; i<h.Sprite.HairCount; i++){
         h.Nodes[i]=(h.Nodes[i]-oldpos)*mulMove+p.Position;
       }
-      p.Render();
+      try{
+        p.Render();
+      }catch(Exception ex){
+        DebugConsole.Write("Error in rendering otherside player");
+        DebugConsole.Write(ex.ToString());
+      }
       for(int i=0; i<h.Sprite.HairCount; i++){
         h.Nodes[i]=(h.Nodes[i]-p.Position)*mulMove+oldpos;
       }

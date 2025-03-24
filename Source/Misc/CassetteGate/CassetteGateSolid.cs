@@ -2,7 +2,6 @@
 
 
 
-using Celeleste.Mods.auspicioushelper;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

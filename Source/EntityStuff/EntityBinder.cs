@@ -13,7 +13,7 @@ using Monocle;
 using MonoMod.Cil;
 using MonoMod.Utils;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 public static class EntityBinder{
   public static Dictionary<Entity, EntityData> entitydata;

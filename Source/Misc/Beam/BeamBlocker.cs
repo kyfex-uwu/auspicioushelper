@@ -2,12 +2,11 @@
 
 
 using System;
-using Celeste;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 [CustomEntity("auspicioushelper/BeamBlocker")]
 [Tracked]

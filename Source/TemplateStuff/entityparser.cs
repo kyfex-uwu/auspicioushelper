@@ -12,7 +12,7 @@ public static class EntityParser{
   public enum Types{
     unable,
     platformbasic,
-    actor,
+    unwrapped,
     basic,
   }
   public class EWrap{
@@ -36,8 +36,8 @@ public static class EntityParser{
             DebugConsole.Write(e.Name +" registered as platformbasic");
             bad=false;
           }else if(t is Actor){
-            parseMap[e.Name] = Types.actor;
-            DebugConsole.Write(e.Name +" registered as actor");
+            parseMap[e.Name] = Types.unwrapped;
+            DebugConsole.Write(e.Name +" registered as unwrapped");
             bad=false;
           }else{
             parseMap[e.Name] = Types.basic;
@@ -73,7 +73,7 @@ public static class EntityParser{
           DebugConsole.Write("Wrongly classified!!! "+d.d.Name);
           return null;
         }
-      case Types.actor:
+      case Types.unwrapped:
         return e;
       case Types.basic:
         if(e!=null){
@@ -89,9 +89,27 @@ public static class EntityParser{
     loaders["dreamBlock"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
     parseMap["jumpThru"] = Types.platformbasic;
     loaders["jumpThru"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
-    parseMap["glider"] = Types.actor;
+    parseMap["glider"] = Types.unwrapped;
     loaders["glider"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
     parseMap["seekerBarrier"] = Types.platformbasic;
     loaders["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
+    
+    parseMap["spikesUp"] = Types.unwrapped;
+    loaders["spikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Up);
+    parseMap["spikesDown"] = Types.unwrapped;
+    loaders["spikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Down);
+    parseMap["spikesLeft"] = Types.unwrapped;
+    loaders["spikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Left);
+    parseMap["spikesRight"] = Types.unwrapped;
+    loaders["spikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Right);
+
+    parseMap["triggerSpikesUp"] = Types.unwrapped;
+    loaders["triggerSpikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Up);
+    parseMap["triggerSpikesDown"] = Types.unwrapped;
+    loaders["triggerSpikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Down);
+    parseMap["triggerSpikesLeft"] = Types.unwrapped;
+    loaders["triggerSpikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Left);
+    parseMap["triggerSpikesRight"] = Types.unwrapped;
+    loaders["triggerSpikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
   }
 }

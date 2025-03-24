@@ -5,7 +5,7 @@ using Celeste;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 [CustomEntity("auspicioushelper/ConditionalStrawbCollectTrigger")]
 public class ConditionalStrawbCollectTrigger:Trigger {

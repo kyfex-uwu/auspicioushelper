@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Celeste.Mods.auspicioushelper;
 using Monocle;
 using System.Collections;
-using Celeleste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Celeste.Mod.auspicioushelper;

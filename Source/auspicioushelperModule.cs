@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using Celeleste.Mods.auspicioushelper;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;

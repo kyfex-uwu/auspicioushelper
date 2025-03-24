@@ -9,7 +9,7 @@ using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 
 [CustomEntity("auspicioushelper/ChannelJelly")]

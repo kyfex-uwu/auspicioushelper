@@ -11,13 +11,13 @@ namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/CassetteGate")]
 public class CassetteGate:Entity{
-  Solid s1;
-  Solid s2;
+  public Solid s1;
+  public Solid s2;
   int id;
 
-  bool open;
+  public bool open;
   bool horizontal;
-  float frac;
+  public float frac;
   int width;
   int height;
   Vector2 size;

@@ -1,8 +1,8 @@
 
 
 using System;
-using Celeleste.Mods.auspicioushelper;
 using Celeste.Mod.Entities;
+using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 

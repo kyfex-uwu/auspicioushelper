@@ -6,7 +6,7 @@ using Celeste.Mod.auspicioushelper;
 using IL.Monocle;
 using Microsoft.Xna.Framework;
 
-namespace Celeleste.Mods.auspicioushelper;
+namespace Celeste.Mods.auspicioushelper;
 
 //take noise in a circle
 public class NoiseSamplerOS2_2DLoop{
