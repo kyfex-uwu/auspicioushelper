@@ -68,7 +68,7 @@ public class TemplateZipmover:Template{
       DebugConsole.Write("using fallback spline");
       LinearSpline l =new LinearSpline();
       spline = l;
-      l.fromNodes(SplineEntity.entityInfoToNodes(dat.Position,dat.Nodes,offset,true));
+      l.fromNodes(SplineEntity.entityInfoToNodes(dat.Position,dat.Nodes,offset,dat.Bool("lastNodeIsKnot",true)));
     }
     spos = new SplineAccessor(spline, Vector2.Zero);
   }
@@ -129,9 +129,10 @@ public class TemplateZipmover:Template{
       done = false;
       while(!done){
         yield return null;
-        at+=Engine.DeltaTime;
+        at+=Engine.DeltaTime*2;
         Vector2 old = virtLoc;
-        done = spos.towardsNext((float)((Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+        done = spos.towardsNext((float)(2*(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+        //DebugConsole.Write($"{at}, {spos.t}");
         virtLoc = Position+spos.pos;
         ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
         childRelposTo(virtLoc, ownLiftspeed);
@@ -139,32 +140,37 @@ public class TemplateZipmover:Template{
       
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       SceneAs<Level>().Shake();
-      yield return 0.5f;
+      yield return 0.25f;
 
       if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
-      (rtype == ReturnType.loop || spos.t<spos.numsegs)){
+      (rtype == ReturnType.loop || spos.t<spos.numsegs-1)){
         sfx.Stop();
         goto going;
       } else{
-        if(spos.t==spos.numsegs && rtype == ReturnType.normal)goto returning;
+        if(spos.t==spos.numsegs-1 && rtype == ReturnType.normal)goto returning;
         sfx.Stop();
-        if(spos.t<spos.numsegs)goto waiting;
+        if(spos.t<spos.numsegs-1 || rtype == ReturnType.loop)goto waiting;
         else yield break;
       }
 
     returning:
+      yield return 0.25f;
+      sfx.Stop();
+      sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
+      sfx.instance.setTimelinePosition(1000);
       done = false;
       at=0;
       while(!done){
         yield return null;
-        at+=Engine.DeltaTime;
+        at+=Engine.DeltaTime/2;
         Vector2 old = virtLoc;
-        done = spos.towardsNext((float)(-(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+        done = spos.towardsNext((float)(-(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime/2));
         virtLoc = Position+spos.pos;
         ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
         childRelposTo(virtLoc, ownLiftspeed);
       }
       if(spos.t>0) goto returning;
+      yield return 0.5f;
       goto waiting;
   }
   public override void relposTo(Vector2 loc,Vector2 liftspeed){

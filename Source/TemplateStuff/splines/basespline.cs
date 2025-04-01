@@ -167,16 +167,16 @@ public class SplineEntity:Entity{
   }
   public static Spline constructImpl(Vector2 firstpos, Vector2[] nodes, Vector2 offset, string type, bool lnn=false){
     switch(type){
-      case "simpleLinear":
+      case "linear":
         LinearSpline sl =new LinearSpline();
         sl.fromNodes(entityInfoToNodes(firstpos,nodes,offset,true));
         return sl;
-      case "linear":
+      case "simpleLinear":
         LinearSpline l = new LinearSpline();
         l.fromNodesAllRed(entityInfoToNodes(firstpos,nodes,offset,lnn));
         return l;
       default:
-        throw new NotImplementedException();
+        return null;
     }
   }
   public SplineEntity(EntityData d, Vector2 offset):base(d.Position+offset){

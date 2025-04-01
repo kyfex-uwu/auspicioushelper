@@ -25,7 +25,7 @@ public class LinearSpline:Spline{
   public override Vector2 getPos(float t){
     t=(t%segments+segments)%segments;
     int low = Util.bsearchLast(st,t);
-    float frac = Util.remap(t, st[low], low<st.Length-1?st[low+1]:nodes.Length);
+    float frac = Util.remap(t, st[low], low<st.Length-1?st[low+1]:segments);
     return (1-frac)*nodes[low]+frac*nodes[(low+1)%nodes.Length];
   }
   public override void fromNodes(Vector2[] innodes){
@@ -47,5 +47,6 @@ public class LinearSpline:Spline{
         j=(j+1)%nodes.Length;
       }
     }
+    
   }
 }
