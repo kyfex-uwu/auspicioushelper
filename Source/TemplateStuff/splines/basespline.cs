@@ -153,7 +153,7 @@ public class SplineEntity:Entity{
     simpleLinear,
     linear,
     catmull,
-    catmulldenormalized,
+    catmullDenormalized,
   }
   Types type;
   public static Vector2[] entityInfoToNodes(Vector2 pos, Vector2[] enodes, Vector2 offset, bool lnn){
@@ -165,12 +165,26 @@ public class SplineEntity:Entity{
     if(lnn)nodes[nodes.Length-1]=enodes[enodes.Length-1]+offset;
     return nodes;
   }
+  public static Spline constructImpl(Vector2 firstpos, Vector2[] nodes, Vector2 offset, string type, bool lnn=false){
+    switch(type){
+      case "simpleLinear":
+        LinearSpline sl =new LinearSpline();
+        sl.fromNodes(entityInfoToNodes(firstpos,nodes,offset,true));
+        return sl;
+      case "linear":
+        LinearSpline l = new LinearSpline();
+        l.fromNodesAllRed(entityInfoToNodes(firstpos,nodes,offset,lnn));
+        return l;
+      default:
+        throw new NotImplementedException();
+    }
+  }
   public SplineEntity(EntityData d, Vector2 offset):base(d.Position+offset){
     type = d.Attr("spline_type","normal") switch {
       "linear"=>Types.linear,
       "basic"=>Types.simpleLinear,
       "catmull"=>Types.catmull,
-      "catmull_denormalized"=>Types.catmulldenormalized,
+      "catmull_denormalized"=>Types.catmullDenormalized,
       _=>Types.simpleLinear,
     };
     Vector2[] nodes = new Vector2[d.Nodes.Length+1+(d.Bool("last_node_knot",false)?1:0)];

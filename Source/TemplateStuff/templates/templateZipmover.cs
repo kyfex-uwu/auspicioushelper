@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics.Tracing;
+using Celeste.Editor;
 using Celeste.Mod.Entities;
+using FMOD.Studio;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -22,6 +25,19 @@ public class TemplateZipmover:Template{
   SplineAccessor spos;
   EntityData dat;
   Vector2 offset;
+  public enum ReturnType{
+    loop,
+    none,
+    normal,
+  }
+  ReturnType rtype;
+  public enum ActivationType{
+    ride,
+    dash,
+    rideAutomatic,
+    dashAutomatic,
+  }
+  ActivationType atype;
   public TemplateZipmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateZipmover(EntityData d, Vector2 offset, int depthoffset)
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
@@ -82,6 +98,50 @@ public class TemplateZipmover:Template{
       }
       yield return 0.5f;
     }
+  }
+  private IEnumerator FancySequence(){
+    waiting:
+    yield return null;
+    if(atype == ActivationType.ride || atype==ActivationType.rideAutomatic){
+      if(hasRiders<Player>()) goto going;
+    } else if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
+      throw new NotImplementedException();
+    }
+    goto waiting;
+
+    going:
+    sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
+    yield return 0.1f;
+    float at=0;
+    bool done = false;
+    while(!done){
+      yield return null;
+      at+=Engine.DeltaTime;
+      Vector2 old = virtLoc;
+      done = spos.towardsNext((float)((Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+      virtLoc = Position+spos.pos;
+      ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+      childRelposTo(virtLoc, ownLiftspeed);
+    }
+    
+    Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+    SceneAs<Level>().Shake();
+    yield return 0.5f;
+
+    if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
+    (rtype == ReturnType.loop || spos.t<spos.numsegs)){
+      sfx.Stop();
+      goto going;
+    } else{
+      if(spos.t==spos.numsegs && rtype == ReturnType.normal)goto returning;
+      sfx.Stop();
+      if(spos.t<spos.numsegs)goto waiting;
+      else yield break;
+    }
+
+    returning:
+
+    goto waiting;
   }
   public override void relposTo(Vector2 loc,Vector2 liftspeed){
     Position = loc+toffset;
