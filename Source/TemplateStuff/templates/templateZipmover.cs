@@ -3,10 +3,7 @@
 
 using System;
 using System.Collections;
-using System.Diagnostics.Tracing;
-using Celeste.Editor;
 using Celeste.Mod.Entities;
-using FMOD.Studio;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -20,7 +17,6 @@ public class TemplateZipmover:Template{
     }
   private SoundSource sfx = new SoundSource();
   Themes theme = Themes.Normal;
-  float progress=0;
   Vector2 virtLoc;
   SplineAccessor spos;
   EntityData dat;
@@ -41,19 +37,35 @@ public class TemplateZipmover:Template{
   public TemplateZipmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateZipmover(EntityData d, Vector2 offset, int depthoffset)
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
-    Add(new Coroutine(Sequence()));
+    Add(new Coroutine(FancySequence()));
     virtLoc = Position;
     Add(sfx);
     dat=d;
     this.offset=offset;
+    rtype = d.Attr("return_type","normal") switch {
+      "loop"=>ReturnType.loop,
+      "none"=>ReturnType.none,
+      _=>ReturnType.normal
+    };
+    atype = d.Attr("activation_type","ride") switch {
+      "ride"=>ActivationType.ride,
+      "dash"=>ActivationType.dash,
+      "rideAutomatic"=>ActivationType.rideAutomatic,
+      "dashAutomatic"=>ActivationType.dashAutomatic,
+      _=>ActivationType.ride,
+    };
   }
   public override void Added(Scene scene){
     base.Added(scene);
     Spline spline=null;
     if(!string.IsNullOrEmpty(dat.Attr("spline"))){
       Spline.splines.TryGetValue(dat.Attr("spline"), out spline);
+      if(spline == null){
+        spline = SplineEntity.constructImpl(dat.Position,dat.Nodes,offset,dat.Attr("spline"),dat.Bool("lastNodeIsKnot",true));
+      }
     }
     if(spline == null){
+      DebugConsole.Write("using fallback spline");
       LinearSpline l =new LinearSpline();
       spline = l;
       l.fromNodes(SplineEntity.entityInfoToNodes(dat.Position,dat.Nodes,offset,true));
@@ -65,7 +77,7 @@ public class TemplateZipmover:Template{
   }
   Vector2 ownLiftspeed;
 
-  private IEnumerator Sequence(){
+  /*private IEnumerator Sequence(){
     while(true){
       if(!hasRiders<Player>()){
         yield return null; continue;
@@ -98,54 +110,66 @@ public class TemplateZipmover:Template{
       }
       yield return 0.5f;
     }
-  }
+  }*/
   private IEnumerator FancySequence(){
+    bool done; float at;
     waiting:
-    yield return null;
-    if(atype == ActivationType.ride || atype==ActivationType.rideAutomatic){
-      if(hasRiders<Player>()) goto going;
-    } else if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
-      throw new NotImplementedException();
-    }
-    goto waiting;
+      yield return null;
+      if(atype == ActivationType.ride || atype==ActivationType.rideAutomatic){
+        if(hasRiders<Player>()) goto going;
+      } else if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
+        throw new NotImplementedException();
+      }
+      goto waiting;
 
     going:
-    sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
-    yield return 0.1f;
-    float at=0;
-    bool done = false;
-    while(!done){
-      yield return null;
-      at+=Engine.DeltaTime;
-      Vector2 old = virtLoc;
-      done = spos.towardsNext((float)((Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
-      virtLoc = Position+spos.pos;
-      ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-      childRelposTo(virtLoc, ownLiftspeed);
-    }
-    
-    Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-    SceneAs<Level>().Shake();
-    yield return 0.5f;
+      sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
+      yield return 0.1f;
+      at=0;
+      done = false;
+      while(!done){
+        yield return null;
+        at+=Engine.DeltaTime;
+        Vector2 old = virtLoc;
+        done = spos.towardsNext((float)((Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+        virtLoc = Position+spos.pos;
+        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposTo(virtLoc, ownLiftspeed);
+      }
+      
+      Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
+      SceneAs<Level>().Shake();
+      yield return 0.5f;
 
-    if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
-    (rtype == ReturnType.loop || spos.t<spos.numsegs)){
-      sfx.Stop();
-      goto going;
-    } else{
-      if(spos.t==spos.numsegs && rtype == ReturnType.normal)goto returning;
-      sfx.Stop();
-      if(spos.t<spos.numsegs)goto waiting;
-      else yield break;
-    }
+      if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
+      (rtype == ReturnType.loop || spos.t<spos.numsegs)){
+        sfx.Stop();
+        goto going;
+      } else{
+        if(spos.t==spos.numsegs && rtype == ReturnType.normal)goto returning;
+        sfx.Stop();
+        if(spos.t<spos.numsegs)goto waiting;
+        else yield break;
+      }
 
     returning:
-
-    goto waiting;
+      done = false;
+      at=0;
+      while(!done){
+        yield return null;
+        at+=Engine.DeltaTime;
+        Vector2 old = virtLoc;
+        done = spos.towardsNext((float)(-(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
+        virtLoc = Position+spos.pos;
+        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposTo(virtLoc, ownLiftspeed);
+      }
+      if(spos.t>0) goto returning;
+      goto waiting;
   }
   public override void relposTo(Vector2 loc,Vector2 liftspeed){
     Position = loc+toffset;
-    virtLoc = Position+spos.getPos(progress);
+    virtLoc = Position+spos.pos;
     childRelposTo(virtLoc,liftspeed+ownLiftspeed);
   }
 }

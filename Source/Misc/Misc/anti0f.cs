@@ -23,11 +23,6 @@ public class Anti0fZone:Entity{
     bounds = new FloatRect(Position.X,Position.Y,d.Width,d.Height);
     hooks.enable();
   }
-  public override void Render()
-  {
-      base.Render();
-      Draw.Rect(bounds.munane(), new Color(0,0.5f,0.5f,0.3f));
-  }
 
 
   public static bool PlayerUpdateDetour(Player p){
