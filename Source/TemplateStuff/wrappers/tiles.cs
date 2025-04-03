@@ -7,26 +7,73 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-public class BgTiles:BackgroundTiles, ITemplateChild{
+public static class TileHooks{
+  static Rectangle hookAnimT(On.Celeste.AnimatedTiles.orig_GetClippedRenderTiles orig, AnimatedTiles a, int extend){
+    Rectangle r = orig(a,extend);
+    if(a.Entity is IBoundsHaver e){
+      return e.GetTilebounds(a.Entity.Position+a.Position, r);
+    }
+    return r;
+  }
+  static Rectangle hookTiles(On.Monocle.TileGrid.orig_GetClippedRenderTiles orig, TileGrid a){
+    Rectangle r = orig(a);
+    if(a.Entity is IBoundsHaver e){
+      return e.GetTilebounds(a.Entity.Position+a.Position, r);
+    }
+    return r;
+  }
+  public static HookManager hooks = new HookManager(()=>{
+    On.Celeste.AnimatedTiles.GetClippedRenderTiles+=hookAnimT;
+    On.Monocle.TileGrid.GetClippedRenderTiles+=hookTiles;
+  },void ()=>{
+    On.Celeste.AnimatedTiles.GetClippedRenderTiles-=hookAnimT;
+    On.Monocle.TileGrid.GetClippedRenderTiles-=hookTiles;
+  },auspicioushelperModule.OnEnterMap);
+}
+
+public interface IBoundsHaver{
+  FloatRect bounds {get;}
+  public Rectangle GetTilebounds(Vector2 loc, Rectangle isect){
+    Vector2 tlc = ((bounds.tlc-loc)/8).Floor();
+    Vector2 brc = ((bounds.brc-loc)/8).Ceiling();
+    FloatRect levelclip = FloatRect.fromCorners(tlc, brc);
+    levelclip.expandAll(0);
+    return levelclip._intersect(new FloatRect(isect)).munane();
+  }
+}
+
+public class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.None;
   public Template parent {get;set;}
   public Vector2 toffset;
+  public FloatRect bounds {get;set;}
   public BgTiles(templateFiller t, Vector2 posoffset, int depthoffset):base(posoffset+t.offset, t.bgt){
     toffset = t.offset;
     Depth+=depthoffset;
+    TileHooks.hooks.enable();
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
   }
+  public override void Added(Scene scene){
+    base.Added(scene);
+    bounds = new FloatRect(SceneAs<Level>().Bounds);
+  }
 }
 
-public class FgTiles:SolidTiles, ITemplateChild{
+public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.All;
   public Template parent {get;set;}
   public Vector2 toffset;
+  public FloatRect bounds {get;set;}
   public FgTiles(templateFiller t, Vector2 posoffset, int depthoffset):base(posoffset+t.offset, t.fgt){
     toffset = t.offset;
     Depth+=depthoffset;
+    TileHooks.hooks.enable();
+  }
+  public override void Added(Scene scene){
+    base.Added(scene);
+    bounds = new FloatRect(SceneAs<Level>().Bounds);
   }
   public bool hasRiders<T>() where T:Actor{
     foreach(T a in Scene.Tracker.GetEntities<T>()){

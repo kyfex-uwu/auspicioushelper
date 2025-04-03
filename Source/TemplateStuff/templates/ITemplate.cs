@@ -16,16 +16,15 @@ public interface ITemplateChild{
   void addTo(Scene s){
 
   }
-  void parentChangesVis(bool visibility, Color tint){
+  void parentChangeStat(bool visibility, bool collidability, int clayer){
 
   }
   bool hasRiders<T>() where T : Actor{
     return false;
   }
-  Template.Propagation propegatesTo(Template target){
+  Template.Propagation propegatesTo(Template target, Template.Propagation p = Template.Propagation.All){
     ITemplateChild c=this;
-    Template.Propagation p = Template.Propagation.All;
-    while(c != target && c!= null){
+    while(c != target && c!= null && p!=Template.Propagation.None){
       if(c==target) return p;
       c=c.parent;
       p&=c.parent.prop;
@@ -52,6 +51,7 @@ public class Template:Entity, ITemplateChild{
   }
   public Propagation prop{get;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
+  public Wrappers.BasicMultient basicents = null;
   public Template(string templateStr, Vector2 pos, int depthoffset):base(pos){
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
       DebugConsole.Write("No template found with identifier "+templateStr);
@@ -70,13 +70,13 @@ public class Template:Entity, ITemplateChild{
   }
   public void addEnt(ITemplateChild c, bool sceneadd=false){
     Entity ce = c as Entity;
-    ce.Add(new ChildMarkerComponent(this));
     if(sceneadd)Scene.Add(ce);
     children.Add(c);
     c.parent = this;
   }
   public override void Added(Scene scene){
     base.Added(scene);
+    if(basicents!=null && basicents.Scene==null) basicents.sceneadd(scene);
     if(t== null) return;
     if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset),true);
     if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset),true);
@@ -88,8 +88,22 @@ public class Template:Entity, ITemplateChild{
         c.addTo(scene);
         addEnt(c);
       }
-      else scene.Add(e);
+      else if(e!=null)scene.Add(e);
     }
+    foreach(DecalData d in t.decals){
+      Decal e = new Decal(d.Texture, simoffset+d.Position, d.Scale, d.GetDepth(0), d.Rotation, d.ColorHex){
+        DepthSetByPlacement = true
+      };
+      AddBasicEnt(e, simoffset+d.Position-Position);
+    }
+  }
+  public void AddBasicEnt(Entity e, Vector2 offset){
+    if(basicents == null){
+      basicents = new Wrappers.BasicMultient(this);
+      addEnt(basicents, Scene!=null);
+      if(Scene!=null)basicents.Scene = Scene;
+    }
+    basicents.add(e,offset);
   }
   public bool hasRiders<T>() where T:Actor{
     foreach(ITemplateChild c in children){

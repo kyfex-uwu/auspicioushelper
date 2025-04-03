@@ -31,6 +31,12 @@ public struct FloatRect{
   public FloatRect(Entity e){
     x=e.Left; y=e.Top; w=e.Width; h=e.Height;
   }
+  public FloatRect(Rectangle r){
+    x=r.X; y=r.Y; w=r.Width; h=r.Height;
+  }
+  public static FloatRect fromCorners(Vector2 tlc, Vector2 brc){
+    return new FloatRect(tlc.X,tlc.Y,brc.X-tlc.X,brc.Y-tlc.Y);
+  }
   public void expandXto(float loc){
     if(loc<x){
       w+=x-loc;
@@ -113,5 +119,13 @@ public struct FloatRect{
   }
   public override string ToString(){
       return "FloatRect:{"+string.Format("x:{0}, y:{1}, w:{2}, h:{3}",x,y,w,h)+"} ";
+  }
+  public void expandAll(float a){
+    x-=a; y-=a; w+=a*2; h+=a*2;
+  }
+  public FloatRect _intersect(FloatRect o){
+    var c1 = Vector2.Max(tlc,o.tlc);
+    var c2 = Vector2.Min(brc, o.brc);
+    return fromCorners(c1,c2);
   }
 }

@@ -42,6 +42,9 @@ public static class SpeedrunToolIop{
         ChannelState.unwatchAll();
         PortalGateH.intersections.Clear();
         foreach(Entity e in Engine.Instance.scene.Entities){
+          if(e is INeedHooks n){
+            n.setupHooksInstance();
+          }
           if(e is IChannelUser e_){
             if(e_ is ChannelBooster b && b.id.ToString() == lastUsed.ToString()){
               ChannelBooster.lastUsed = b;

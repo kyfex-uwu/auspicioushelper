@@ -77,12 +77,18 @@ public static class EntityParser{
         return e;
       case Types.basic:
         if(e!=null){
-          return new Wrappers.BasicEnt(e,t,simoffset+d.d.Position-t.Position);
+          t.AddBasicEnt(e,simoffset+d.d.Position-t.Position);
+          //return new Wrappers.BasicEnt(e,t,simoffset+d.d.Position-t.Position);
         }
         return null;
       default:
         return null;
     }
+  }
+  static EntityID geid(EntityData e){
+    if(Engine.Scene is Level l)
+      return new EntityID(l.Session.LevelData.Name,e.ID);
+    return new EntityID("",e.ID);
   }
   static EntityParser(){
     parseMap["dreamBlock"] = Types.platformbasic;
@@ -102,7 +108,6 @@ public static class EntityParser{
     loaders["spikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Left);
     parseMap["spikesRight"] = Types.unwrapped;
     loaders["spikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Right);
-
     parseMap["triggerSpikesUp"] = Types.unwrapped;
     loaders["triggerSpikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Up);
     parseMap["triggerSpikesDown"] = Types.unwrapped;
@@ -111,5 +116,12 @@ public static class EntityParser{
     loaders["triggerSpikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Left);
     parseMap["triggerSpikesRight"] = Types.unwrapped;
     loaders["triggerSpikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
+
+    parseMap["refill"] = Types.basic;
+    loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Refill(e,offset);
+    parseMap["touchSwitch"] = Types.basic;
+    loaders["touchSwitch"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TouchSwitch(e,offset);
+    parseMap["strawberry"] = Types.basic;
+    loaders["strawberry"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Strawberry(e,offset,geid(e));
   }
 }

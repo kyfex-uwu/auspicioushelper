@@ -42,6 +42,38 @@ public static class MarkedRoomParser{
         temp.childEntities.Add(w);
       }
     }
+    foreach(DecalData d in l.FgDecals){
+      var hits = rects.collidePointAll(d.Position);
+      foreach(int handle in hits){
+        string tid = handleDict[handle];
+        templates.TryGetValue(tid, out var temp);
+        if(temp == null) continue;
+        temp.decals.Add(new DecalData(){
+          Texture = d.Texture,
+          Position = d.Position,
+          Scale = d.Scale,
+          Rotation = d.Rotation,
+          ColorHex = d.ColorHex,
+          Depth = d.GetDepth(-10500)
+        });
+      }
+    }
+    foreach(DecalData d in l.BgDecals){
+      var hits = rects.collidePointAll(d.Position);
+      foreach(int handle in hits){
+        string tid = handleDict[handle];
+        templates.TryGetValue(tid, out var temp);
+        if(temp == null) continue;
+        temp.decals.Add(new DecalData(){
+          Texture = d.Texture,
+          Position = d.Position,
+          Scale = d.Scale,
+          Rotation = d.Rotation,
+          ColorHex = d.ColorHex,
+          Depth = d.GetDepth(9000)
+        });
+      }
+    }
   }
   public static void parseMapdata(MapData m){
     templates.Clear();

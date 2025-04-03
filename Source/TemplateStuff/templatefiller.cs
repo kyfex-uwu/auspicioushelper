@@ -23,6 +23,7 @@ public class templateFiller:Entity{
   public VirtualMap<char> bgt;
   public Vector2 offset;
   public Vector2 origin=>-offset+Position;
+  public List<DecalData> decals = new List<DecalData>();
   public List<EntityParser.EWrap> childEntities = new List<EntityParser.EWrap>();
   public templateFiller(EntityData d, Vector2 offset):base(d.Position){
     this.Collider = new Hitbox(d.Width, d.Height);

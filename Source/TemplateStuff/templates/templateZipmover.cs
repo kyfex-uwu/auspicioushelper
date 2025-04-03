@@ -134,8 +134,9 @@ public class TemplateZipmover:Template{
         done = spos.towardsNext((float)(2*(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
         //DebugConsole.Write($"{at}, {spos.t}");
         virtLoc = Position+spos.pos;
+        Vector2 oldOLS = ownLiftspeed;
         ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc, ownLiftspeed);
+        childRelposTo(virtLoc, done?oldOLS:ownLiftspeed);
       }
       
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);

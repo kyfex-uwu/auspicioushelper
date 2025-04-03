@@ -14,7 +14,7 @@ namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/PortalGateH")]
 [Tracked]
-public class PortalGateH:Entity{
+public class PortalGateH:Entity, INeedHooks{
   private MTexture texture = GFX.Game["util/lightbeam"];
   public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(20, 70, 100);
   public static Dictionary<Entity, PortalIntersectInfoH> intersections = new Dictionary<Entity, PortalIntersectInfoH>();
