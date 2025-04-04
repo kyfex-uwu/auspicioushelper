@@ -43,7 +43,11 @@ public static class DebugConsole {
     public static void Write(string message) {
         if(!open) return;
         if (consoleThread == null) throw new InvalidOperationException("Debug console not open.");
-        messageQueue.Add(message);
+        try{
+            messageQueue.Add(message);
+        }catch(Exception){
+
+        }
     }
     public static void Write(char[,] arr){
         string res = "";

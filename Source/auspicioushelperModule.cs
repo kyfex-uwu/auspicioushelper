@@ -87,6 +87,14 @@ public class auspicioushelperModule : EverestModule {
         if(Engine.Instance.scene is LevelLoader l){
             MarkedRoomParser.parseMapdata(l.Level.Session.MapData);
         }
+        DebugConsole.Write(Engine.Scene.ToString());
+        if(Session != null){
+            try{
+                Session.load(false);
+            } catch(Exception ex){
+                DebugConsole.Write($"reloading error: {ex}");
+            }
+        }
     }
     public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
         //trash is called after constructors
@@ -95,7 +103,7 @@ public class auspicioushelperModule : EverestModule {
 
     public override void LoadContent(bool firstLoad){
         base.LoadContent(firstLoad);
-        SpeedrunToolIop.speedruntoolinteropload();
+        SpeedrunToolIop.hooks.enable();
         auspicioushelperGFX.loadContent();
         MaterialPipe.setup();
     }

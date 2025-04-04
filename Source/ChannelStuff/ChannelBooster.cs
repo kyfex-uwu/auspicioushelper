@@ -82,7 +82,8 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
   public int currentState;
   public bool dirty;
   public bool selfswitching;
-  public EntityID id;
+  public int id;
+  public static int idctr = 0;
   public Color iinnerColor;
 
 
@@ -116,7 +117,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     innersprite.Visible = false;
     channel = data.Attr("channel","");
     selfswitching = data.Bool("self_activating", false);
-    id=_id;
+    id=idctr++;
     hooks.enable();
   }
   public override void Added(Scene scene)

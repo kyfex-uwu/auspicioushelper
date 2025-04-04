@@ -85,11 +85,6 @@ public static class EntityParser{
         return null;
     }
   }
-  static EntityID geid(EntityData e){
-    if(Engine.Scene is Level l)
-      return new EntityID(l.Session.LevelData.Name,e.ID);
-    return new EntityID("",e.ID);
-  }
   static EntityParser(){
     parseMap["dreamBlock"] = Types.platformbasic;
     loaders["dreamBlock"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
@@ -122,6 +117,11 @@ public static class EntityParser{
     parseMap["touchSwitch"] = Types.basic;
     loaders["touchSwitch"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TouchSwitch(e,offset);
     parseMap["strawberry"] = Types.basic;
-    loaders["strawberry"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Strawberry(e,offset,geid(e));
+    loaders["strawberry"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>{
+      EntityID id = new EntityID(ld.Name,e.ID);
+      DebugConsole.Write("Trying to template berry: "+ id.ToString());
+      if(l.Session.DoNotLoad.Contains(id)) return null;
+      return (Entity) new Strawberry(e,offset,new EntityID(ld.Name,e.ID));
+    };
   }
 }

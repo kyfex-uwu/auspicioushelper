@@ -83,7 +83,7 @@ public class Template:Entity, ITemplateChild{
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.Position-t.origin;
     foreach(EntityParser.EWrap w in t.childEntities){
-      Entity e = EntityParser.create(w,l,null,simoffset,this);
+      Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this);
       if(e is ITemplateChild c){
         c.addTo(scene);
         addEnt(c);

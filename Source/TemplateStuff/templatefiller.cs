@@ -16,6 +16,7 @@ namespace Celeste.Mod.auspicioushelper;
 public class templateFiller:Entity{
   
   public string name;
+  public LevelData roomdat;
   Rectangle tr;
   // char[,] fgtiles;
   // char[,] bgtiles;

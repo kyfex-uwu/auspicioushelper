@@ -14,7 +14,7 @@ namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/PortalGateH")]
 [Tracked]
-public class PortalGateH:Entity, INeedHooks{
+public class PortalGateH:Entity{
   private MTexture texture = GFX.Game["util/lightbeam"];
   public NoiseSamplerOS2_2DLoop ogen = new NoiseSamplerOS2_2DLoop(20, 70, 100);
   public static Dictionary<Entity, PortalIntersectInfoH> intersections = new Dictionary<Entity, PortalIntersectInfoH>();
@@ -177,6 +177,7 @@ public class PortalGateH:Entity, INeedHooks{
   public bool contain=true;
   public List<uint> handles = new List<uint>();
   public Color color;
+  public bool giveRCB;
   
   public PortalGateH(EntityData d, Vector2 offset):base(d.Position+offset){
     portalHooks.hooks.enable();
@@ -214,6 +215,7 @@ public class PortalGateH:Entity, INeedHooks{
         }
       });
     }
+    giveRCB = d.Bool("give_rcb",true);
     RcbHelper.hooks.enable();
   }
   

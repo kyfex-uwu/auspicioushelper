@@ -15,7 +15,9 @@ public static class MarkedRoomParser{
     var handleDict = new Dictionary<int, string>();
     foreach(EntityData d in l.Entities){
       if(d.Name == "auspicioushelper/templateFiller"){
-        templateFiller t = new templateFiller(d, Vector2.Zero); //we are in frame of room <3
+        templateFiller t = new templateFiller(d, Vector2.Zero){
+          roomdat = l
+        }; //we are in frame of room <3
         string id = prefix+t.name;
         if(templates.ContainsKey(id)){
           DebugConsole.Write("Multiple templates with the same identifier "+id);
