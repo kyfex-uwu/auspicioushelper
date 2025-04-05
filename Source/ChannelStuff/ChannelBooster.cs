@@ -296,7 +296,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
   public void registerMaterials(){
     layerA.planDraw(this);
   }
-  public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
+  public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     if(respawnTimer<=0 && sprite.Visible){
       innersprite.Position = sprite.Position.Floor();
       innersprite.Render();

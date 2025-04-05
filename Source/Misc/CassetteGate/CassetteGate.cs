@@ -28,7 +28,7 @@ public class CassetteGate:Entity{
   //average dotproduct unroller
   float blockWidth=>major.X*majorAxis+minor.X*minorAxis;
   float blockHeight=>major.Y*majorAxis+minor.Y*minorAxis;
-  public static MaterialLayer visuals = null;
+  public static BasicMaterialLayer visuals = null;
   
   public CassetteGate(EntityData d, Vector2 pos):base(d.Position+pos){
     size = new Vector2(width = d.Width, height=d.Height);
@@ -39,7 +39,7 @@ public class CassetteGate:Entity{
 
     id = d.ID;
     if(visuals == null){
-      visuals = new MaterialLayer(-9001, auspicioushelperGFX.LoadEffect("CassetteGateShader"));
+      visuals = new BasicMaterialLayer(-9001, auspicioushelperGFX.LoadEffect("CassetteGateShader"));
     }
     MaterialPipe.addLayer(visuals);
   }

@@ -43,6 +43,7 @@ public static class SpeedrunToolIop{
         int? lastUsed = ChannelBooster.lastUsed?.id;
         ChannelState.unwatchAll();
         PortalGateH.intersections.Clear();
+        TemplateCassetteManager.unfrickMats(level);
         foreach(Entity e in Engine.Instance.scene.Entities){
           if(e is PortalGateH portalgateh){
             portalHooks.hooks.enable();

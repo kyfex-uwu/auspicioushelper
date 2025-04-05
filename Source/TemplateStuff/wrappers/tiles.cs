@@ -1,6 +1,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -59,6 +60,13 @@ public class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
     base.Added(scene);
     bounds = new FloatRect(SceneAs<Level>().Bounds);
   }
+  public void AddAllChildren(List<Entity> l){
+    l.Add(this);
+  }
+  public void parentChangeStat(int vis, int col){
+    if(vis!=0)Visible = vis>0;
+    if(col!=0)Collidable = col>0;
+  }
 }
 
 public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
@@ -70,6 +78,7 @@ public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
     toffset = t.offset;
     Depth+=depthoffset;
     TileHooks.hooks.enable();
+    OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
   }
   public override void Added(Scene scene){
     base.Added(scene);
@@ -158,5 +167,14 @@ public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
         }
       }
     }
+  }
+  public void AddAllChildren(List<Entity> l){
+    l.Add(this);
+  }
+  public void parentChangeStat(int vis, int col){
+    if(vis!=0)Visible = vis>0;
+    if(col!=0)Collidable = col>0;
+    if(col>0) EnableStaticMovers();
+    else if(col<0) DisableStaticMovers();
   }
 }

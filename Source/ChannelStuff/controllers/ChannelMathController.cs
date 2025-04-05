@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Celeste.Mod.Entities;
 using Celeste.Mods.auspicioushelper;
@@ -33,6 +34,11 @@ public class ChannelMathController:Entity{
     runEveryFrame = d.Bool("every_frame",false);
     debug = d.Bool("debug",false);
     var bin=Convert.FromBase64String(d.Attr("compiled_operations",""));
+    DebugConsole.Write(bin.Length.ToString());
+    if(bin.Length<2){
+      DebugConsole.Write("Invalid instructions - too short");
+      return;
+    }
     int version = BitConverter.ToUInt16(bin);
     if(version!=1){
       DebugConsole.Write("Invalid version for mathcontroller");
@@ -51,7 +57,7 @@ public class ChannelMathController:Entity{
     reg = new int[numReg];
     op = new byte[opsLength];
     Array.Copy(bin, opsOffset, op, 0, opsLength);
-
+    needsrun = true;
   }
   public override void Added(Scene scene){
     base.Added(scene);

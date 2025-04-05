@@ -11,7 +11,7 @@ namespace Celeste.Mod.auspicioushelper;
 [CustomEntity("auspicioushelper/MaterialController")]
 [Tracked]
 public class MaterialController:Entity{
-  static Dictionary<string, MaterialLayer> loadedMats = new Dictionary<string, MaterialLayer>();
+  static Dictionary<string, IMaterialLayer> loadedMats = new Dictionary<string, IMaterialLayer>();
   public MaterialController(EntityData e,Vector2 v):base(new Vector2(0,0)){
     string path=e.Attr("path","");
     bool reload = e.Bool("reload",false);

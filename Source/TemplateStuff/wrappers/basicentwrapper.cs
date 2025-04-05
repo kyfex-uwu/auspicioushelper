@@ -62,4 +62,18 @@ public class BasicMultient:Entity, ITemplateChild{
       scene.Add(en.e);
     }
   }
+  public void AddAllChildren(List<Entity> l){
+    foreach(EntEnt ent in ents)l.Add(ent.e);
+  }
+  public void parentChangeStat(int vis, int col){
+    foreach(EntEnt ent in ents){
+      if(vis!=0) ent.e.Visible = vis>0; 
+      if(col!=0){
+        ent.e.Collidable = col>0; 
+        foreach(Component c in ent.e.Components){
+          if(c is PlayerCollider cl) cl.Active=col>0;
+        }
+      }
+    }
+  }
 }

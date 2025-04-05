@@ -16,9 +16,7 @@ public interface ITemplateChild{
   void addTo(Scene s){
 
   }
-  void parentChangeStat(bool visibility, bool collidability, int clayer){
-
-  }
+  void parentChangeStat(int vis, int col);
   bool hasRiders<T>() where T : Actor{
     return false;
   }
@@ -31,6 +29,14 @@ public interface ITemplateChild{
     }
     return Template.Propagation.None;
   }
+  DashCollisionResults propegateDashHit(Player player, Vector2 direction){
+    if((prop&Template.Propagation.DashHit) != Template.Propagation.None && (parent!=null)){
+      if(parent.OnDashCollide != null) return parent.OnDashCollide(player, direction);
+      return ((ITemplateChild)parent).propegateDashHit(player, direction);
+    }
+    return DashCollisionResults.NormalCollision;
+  }
+  void AddAllChildren(List<Entity> list);
 }
 
 public class Template:Entity, ITemplateChild{
@@ -52,6 +58,7 @@ public class Template:Entity, ITemplateChild{
   public Propagation prop{get;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
+  public DashCollision OnDashCollide = null;
   public Template(string templateStr, Vector2 pos, int depthoffset):base(pos){
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
       DebugConsole.Write("No template found with identifier "+templateStr);
@@ -113,5 +120,15 @@ public class Template:Entity, ITemplateChild{
   }
   public override void Removed(Scene scene){
     foreach(ITemplateChild c in children) (c as Entity).RemoveSelf();
+  }
+  public void AddAllChildren(List<Entity> l){
+    foreach(ITemplateChild c in children){
+      c.AddAllChildren(l);
+    }
+  }
+  public virtual void parentChangeStat(int vis, int col){
+    foreach(ITemplateChild c in children){
+      c.parentChangeStat(vis,col);
+    }
   }
 }

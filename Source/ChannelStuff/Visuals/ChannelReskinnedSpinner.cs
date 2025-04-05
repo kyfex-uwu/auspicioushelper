@@ -89,7 +89,7 @@ public class ChannelReskinnedSpinner:Entity, IMaterialObject{
   public void registerMaterials(){
     ChannelBaseEntity.layerA.planDraw(this);
   }
-  public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
+  public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     sb.Draw(sprite.Texture.Texture_Safe, Position, sprite.ClipRect, Color.White, 
       ((float)Math.PI/2)*(float)(randomSeed & 3), origin,1,(randomSeed&4) !=0?SpriteEffects.FlipHorizontally:SpriteEffects.None,0);
     // Vector2 pos = Position-new Vector2(2,2);

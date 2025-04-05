@@ -1,6 +1,7 @@
 
 
 
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
 
@@ -53,5 +54,74 @@ public static class Util{
     t=t-low;
     high = high-low;
     return t/high;
+  }
+  static Dictionary<char,char> escape = new Dictionary<char, char>{
+    {'{','}'}, {'[',']'}, {'(',')'},
+  };
+  public static Dictionary<string,string> kvparseflat(string str){
+    Stack<char> unescaped = new Stack<char>();
+    var o = new Dictionary<string,string>();
+    string k="";
+    string v="";
+    int idx=0;
+    bool escapeNext = false;
+    parsekey:
+      if(idx>=str.Length) return o;
+      if(str[idx] == ':'){
+        idx++;goto parsevalue;
+      }
+      else{
+        k+=str[idx]; idx++; goto parsekey;
+      }
+
+    parsevalue:
+      if((idx >= str.Length||str[idx] == ',') && unescaped.Count ==0){
+        idx++; goto fent;
+      }
+      if(idx >= str.Length){
+        DebugConsole.Write("PARSE ERROR: "+str);
+        return null;
+      }
+      if(escape.TryGetValue(str[idx], out var esc)){
+        unescaped.Push(esc);
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      if(unescaped.Count>0 && unescaped.Peek()==str[idx]){
+        unescaped.Pop(); 
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      if(str[idx]=='"'){
+        v+=str[idx]; idx++; goto parsestring;
+      }
+      v+=str[idx]; idx++; goto parsevalue;
+
+    parsestring:
+      if(idx == str.Length){
+        DebugConsole.Write("PARSE ERROR: "+str);
+      }
+      if(escapeNext){
+        escapeNext = false; 
+        v+=str[idx]; idx++; goto parsestring;
+      }
+      if(str[idx] == '"'){
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      v+=str[idx]; idx++; goto parsestring;
+
+    fent:
+      o.Add(k.Trim(),v.Trim());
+      k=""; v="";
+      goto parsekey;
+  }
+  public static string stripEnclosure(string str){
+    if(str == "") return "";
+    if(escape.TryGetValue(str[0],out var esc)){
+      if(str[str.Length-1]==esc)return str.Substring(1,str.Length-2);
+      else {
+        DebugConsole.Write("Enclosing characters not symmetric: "+str);
+        return str;
+      }
+    }
+    return str;
   }
 }

@@ -7,8 +7,11 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
+
+
+
 public static class MaterialPipe {
-  public static List<MaterialLayer> layers = new List<MaterialLayer>();
+  public static List<IMaterialLayer> layers = new List<IMaterialLayer>();
   public static bool dirty;
   public static GraphicsDevice gd;
   public static void setup(){
@@ -56,7 +59,7 @@ public static class MaterialPipe {
     }
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
-    foreach(MaterialLayer l in layers){
+    foreach(IMaterialLayer l in layers){
       if(l.independent){
         if(l.checkdo())l.render(self.Camera,sb);
         else l.diddraw = false;
@@ -91,7 +94,7 @@ public static class MaterialPipe {
     gd.SetRenderTarget(t);
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
   }
-  public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, MaterialLayer l){
+  public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, IMaterialLayer l){
     if(l.checkdo()){
       if(l.independent){
         //DebugConsole.Write("pasting prerendered layer");
@@ -105,14 +108,14 @@ public static class MaterialPipe {
       }
     }
   }
-  public static void addLayer(MaterialLayer l){
+  public static void addLayer(IMaterialLayer l){
     l.removeNext=false;
     if(layers.Contains(l)) return; //we do not allow that, no sir
     dirty = true;
     layers.Add(l);
     l.enabled=true;
   }
-  public static void removeLayer(MaterialLayer l){
+  public static void removeLayer(IMaterialLayer l){
     layers.Remove(l);
     l.enabled=false;
   }
@@ -125,10 +128,13 @@ public static class MaterialPipe {
     );
   }
   public static void redoLayers(){
-    var newLayers = new List<MaterialLayer>();
-    foreach(MaterialLayer l in layers){
+    var newLayers = new List<IMaterialLayer>();
+    foreach(IMaterialLayer l in layers){
       if(!l.removeNext) newLayers.Add(l);
-      else l.enabled = false;
+      else{
+        l.enabled = false;
+        l.onRemove();
+      }
       l.removeNext=true;
     }
     layers=newLayers;

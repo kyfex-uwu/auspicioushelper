@@ -3,6 +3,7 @@
 
 
 
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -18,6 +19,8 @@ public class BasicPlatform:Entity, ITemplateChild{
     this.p=p;
     parent = t;
     toffset = offset;
+    Visible = false;
+    p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     if(p == null)return;
@@ -38,5 +41,14 @@ public class BasicPlatform:Entity, ITemplateChild{
       if(typeof(T) == typeof(Actor)) return j.HasRider();
     }
     return false;
+  }
+  public void AddAllChildren(List<Entity> l){
+    l.Add(p);
+  }
+  public void parentChangeStat(int vis, int col){
+    if(vis!=0)p.Visible = vis>0;
+    if(col!=0)p.Collidable = col>0;
+    if(col>0) p.EnableStaticMovers();
+    else if(col<0) p.DisableStaticMovers();
   }
 }

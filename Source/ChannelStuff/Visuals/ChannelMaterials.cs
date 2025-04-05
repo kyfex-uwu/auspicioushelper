@@ -7,7 +7,7 @@ using Monocle;
 
 //I have become the c# abstraction-enraptured person lmao like actually what is this haha
 //OK to be sort of fair I intended to do a custom rasterMats for this but decided not.
-public class ChannelMaterialsA:MaterialLayer{
+public class ChannelMaterialsA:BasicMaterialLayer{
   private List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
   public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader2")){

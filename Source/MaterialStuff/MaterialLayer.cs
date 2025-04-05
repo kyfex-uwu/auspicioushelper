@@ -10,20 +10,36 @@ using Celeste.Mod;
 
 namespace Celeste.Mods.auspicioushelper;
 
-public class MaterialLayer{
-  public bool independent;
-  public float depth;
+
+public interface IMaterialLayer{
+  public bool enabled {get;set;}
+  public bool removeNext {get;set;}
+  public float depth {get;}
+  public RenderTarget2D outtex {get;}
+  public bool independent {get;}
+  public bool diddraw {get;set;}
+  public void render(Camera c, SpriteBatch sb){
+    render(c,sb,null);
+  }
+  public void render(Camera c, SpriteBatch sb, RenderTarget2D back);
+  public bool checkdo();
+  public void onRemove(){}
+}
+
+public class BasicMaterialLayer:IMaterialLayer{
+  public bool independent {get;set;}
+  public float depth {get;set;}
   public RenderTarget2D mattex;
-  public RenderTarget2D outtex;
+  public RenderTarget2D outtex {get;}
   public List<IMaterialObject> willDraw = new List<IMaterialObject>();
   public Effect normalShader;
   public bool both;
   public bool always;
-  public bool diddraw;
-  public bool enabled;
-  public bool removeNext;
+  public bool diddraw {get;set;}
+  public bool enabled {get;set;}
+  public bool removeNext {get;set;}
   public Effect quietShader = null;
-  public MaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
+  public BasicMaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     if(!outonly){
       mattex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);

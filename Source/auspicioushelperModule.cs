@@ -45,7 +45,7 @@ public class auspicioushelperModule : EverestModule {
     public static void tinyCleanup(){
         PortalGateH.intersections.Clear();
     }
-    public void OnTransition(Level level, LevelData next, Vector2 direction){
+    void OnTransition(Level level, LevelData next, Vector2 direction){
         Session.save();
         ChannelState.unwatchTemporary();
         tinyCleanup();
@@ -53,7 +53,7 @@ public class auspicioushelperModule : EverestModule {
         OnReset.run();
         OnNewScreen.run();
     } 
-    public static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
+    static void ChangerespawnHandler(On.Celeste.ChangeRespawnTrigger.orig_OnEnter orig, ChangeRespawnTrigger self, Player player){
         orig(self, player);
         //if ((!session.RespawnPoint.HasValue || session.RespawnPoint.Value != Target))
         Session session = (self.Scene as Level).Session;
@@ -61,7 +61,7 @@ public class auspicioushelperModule : EverestModule {
             Session.save();
         }
     }
-    public static void OnDie(Player player){
+    static void OnDie(Player player){
         Session.load(false);
         ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
@@ -69,7 +69,7 @@ public class auspicioushelperModule : EverestModule {
 
         OnReset.run();
     }
-    public static void OnEnter(Session session, bool fromSave){
+    static void OnEnter(Session session, bool fromSave){
         Session?.load(!fromSave);
         ChannelState.unwatchAll();
         JumpListener.releaseHooks();
@@ -81,7 +81,7 @@ public class auspicioushelperModule : EverestModule {
         OnNewScreen.run();
         OnEnterMap.run();
     }
-    public static void OnReload(bool silent){
+    static void OnReload(bool silent){
         DebugConsole.Write("reloaded");
         //DebugConsole.Write(Engine.Instance.scene.ToString());
         if(Engine.Instance.scene is LevelLoader l){
@@ -96,7 +96,7 @@ public class auspicioushelperModule : EverestModule {
             }
         }
     }
-    public static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
+    static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
         //trash is called after constructors
         MaterialPipe.redoLayers();
     }

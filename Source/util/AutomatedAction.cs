@@ -75,17 +75,6 @@ public class ActionList{
   }
 }
 
-//use this for any hooks that we detatch on a roomly basis
-public interface INeedHooks{
-  static HookManager hooks;
-  public static virtual void setupHooks(){
-    hooks.enable();
-  }
-  public virtual void setupHooksInstance(){
-    hooks.enable();
-  }
-}
-
 public class HookManager{
   Action setup;
   Action unsetup=null;
@@ -120,7 +109,7 @@ public class HookManager{
   public bool condDisable(){
     if(!active) return true;
     active=!condunsetup();
-    return active;
+    return !active;
   }
   public bool disable(){
     if(condunsetup != null) return active = !condDisable();

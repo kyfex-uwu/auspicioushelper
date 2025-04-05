@@ -20,7 +20,8 @@ public static class DebugConsole {
         if (consoleThread != null) return;
 
         if (!AllocConsole()) {
-            throw new InvalidOperationException("Failed to allocate a console.");
+            Logger.Log("auspicious","Failed to allocate a console.");
+            return;
         }
 
         consoleThread = new Thread(() => {

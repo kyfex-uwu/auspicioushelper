@@ -88,7 +88,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
   public void registerMaterials(){
     ChannelBaseEntity.layerA.planDrawBG(this);
   }
-  public void renderMaterial(MaterialLayer l, SpriteBatch sb, Camera c){
+  public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     // well since this is initially for towercollab there's no need to do culling (forgive me I am so sorry like)
     int n = nodes.Count;
     foreach(ActiveSprite s in chain){
