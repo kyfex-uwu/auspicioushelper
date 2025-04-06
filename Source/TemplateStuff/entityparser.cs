@@ -14,6 +14,7 @@ public static class EntityParser{
     platformbasic,
     unwrapped,
     basic,
+    removeSMbasic,
   }
   public class EWrap{
     public EntityData d;
@@ -65,6 +66,7 @@ public static class EntityParser{
     loaders.TryGetValue(d.d.Name, out var loader);
     if(loader == null && !Level.EntityLoaders.TryGetValue(d.d.Name, out loader)) return null;
     Entity e = loader(l,ld,simoffset,d.d);
+    if(e==null) return null;
     switch(d.t){
       case Types.platformbasic:
         if(e is Platform p){
@@ -81,6 +83,12 @@ public static class EntityParser{
           //return new Wrappers.BasicEnt(e,t,simoffset+d.d.Position-t.Position);
         }
         return null;
+      case Types.removeSMbasic:
+        List<StaticMover> SMRemove = new List<StaticMover>();
+        foreach(Component c in e.Components) if(c is StaticMover sm) SMRemove.Add(sm);
+        foreach(StaticMover sm in SMRemove) e.Remove(sm);
+        t.AddBasicEnt(e,simoffset+d.d.Position-t.Position);
+        return null;
       default:
         return null;
     }
@@ -95,21 +103,21 @@ public static class EntityParser{
     parseMap["seekerBarrier"] = Types.platformbasic;
     loaders["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
     
-    parseMap["spikesUp"] = Types.unwrapped;
+    parseMap["spikesUp"] = Types.removeSMbasic;
     loaders["spikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Up);
-    parseMap["spikesDown"] = Types.unwrapped;
+    parseMap["spikesDown"] = Types.removeSMbasic;
     loaders["spikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Down);
-    parseMap["spikesLeft"] = Types.unwrapped;
+    parseMap["spikesLeft"] = Types.removeSMbasic;
     loaders["spikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Left);
-    parseMap["spikesRight"] = Types.unwrapped;
+    parseMap["spikesRight"] = Types.removeSMbasic;
     loaders["spikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Right);
-    parseMap["triggerSpikesUp"] = Types.unwrapped;
+    parseMap["triggerSpikesUp"] = Types.removeSMbasic;
     loaders["triggerSpikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Up);
-    parseMap["triggerSpikesDown"] = Types.unwrapped;
+    parseMap["triggerSpikesDown"] = Types.removeSMbasic;
     loaders["triggerSpikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Down);
-    parseMap["triggerSpikesLeft"] = Types.unwrapped;
+    parseMap["triggerSpikesLeft"] = Types.removeSMbasic;
     loaders["triggerSpikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Left);
-    parseMap["triggerSpikesRight"] = Types.unwrapped;
+    parseMap["triggerSpikesRight"] = Types.removeSMbasic;
     loaders["triggerSpikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
 
     parseMap["refill"] = Types.basic;

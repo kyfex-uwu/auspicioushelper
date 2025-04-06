@@ -13,11 +13,12 @@ public interface ITemplateChild{
   Template parent {get; set;}
   Template.Propagation prop {get;}
   void relposTo(Vector2 loc, Vector2 liftspeed);
-  void addTo(Scene s){
-
-  }
+  void addTo(Scene s){}
   void parentChangeStat(int vis, int col);
   bool hasRiders<T>() where T : Actor{
+    return false;
+  }
+  bool hasInside(Actor a){
     return false;
   }
   Template.Propagation propegatesTo(Template target, Template.Propagation p = Template.Propagation.All){
@@ -55,6 +56,7 @@ public class Template:Entity, ITemplateChild{
       Inside = 1<<4,
       All = Riding|DashHit|Weight|Shake|Inside
   }
+  public Vector2 ownLiftspeed;
   public Propagation prop{get;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
@@ -116,6 +118,10 @@ public class Template:Entity, ITemplateChild{
     foreach(ITemplateChild c in children){
       if((c.prop & Propagation.Riding)!=0 && c.hasRiders<T>()) return true;
     }
+    return false;
+  }
+  public bool hasInside(Actor a){
+    foreach(ITemplateChild c in children) if(c.hasInside(a)) return true;
     return false;
   }
   public override void Removed(Scene scene){

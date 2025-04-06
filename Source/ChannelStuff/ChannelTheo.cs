@@ -11,7 +11,6 @@ namespace Celeste.Mod.auspicioushelper;
 [Tracked]
 [CustomEntity("auspicioushelper/ChannelTheo")]
 public class ChannelTheo:TheoCrystal, IChannelUser{
-  public static bool hooked = false;
   public string channel {get; set;}
   public bool active=false;
   public bool switchThrown;
@@ -33,13 +32,8 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
       playerfrac = data.Float("player_momentum_weight",1);
       theofrac = data.Float("theo_momentum_weight",0);
     };
-    if(!hooked){
-      hooked=true;
-      On.Celeste.Player.Throw += PlayerThrowHook;
-      On.Celeste.Holdable.Pickup += PickupHook;
-      On.Celeste.TheoCrystal.Die += OnDie;
-    }
     Hold.OnPickup = OnPickupHook;
+    hooks.enable();
   }
   public static void OnDie(On.Celeste.TheoCrystal.orig_Die orig, TheoCrystal self){
     if((self.Scene is Level L) && L.Transitioning){
@@ -95,4 +89,13 @@ public class ChannelTheo:TheoCrystal, IChannelUser{
     }
     base.OnPickup();
   }
+  static HookManager hooks = new HookManager(()=>{
+    On.Celeste.Player.Throw += PlayerThrowHook;
+    On.Celeste.Holdable.Pickup += PickupHook;
+    On.Celeste.TheoCrystal.Die += OnDie;
+  }, void ()=>{
+    On.Celeste.Player.Throw -= PlayerThrowHook;
+    On.Celeste.Holdable.Pickup -= PickupHook;
+    On.Celeste.TheoCrystal.Die -= OnDie;
+  });
 }

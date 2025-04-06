@@ -75,7 +75,6 @@ public class TemplateZipmover:Template{
   public override void Update(){
     base.Update();
   }
-  Vector2 ownLiftspeed;
 
   /*private IEnumerator Sequence(){
     while(true){
@@ -178,5 +177,9 @@ public class TemplateZipmover:Template{
     Position = loc+toffset;
     virtLoc = Position+spos.pos;
     childRelposTo(virtLoc,liftspeed+ownLiftspeed);
+  }
+  public override void Removed(Scene scene){
+    base.Removed(scene);
+    sfx.Stop();
   }
 }

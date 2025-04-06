@@ -42,6 +42,9 @@ public class BasicPlatform:Entity, ITemplateChild{
     }
     return false;
   }
+  public bool hasInside(Actor a){
+    return p.Collider.Collide(a.Collider);
+  }
   public void AddAllChildren(List<Entity> l){
     l.Add(p);
   }

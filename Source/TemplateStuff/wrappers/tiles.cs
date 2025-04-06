@@ -90,6 +90,9 @@ public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
     }
     return false;
   }
+  public bool hasInside(Actor a){
+    return Collider.Collide(a.Collider);
+  }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     MoveTo(loc+toffset, liftspeed);
   }

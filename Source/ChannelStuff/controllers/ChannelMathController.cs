@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Celeste.Editor;
 using Celeste.Mod.Entities;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
@@ -17,12 +18,12 @@ public class ChannelMathController:Entity{
   byte[] op = null;
   int[] reg;
   enum Op:byte{
-    noop, loadZero, loadImmediateByte, loadImmediateInt, loadChannel, storeChannel, copy,
+    noop, loadZero, loadI, loadImmediateInt, loadChannel, storeChannel, copy,
     startAccInit0, startAccInit1, startAccInitImm, startAccInitReg, startAcc, finishAcc,
     mult, div, mod, add, sub, lshift, rshift, and, or, xor, land, lor, max, min, take,
     multI, divI, modI, addI, subI, lshiftI, rshiftI, andI, orI, xorI, landI, lorI, maxI, minI, takeI,
     eq,ne,le,ge,less,greater, eqI,neI,leI,geI,lessI,greaterI, not, lnot,
-    jnz, setsptr, setsptrI, loadsptr,
+    jnz, jz, j, setsptr, setsptrI, loadsptr, iops, iopsi, iopsii, iopss, iopssi, iopssii, iopvsvi
   }
   List<string> usedChannels = new List<string>();
   bool runImmediately;
@@ -92,7 +93,7 @@ public class ChannelMathController:Entity{
     while(iptr<op.Length){
       switch((Op)op[iptr++]){
         case Op.loadZero: reg[op[iptr++]]=0; break;
-        case Op.loadImmediateByte: reg[op[iptr++]]=op[iptr++];break;
+        case Op.loadI: reg[op[iptr++]]=(sbyte)op[iptr++];break;
         case Op.loadImmediateInt: reg[op[iptr++]]=BitConverter.ToInt32(op,iptr);iptr+=4;break;
         case Op.loadChannel:
           ridx=op[iptr++];
@@ -140,23 +141,23 @@ public class ChannelMathController:Entity{
               case Op.lor: acc=acc==0?reg[op[iptr]]:acc;break;
               case Op.max: acc=Math.Max(acc, reg[op[iptr]]);break;
               case Op.min: acc=Math.Min(acc, reg[op[iptr]]);break;
-              case Op.take: if(sptr--==0) acc=reg[op[iptr]];break;
+              case Op.take: if(--sptr==0) acc=reg[op[iptr]];break;
 
-              case Op.multI: acc*=op[iptr];break;
-              case Op.divI: acc/=op[iptr];break;
-              case Op.modI: acc%=op[iptr];break;
-              case Op.addI: acc+=op[iptr];break;
-              case Op.subI: acc-=op[iptr];break;
-              case Op.lshiftI: acc<<=op[iptr];break;
-              case Op.rshiftI: acc>>=op[iptr];break;
-              case Op.andI: acc&=op[iptr];break;
-              case Op.orI: acc|=op[iptr];break;
-              case Op.xorI: acc^=op[iptr];break;
-              case Op.landI: acc=acc!=0?op[iptr]:0;break;
-              case Op.lorI: acc=acc==0?op[iptr]:acc;break;
-              case Op.maxI: acc=Math.Max(acc, op[iptr]);break;
-              case Op.minI: acc=Math.Min(acc, op[iptr]);break;
-              case Op.takeI: if(sptr--==0) acc=op[iptr];break;
+              case Op.multI: acc*=(sbyte)op[iptr];break;
+              case Op.divI: acc/=(sbyte)op[iptr];break;
+              case Op.modI: acc%=(sbyte)op[iptr];break;
+              case Op.addI: acc+=(sbyte)op[iptr];break;
+              case Op.subI: acc-=(sbyte)op[iptr];break;
+              case Op.lshiftI: acc<<=(sbyte)op[iptr];break;
+              case Op.rshiftI: acc>>=(sbyte)op[iptr];break;
+              case Op.andI: acc&=(int)(sbyte)op[iptr];break;
+              case Op.orI: acc|=(int)(sbyte)op[iptr];break;
+              case Op.xorI: acc^=(int)(sbyte)op[iptr];break;
+              case Op.landI: acc=acc!=0?(sbyte)op[iptr]:0;break;
+              case Op.lorI: acc=acc==0?(sbyte)op[iptr]:acc;break;
+              case Op.maxI: acc=Math.Max(acc, (sbyte)op[iptr]);break;
+              case Op.minI: acc=Math.Min(acc, (sbyte)op[iptr]);break;
+              case Op.takeI: if(--sptr==0) acc=(sbyte)op[iptr];break;
               default:break;
             }
             iptr++;
@@ -169,21 +170,124 @@ public class ChannelMathController:Entity{
         case Op.ge:reg[op[iptr++]]= (reg[op[iptr++]]>=reg[op[iptr++]])?1:0; break;
         case Op.less:reg[op[iptr++]]= (reg[op[iptr++]]<reg[op[iptr++]])?1:0; break;
         case Op.greater:reg[op[iptr++]]= (reg[op[iptr++]]>reg[op[iptr++]])?1:0; break;
-        case Op.eqI:reg[op[iptr++]]= (reg[op[iptr++]]==op[iptr++])?1:0; break;
-        case Op.neI:reg[op[iptr++]]= (reg[op[iptr++]]!=op[iptr++])?1:0; break;
-        case Op.leI:reg[op[iptr++]]= (reg[op[iptr++]]<=op[iptr++])?1:0; break;
-        case Op.geI:reg[op[iptr++]]= (reg[op[iptr++]]>=op[iptr++])?1:0; break;
-        case Op.lessI:reg[op[iptr++]]= (reg[op[iptr++]]<op[iptr++])?1:0; break;
-        case Op.greaterI:reg[op[iptr++]]= (reg[op[iptr++]]>op[iptr++])?1:0; break;
+        case Op.eqI:reg[op[iptr++]]= (reg[op[iptr++]]==(sbyte)op[iptr++])?1:0; break;
+        case Op.neI:reg[op[iptr++]]= (reg[op[iptr++]]!=(sbyte)op[iptr++])?1:0; break;
+        case Op.leI:reg[op[iptr++]]= (reg[op[iptr++]]<=(sbyte)op[iptr++])?1:0; break;
+        case Op.geI:reg[op[iptr++]]= (reg[op[iptr++]]>=(sbyte)op[iptr++])?1:0; break;
+        case Op.lessI:reg[op[iptr++]]= (reg[op[iptr++]]<(sbyte)op[iptr++])?1:0; break;
+        case Op.greaterI:reg[op[iptr++]]= (reg[op[iptr++]]>(sbyte)op[iptr++])?1:0; break;
 
         case Op.not: reg[op[iptr++]]=~reg[op[iptr++]]; break;
         case Op.lnot: reg[op[iptr++]]=reg[op[iptr++]]!=0?0:1; break;
 
         case Op.setsptr: sptr = reg[op[iptr++]]; break;
-        case Op.setsptrI: sptr = reg[op[iptr++]]; break;
+        case Op.setsptrI: sptr = op[iptr++]; break;
         case Op.loadsptr: reg[op[iptr++]]=sptr; break; 
+
+        case Op.iops: reg[op[iptr++]] = interop(1,0,ref iptr); break;
+        case Op.iopsi: reg[op[iptr++]] = interop(1,1,ref iptr); break;
+        case Op.iopsii: reg[op[iptr++]] = interop(1,2,ref iptr); break;
+        case Op.iopss: reg[op[iptr++]] = interop(2,0,ref iptr); break;
+        case Op.iopssi: reg[op[iptr++]] = interop(2,1,ref iptr); break;
+        case Op.iopssii: reg[op[iptr++]] = interop(2,2,ref iptr); break;
+        case Op.iopvsvi: reg[op[iptr++]] = interop(op[iptr++],op[iptr++],ref iptr); break;
         default: break;
       }
     }
   }
+  public delegate int iopFunc(List<string> args,List<int> values);
+  static Dictionary<string, iopFunc> iopFuncs = new Dictionary<string, iopFunc>();
+  public int interop(int stringCount, int intCount, ref int iptr){
+    List<string> strs = new List<string>();
+    List<int> ints = new List<int>();
+    for(int i=0; i<stringCount; i++){
+      int len = op[iptr++];
+      strs.Add(Encoding.ASCII.GetString(op, iptr, len));
+      iptr+=len;
+    }
+    for(int i=0; i<intCount; i++){
+      ints.Add(reg[op[iptr++]]);
+    }
+    if(!iopFuncs.TryGetValue(strs[0], out iopFunc f)){
+      DebugConsole.Write($"Interop function {strs[0]} not yet registered");
+      return 0;
+    }
+    try{
+      return f(strs, ints);
+    }catch(Exception ex){
+      DebugConsole.Write($"Mathcontroller interop {strs[0]} failed {ex}");
+      return 0;
+    }
+  }
+  public static void registerInterop(string identifier, iopFunc function){
+    if(!iopFuncs.TryAdd(identifier,function)){
+      DebugConsole.Write($"Interop registration collision at {identifier}");
+    }
+  }
+  public static void deregisterInterop(string identifier, iopFunc function){
+    if(!iopFuncs.TryGetValue(identifier, out var f)){
+      DebugConsole.Write($"No registered interop function at {identifier}");
+      return;
+    }
+    if(f != function){
+      DebugConsole.Write($"Provided function does not match interop function at {identifier}");
+      return;
+    }
+    iopFuncs.Remove(identifier);
+  }
+  public static void setupDefaultInterop(){
+    registerInterop("print",(List<string> strs, List<int> ints)=>{
+      string str = "From mathcontroller: ";
+      for(int i=0; i<strs.Count; i++) str+=strs[i]+" ";
+      for(int i=0; i<ints.Count; i++) str+=ints[i].ToString()+" ";
+      DebugConsole.Write(str);
+      return 0;
+    });
+    registerInterop("hasBerry",(List<string> strs, List<int> ints)=>{
+      return SaveData.Instance.CheckStrawberry(new EntityID(strs[1],ints[0]))?1:0;
+    });
+    registerInterop("getFlag",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) return l.Session.GetFlag(strs[1])?1:0;
+      return 0;
+    });
+    registerInterop("setFlag",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) l.Session.SetFlag(strs[1], ints[0]!=0);
+      return ints[0];
+    });
+    registerInterop("getCounter",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) return l.Session.GetCounter(strs[0]);
+      return 0;
+    });
+    registerInterop("setCounter",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) l.Session.SetCounter(strs[1], ints[0]);
+      return ints[0];
+    });
+    registerInterop("getCoreMode",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) return l.Session.CoreMode == Session.CoreModes.Cold?1:0;
+      return 0;
+    });
+    registerInterop("setCoreMode",(List<string> strs, List<int> ints)=>{
+      if(Engine.Scene is Level l) l.Session.CoreMode = ints[0]==0?Session.CoreModes.Hot:Session.CoreModes.Cold;
+      return 0;
+    });
+    registerInterop("getPlayer",(List<string> strs, List<int> ints)=>{
+      Player p = Engine.Scene.Tracker.GetEntity<Player>();
+      if(p==null) return 0;
+      switch(strs[1]){
+        case "speedx": return (int)p.Speed.X;
+        case "speedy": return (int)p.Speed.Y;
+        case "posx": return (int)p.Position.X;
+        case "posy": return (int)p.Position.Y;
+        default: return 0;
+      }
+    });
+    registerInterop("killPlayer",(List<string> strs, List<int> ints)=>{
+      Player p = Engine.Scene.Tracker.GetEntity<Player>();
+      Vector2 dir = ints.Count>=3?new Vector2(0.1f*(float)ints[1],0.1f*(float)ints[2]):Vector2.Zero;
+      if(ints[0]!=0) p.Die(dir);
+      return (p!=null && ints[0]!=0)?1:0;
+    });
+  }
+
+  static HookManager hooks = new HookManager(setupDefaultInterop,void ()=>{}).enable();
 }

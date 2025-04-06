@@ -31,7 +31,6 @@ public class TemplateSwapblock:Template{
     dat=d;
     this.offset=offset;
   }
-  Vector2 ownLiftspeed;
   public override void Update(){
     base.Update();
     if(progress!=target){
