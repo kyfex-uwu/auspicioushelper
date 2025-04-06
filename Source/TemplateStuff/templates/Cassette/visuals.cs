@@ -88,8 +88,11 @@ public class CassetteMaterialLayer:IMaterialLayer{
     MaterialPipe.gd.SetRenderTarget(mattex);
     MaterialPipe.gd.Clear(Color.Transparent);
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
-    foreach(Entity e in items){
+    if(ChannelState.readChannel(channel) == 0)foreach(Entity e in items){
       if(e.Scene != null && e.Depth<=depth) e.Render();
+    }
+    foreach(IMaterialObject e in trying){
+      e.renderMaterial(this, sb, c);
     }
     sb.End();
     MaterialPipe.gd.Textures[1] = mattex;
@@ -101,7 +104,9 @@ public class CassetteMaterialLayer:IMaterialLayer{
     diddraw = true;
   }
   public bool checkdo(){
-    return ChannelState.readChannel(channel) == 0;
+    bool drawnormal = ChannelState.readChannel(channel) == 0;
+    if(drawnormal) trying.Clear();
+    return drawnormal || trying.Count>0;
   }
   public void onRemove(){
     if(layers.TryGetValue(channel, out var l) && l==this) layers.Remove(channel);
@@ -112,12 +117,24 @@ public class CassetteMaterialLayer:IMaterialLayer{
     }
     dirty=true;
   }
+  public HashSet<IMaterialObject> trying = new HashSet<IMaterialObject>();
+  public void addTrying(IMaterialObject o){
+    trying.Add(o);
+  }
+  public void removeTrying(IMaterialObject o){
+    trying.Remove(o);
+  }
   static HookManager resources = new HookManager(()=>{
     //totally a hook (this is a good api)
     shader = auspicioushelperGFX.LoadEffect("cassetteshader");
   },bool ()=>{
     foreach(var pair in layers){
-      pair.Value.items.Clear();
+      List<Entity> keep = new List<Entity>();
+      foreach(Entity e in pair.Value.items){
+        if(e.Scene!=null)keep.Add(e);
+      }
+      pair.Value.items = keep;
+      pair.Value.trying.Clear();
     }
     return false;
   },auspicioushelperModule.OnReset);

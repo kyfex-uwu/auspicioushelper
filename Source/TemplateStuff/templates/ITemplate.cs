@@ -38,10 +38,11 @@ public interface ITemplateChild{
     return DashCollisionResults.NormalCollision;
   }
   void AddAllChildren(List<Entity> list);
+  void setOffset(Vector2 ppos){}
 }
 
 public class Template:Entity, ITemplateChild{
-  templateFiller t=null;
+  public templateFiller t=null;
   public List<ITemplateChild> children = new List<ITemplateChild>();
   public int depthoffset;
   public Template parent{get;set;} = null;
@@ -56,8 +57,11 @@ public class Template:Entity, ITemplateChild{
       Inside = 1<<4,
       All = Riding|DashHit|Weight|Shake|Inside
   }
+  public virtual Vector2 virtLoc=>Position;
   public Vector2 ownLiftspeed;
-  public Propagation prop{get;} = Propagation.All; 
+  public Vector2 gatheredLiftspeed=>parent==null?ownLiftspeed:ownLiftspeed+parent.gatheredLiftspeed;
+  public Vector2 parentLiftspeed=>parent==null?Vector2.Zero:parent.gatheredLiftspeed;
+  public Propagation prop{get;set;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
   public DashCollision OnDashCollide = null;
@@ -70,7 +74,7 @@ public class Template:Entity, ITemplateChild{
   }
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
-    childRelposTo(Position, liftspeed);
+    childRelposTo(virtLoc, liftspeed);
   }
   public void childRelposTo(Vector2 loc, Vector2 liftspeed){
     foreach(ITemplateChild c in children){
@@ -83,10 +87,21 @@ public class Template:Entity, ITemplateChild{
     children.Add(c);
     c.parent = this;
   }
-  public override void Added(Scene scene){
-    base.Added(scene);
-    if(basicents!=null && basicents.Scene==null) basicents.sceneadd(scene);
-    if(t== null) return;
+  public void setOffset(Vector2 ppos){
+    this.toffset = Position-ppos;
+  }
+  public virtual void addTo(Scene scene){
+    if(Scene != null){
+      DebugConsole.Write("Something has gone terribly wrong in recursive adding process");
+    }
+    Scene = scene;
+    if(basicents != null){
+      DebugConsole.Write("Weird if this happens but nothing is actually wrong");
+      basicents.sceneadd(scene);
+    }
+    scene.Add(this);
+
+    if(t==null) return;
     if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset),true);
     if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset),true);
     Level l = SceneAs<Level>();
@@ -94,8 +109,9 @@ public class Template:Entity, ITemplateChild{
     foreach(EntityParser.EWrap w in t.childEntities){
       Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this);
       if(e is ITemplateChild c){
-        c.addTo(scene);
         addEnt(c);
+        c.addTo(scene);
+        c.setOffset(Position);
       }
       else if(e!=null)scene.Add(e);
     }
@@ -106,11 +122,18 @@ public class Template:Entity, ITemplateChild{
       AddBasicEnt(e, simoffset+d.Position-Position);
     }
   }
+  public override void Added(Scene scene){
+    if(Scene == null){
+      //DebugConsole.Write($"Got top-level template {this} of {t?.name}");
+      addTo(scene);
+    }
+    base.Added(scene);
+  }
   public void AddBasicEnt(Entity e, Vector2 offset){
     if(basicents == null){
       basicents = new Wrappers.BasicMultient(this);
-      addEnt(basicents, Scene!=null);
-      if(Scene!=null)basicents.Scene = Scene;
+      addEnt(basicents);
+      if(Scene!=null)basicents.sceneadd(Scene);
     }
     basicents.add(e,offset);
   }
@@ -121,7 +144,8 @@ public class Template:Entity, ITemplateChild{
     return false;
   }
   public bool hasInside(Actor a){
-    foreach(ITemplateChild c in children) if(c.hasInside(a)) return true;
+    foreach(ITemplateChild c in children) 
+      if(((c.prop&Propagation.Inside)!=Propagation.None) && c.hasInside(a)) return true;
     return false;
   }
   public override void Removed(Scene scene){

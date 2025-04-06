@@ -36,7 +36,7 @@ public static class MaterialPipe {
     SpriteBatch sb = Draw.SpriteBatch;
     gd = Engine.Instance.GraphicsDevice;
     RenderTarget2D t = GameplayBuffers.Gameplay;
-    if(dirty) layers.Sort((a, b) => a.depth.CompareTo(b.depth));
+    if(dirty) layers.Sort((a, b) => -a.depth.CompareTo(b.depth));
     dirty=false;
 
     double curdepth = float.PositiveInfinity;

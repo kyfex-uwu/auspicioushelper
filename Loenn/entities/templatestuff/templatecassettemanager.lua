@@ -11,7 +11,15 @@ entity.placements = {
     name = "Template Cassette Manager",
     data = {
       materials = "",
-      timings = ""
+      timings = "",
+      onactivate = "",
+      ondeactivate = "",
+      channel = "",
+      beatsPerMeasure = 4,
+      beatsPerMinute = 90,
+      offset = 0,
+      useChannel = false,
+      trysync = true
     }
   }
 }

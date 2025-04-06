@@ -52,4 +52,7 @@ public class TemplateDisappearer:Template{
     //DebugConsole.Write($" set {vis} {col} {selfVis}");
     if(nvis!=0 || ncol!=0) base.parentChangeStat(nvis,ncol);
   }
+  public bool getParentCol(){
+    return parentCol;
+  }
 }

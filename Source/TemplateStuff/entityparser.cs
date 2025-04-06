@@ -33,15 +33,15 @@ public static class EntityParser{
         if(Level.EntityLoaders.TryGetValue(e.Name, out var loader)){
           Entity t = loader(null, null, Vector2.Zero, e);
           if(t is Platform){
-            parseMap[e.Name] = Types.platformbasic;
+            etype = parseMap[e.Name] = Types.platformbasic;
             DebugConsole.Write(e.Name +" registered as platformbasic");
             bad=false;
-          }else if(t is Actor){
-            parseMap[e.Name] = Types.unwrapped;
+          }else if(t is Actor || t is ITemplateChild){
+            etype = parseMap[e.Name] = Types.unwrapped;
             DebugConsole.Write(e.Name +" registered as unwrapped");
             bad=false;
           }else{
-            parseMap[e.Name] = Types.basic;
+            etype = parseMap[e.Name] = Types.basic;
             DebugConsole.Write(e.Name +" registered as basic");
             bad=false;
           }

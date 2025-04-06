@@ -119,5 +119,4 @@ public class ChannelJelly : Glider, IChannelUser {
       base.Removed(scene);
       platform.RemoveSelf();
   }
-  
 }

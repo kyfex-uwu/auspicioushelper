@@ -17,7 +17,7 @@ public class TemplateZipmover:Template{
     }
   private SoundSource sfx = new SoundSource();
   Themes theme = Themes.Normal;
-  Vector2 virtLoc;
+  public override Vector2 virtLoc=>Position+spos.pos;
   SplineAccessor spos;
   EntityData dat;
   Vector2 offset;
@@ -38,7 +38,6 @@ public class TemplateZipmover:Template{
   public TemplateZipmover(EntityData d, Vector2 offset, int depthoffset)
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
     Add(new Coroutine(FancySequence()));
-    virtLoc = Position;
     Add(sfx);
     dat=d;
     this.offset=offset;
@@ -65,7 +64,7 @@ public class TemplateZipmover:Template{
       }
     }
     if(spline == null){
-      DebugConsole.Write("using fallback spline");
+      //DebugConsole.Write("using fallback spline");
       LinearSpline l =new LinearSpline();
       spline = l;
       l.fromNodes(SplineEntity.entityInfoToNodes(dat.Position,dat.Nodes,offset,dat.Bool("lastNodeIsKnot",true)));
@@ -76,40 +75,6 @@ public class TemplateZipmover:Template{
     base.Update();
   }
 
-  /*private IEnumerator Sequence(){
-    while(true){
-      if(!hasRiders<Player>()){
-        yield return null; continue;
-      }
-      sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
-      yield return 0.1f;
-      float at = 0;
-      //DebugConsole.Write(virtLoc.ToString());
-      while(at<1f){
-        yield return null;
-        at = Calc.Approach(at, 1f, 2f * Engine.DeltaTime);
-        progress = Ease.SineIn(at);
-        Vector2 old = virtLoc;
-        virtLoc = Position+spos.getPos(progress);
-        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc,ownLiftspeed);
-      }
-      Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
-      SceneAs<Level>().Shake();
-      yield return 0.5f;
-      float at2 = 0;
-      while (at2 < 1f){
-        yield return null;
-        at2 = Calc.Approach(at2, 1f, 0.5f * Engine.DeltaTime);
-        progress = 1f - Ease.SineIn(at2);
-        Vector2 old = virtLoc;
-        virtLoc = Position+spos.getPos(progress);
-        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc,ownLiftspeed);
-      }
-      yield return 0.5f;
-    }
-  }*/
   private IEnumerator FancySequence(){
     bool done; float at;
     waiting:
@@ -132,11 +97,11 @@ public class TemplateZipmover:Template{
         Vector2 old = virtLoc;
         done = spos.towardsNext((float)(2*(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
         //DebugConsole.Write($"{at}, {spos.t}");
-        virtLoc = Position+spos.pos;
         Vector2 oldOLS = ownLiftspeed;
         ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc, done?oldOLS:ownLiftspeed);
+        childRelposTo(virtLoc, done?oldOLS+parentLiftspeed:gatheredLiftspeed);
       }
+      ownLiftspeed = Vector2.Zero;
       
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       SceneAs<Level>().Shake();
@@ -165,19 +130,20 @@ public class TemplateZipmover:Template{
         at+=Engine.DeltaTime/2;
         Vector2 old = virtLoc;
         done = spos.towardsNext((float)(-(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime/2));
-        virtLoc = Position+spos.pos;
+        //virtLoc = Position+spos.pos;
         ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc, ownLiftspeed);
+        childRelposTo(virtLoc, gatheredLiftspeed);
       }
+      ownLiftspeed = Vector2.Zero;
       if(spos.t>0) goto returning;
       yield return 0.5f;
       goto waiting;
   }
-  public override void relposTo(Vector2 loc,Vector2 liftspeed){
-    Position = loc+toffset;
-    virtLoc = Position+spos.pos;
-    childRelposTo(virtLoc,liftspeed+ownLiftspeed);
-  }
+  // public override void relposTo(Vector2 loc,Vector2 liftspeed){
+  //   Position = loc+toffset;
+  //   virtLoc = Position+spos.pos;
+  //   childRelposTo(virtLoc,liftspeed+ownLiftspeed);
+  // }
   public override void Removed(Scene scene){
     base.Removed(scene);
     sfx.Stop();

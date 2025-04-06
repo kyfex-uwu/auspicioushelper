@@ -84,6 +84,7 @@ public class auspicioushelperModule : EverestModule {
     static void OnReload(bool silent){
         DebugConsole.Write("reloaded");
         //DebugConsole.Write(Engine.Instance.scene.ToString());
+        ChannelState.unwatchAll();
         if(Engine.Instance.scene is LevelLoader l){
             MarkedRoomParser.parseMapdata(l.Level.Session.MapData);
         }

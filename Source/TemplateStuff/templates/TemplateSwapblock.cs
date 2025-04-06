@@ -18,7 +18,7 @@ public class TemplateSwapblock:Template{
     set=>spos.t=value;
   }
   float target=0;
-  Vector2 virtLoc;
+  public override Vector2 virtLoc=>Position+spos.pos;
   SplineAccessor spos;
   EntityData dat;
   Vector2 offset;
@@ -27,21 +27,21 @@ public class TemplateSwapblock:Template{
   public TemplateSwapblock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateSwapblock(EntityData d, Vector2 offset, int depthoffset)
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
-    virtLoc = Position;
     dat=d;
     this.offset=offset;
+    DebugConsole.Write($"{t.childEntities.Count}");
   }
   public override void Update(){
     base.Update();
     if(progress!=target){
       speed = Calc.Approach(speed,maxspeed,maxspeed*Engine.DeltaTime*6);
       Vector2 old = virtLoc;
-      virtLoc = Position+spos.towardsNextDist(speed*Engine.DeltaTime, out bool done);
+      bool done = spos.towardsNextDist(speed*Engine.DeltaTime);
       if(done && progress ==0){
         target = target%spos.numsegs;
       }
       ownLiftspeed = (virtLoc-old).SafeNormalize()*speed;
-      childRelposTo(virtLoc,ownLiftspeed);
+      childRelposTo(virtLoc,gatheredLiftspeed);
     } else {
       speed=0;
       Audio.Stop(movesfx);
@@ -67,9 +67,9 @@ public class TemplateSwapblock:Template{
     spos = new SplineAccessor(spline, Vector2.Zero);
     Add(new DashListener((Vector2 dir)=>activate()));
   }
-  public override void relposTo(Vector2 loc, Vector2 liftspeed){
-    Position = loc+toffset;
-    virtLoc = Position+spos.getPos(progress);
-    childRelposTo(virtLoc,ownLiftspeed+liftspeed);
-  }
+  // public override void relposTo(Vector2 loc, Vector2 liftspeed){
+  //   Position = loc+toffset;
+  //   virtLoc = Position+spos.pos;
+  //   childRelposTo(virtLoc,ownLiftspeed+liftspeed);
+  // }
 }
