@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
@@ -82,7 +83,9 @@ public class auspicioushelperModule : EverestModule {
         OnEnterMap.run();
     }
     static void OnReload(bool silent){
-        DebugConsole.Write("reloaded");
+        DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.hideHelperMaps}");
+        //foreach (ModAsset item in Everest.Content.Map.Values.Where((ModAsset asset) => asset.Type == typeof(AssetTypeMap)))
+        if(Settings.hideHelperMaps)MapHider.hideListed();
         //DebugConsole.Write(Engine.Instance.scene.ToString());
         ChannelState.unwatchAll();
         if(Engine.Instance.scene is LevelLoader l){

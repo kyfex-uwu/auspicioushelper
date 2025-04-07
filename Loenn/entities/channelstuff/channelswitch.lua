@@ -30,16 +30,7 @@ channelswitch.fieldInformation = {
     fieldType="integer"
   }
 }
-function channelswitch.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
+channelswitch.texture = "objects/coreFlipSwitch/o1"
 
-function channelswitch.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, 16, 16)
-end
 
 return channelswitch

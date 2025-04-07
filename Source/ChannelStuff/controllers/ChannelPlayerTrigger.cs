@@ -18,6 +18,8 @@ public class ChannelPlayerTrigger:Trigger{
   }
   public Op op;
   public int value;
+  bool activateOnEnter=false;
+  bool activateOnleave=false;
 
   public ChannelPlayerTrigger(EntityData data, Vector2 offset):base(data, offset){
     
@@ -30,7 +32,12 @@ public class ChannelPlayerTrigger:Trigger{
       case "jump":
         Add(new JumpListener((int t)=>activate()));
         break;
-      default: break;
+      case "enter":
+        activateOnEnter=true; break;
+      case "leave":
+        activateOnleave=true; break;
+
+      default: DebugConsole.Write("Unknown action"+data.Attr("action")); break;
     }
     op = data.Attr("op","") switch {
       "xor"=>Op.xor,
@@ -56,5 +63,14 @@ public class ChannelPlayerTrigger:Trigger{
       Op.min => Math.Min(value, oldval),
       _=>oldval
     });
+  }
+  public override void OnEnter(Player player){
+    DebugConsole.Write("here");
+    base.OnEnter(player);
+    if(activateOnEnter) activate();
+  }
+  public override void OnLeave(Player player){
+    base.OnLeave(player);
+    if(activateOnleave) activate();
   }
 }

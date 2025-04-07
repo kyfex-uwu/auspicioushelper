@@ -23,4 +23,23 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       _tryQuietShader = value;
     }
   }
+  private bool _hideHelperMaps = false;
+  public bool hideHelperMaps {
+    get=>_hideHelperMaps;
+    set{
+      _hideHelperMaps = value;
+      if(value)MapHider.hideListed();
+      else MapHider.revealListed();
+    }
+  }
+
+  private string _hideRules = "0:\"\\/t$\"";
+  [SettingMaxLength(600)]
+  public string hideRules {
+    get=>_hideRules;
+    set{
+      _hideRules = value;
+      MapHider.uncache();
+    }
+  } 
 }

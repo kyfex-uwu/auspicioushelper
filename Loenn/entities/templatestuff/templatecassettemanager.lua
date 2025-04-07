@@ -19,7 +19,8 @@ entity.placements = {
       beatsPerMinute = 90,
       offset = 0,
       useChannel = false,
-      trysync = true
+      trysync = true,
+      correct = true,
     }
   }
 }

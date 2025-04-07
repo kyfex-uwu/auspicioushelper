@@ -70,7 +70,7 @@ public static class EntityParser{
     switch(d.t){
       case Types.platformbasic:
         if(e is Platform p){
-          return new Wrappers.BasicPlatform(p,t,simoffset+d.d.Position-t.Position);
+          return new Wrappers.BasicPlatform(p,t,simoffset+d.d.Position-t.virtLoc);
         }else{
           DebugConsole.Write("Wrongly classified!!! "+d.d.Name);
           return null;
@@ -79,7 +79,7 @@ public static class EntityParser{
         return e;
       case Types.basic:
         if(e!=null){
-          t.AddBasicEnt(e,simoffset+d.d.Position-t.Position);
+          t.AddBasicEnt(e,simoffset+d.d.Position-t.virtLoc);
           //return new Wrappers.BasicEnt(e,t,simoffset+d.d.Position-t.Position);
         }
         return null;
@@ -87,7 +87,7 @@ public static class EntityParser{
         List<StaticMover> SMRemove = new List<StaticMover>();
         foreach(Component c in e.Components) if(c is StaticMover sm) SMRemove.Add(sm);
         foreach(StaticMover sm in SMRemove) e.Remove(sm);
-        t.AddBasicEnt(e,simoffset+d.d.Position-t.Position);
+        t.AddBasicEnt(e,simoffset+d.d.Position-t.virtLoc);
         return null;
       default:
         return null;
@@ -120,8 +120,8 @@ public static class EntityParser{
     parseMap["triggerSpikesRight"] = Types.removeSMbasic;
     loaders["triggerSpikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
 
-    parseMap["refill"] = Types.basic;
-    loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Refill(e,offset);
+    parseMap["refill"] = Types.unwrapped;
+    loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Wrappers.RefillW(e,offset);
     parseMap["touchSwitch"] = Types.basic;
     loaders["touchSwitch"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TouchSwitch(e,offset);
     parseMap["strawberry"] = Types.basic;

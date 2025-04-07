@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Threading;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -54,8 +55,7 @@ public class TemplateZipmover:Template{
       _=>ActivationType.ride,
     };
   }
-  public override void Added(Scene scene){
-    base.Added(scene);
+  public override void addTo(Scene scene){
     Spline spline=null;
     if(!string.IsNullOrEmpty(dat.Attr("spline"))){
       Spline.splines.TryGetValue(dat.Attr("spline"), out spline);
@@ -70,7 +70,24 @@ public class TemplateZipmover:Template{
       l.fromNodes(SplineEntity.entityInfoToNodes(dat.Position,dat.Nodes,offset,dat.Bool("lastNodeIsKnot",true)));
     }
     spos = new SplineAccessor(spline, Vector2.Zero);
+    if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
+      OnDashCollide = (Player p, Vector2 dir)=>{
+        if(dashed == 0){
+          dashed = 1;
+          Add(new Coroutine(dashAudioSeq()));
+          return DashCollisionResults.Rebound;
+        }
+        return DashCollisionResults.NormalCollision;
+      };
+    }
+    base.addTo(scene);
   }
+  IEnumerator dashAudioSeq(){
+    var audio = Audio.Play("event:/new_content/game/10_farewell/fusebox_hit_1");
+    yield return 0.15f;
+    Audio.Stop(audio,true);
+  }
+  int dashed;
   public override void Update(){
     base.Update();
   }
@@ -78,11 +95,12 @@ public class TemplateZipmover:Template{
   private IEnumerator FancySequence(){
     bool done; float at;
     waiting:
+      dashed = 0;
       yield return null;
       if(atype == ActivationType.ride || atype==ActivationType.rideAutomatic){
         if(hasRiders<Player>()) goto going;
       } else if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
-        throw new NotImplementedException();
+        if(dashed!=0) goto going;
       }
       goto waiting;
 

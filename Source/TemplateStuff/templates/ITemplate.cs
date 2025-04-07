@@ -39,6 +39,7 @@ public interface ITemplateChild{
   }
   void AddAllChildren(List<Entity> list);
   void setOffset(Vector2 ppos){}
+  void shake(Vector2 amount){}
 }
 
 public class Template:Entity, ITemplateChild{
@@ -102,16 +103,16 @@ public class Template:Entity, ITemplateChild{
     scene.Add(this);
 
     if(t==null) return;
-    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,Position,depthoffset),true);
-    if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, Position, depthoffset),true);
+    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset),true);
+    if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, virtLoc, depthoffset),true);
     Level l = SceneAs<Level>();
-    Vector2 simoffset = this.Position-t.origin;
+    Vector2 simoffset = this.virtLoc-t.origin;
     foreach(EntityParser.EWrap w in t.childEntities){
       Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this);
       if(e is ITemplateChild c){
         addEnt(c);
         c.addTo(scene);
-        c.setOffset(Position);
+        c.setOffset(virtLoc);
       }
       else if(e!=null)scene.Add(e);
     }
@@ -119,7 +120,7 @@ public class Template:Entity, ITemplateChild{
       Decal e = new Decal(d.Texture, simoffset+d.Position, d.Scale, d.GetDepth(0), d.Rotation, d.ColorHex){
         DepthSetByPlacement = true
       };
-      AddBasicEnt(e, simoffset+d.Position-Position);
+      AddBasicEnt(e, simoffset+d.Position-virtLoc);
     }
   }
   public override void Added(Scene scene){

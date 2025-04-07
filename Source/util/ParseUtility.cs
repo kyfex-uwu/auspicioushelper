@@ -115,6 +115,7 @@ public static class Util{
   }
   public static string stripEnclosure(string str){
     if(str == "") return "";
+    if(str[0] == '\"' && str[str.Length-1] == '\"') return str.Substring(1,str.Length-2);
     if(escape.TryGetValue(str[0],out var esc)){
       if(str[str.Length-1]==esc)return str.Substring(1,str.Length-2);
       else {

@@ -42,7 +42,7 @@ public class BasicMultient:Entity, ITemplateChild{
     }
   }
   List<EntEnt> ents = new List<EntEnt>();
-  public BasicMultient(Template t):base(t.Position){
+  public BasicMultient(Template t):base(t.virtLoc){
     parent = t;
     Depth = -9000+t.depthoffset;
   }

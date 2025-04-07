@@ -3,32 +3,21 @@ local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/TemplateZipmover"
+entity.name = "auspicioushelper/TemplateChannelmover"
 entity.depth = 2000
 entity.nodeLimits = {1,100}
 entity.nodeLineRenderType = "line"
 
-local rtypes = {"loop","none", "normal"}
-local atypes = {"ride","rideAutomatic","dash","dashAutomatic"}
-
 entity.placements = {
   {
-    name = "Template Zipmover",
+    name = "Template Channelmover",
     data = {
       template = "",
       depthoffset=5,
-      return_type = "normal",
-      activation_type = "ride",
-      lastNodeIsKnot = true
+      channel = "",
+      move_time=1.8,
+      asymmetry=1.0
     }
-  }
-}
-entity.fieldInformation = {
-  return_type ={
-    options = rtypes,
-  },
-  activation_type={
-    options = atypes
   }
 }
 

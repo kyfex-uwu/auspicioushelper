@@ -14,7 +14,7 @@ public class BasicPlatform:Entity, ITemplateChild{
   public Template.Propagation prop {get;} = Template.Propagation.All;
   Platform p;
   Vector2 toffset;
-  public BasicPlatform(Platform p, Template t, Vector2 offset):base(t.Position){
+  public BasicPlatform(Platform p, Template t, Vector2 offset):base(t.virtLoc){
     p.Depth += t.depthoffset;
     this.p=p;
     parent = t;

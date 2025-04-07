@@ -53,8 +53,7 @@ public class TemplateSwapblock:Template{
     target+=1;
     speed=Math.Max(speed,maxspeed/3);
   }
-  public override void Added(Scene scene){
-    base.Added(scene);
+  public override void addTo(Scene scene){
     Spline spline=null;
     if(!string.IsNullOrEmpty(dat.Attr("spline"))){
       Spline.splines.TryGetValue(dat.Attr("spline"), out spline);
@@ -66,6 +65,7 @@ public class TemplateSwapblock:Template{
     }
     spos = new SplineAccessor(spline, Vector2.Zero);
     Add(new DashListener((Vector2 dir)=>activate()));
+    base.addTo(scene);
   }
   // public override void relposTo(Vector2 loc, Vector2 liftspeed){
   //   Position = loc+toffset;
