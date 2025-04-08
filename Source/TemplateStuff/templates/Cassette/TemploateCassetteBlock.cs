@@ -26,9 +26,11 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
   public bool doRaise;
   public override Vector2 virtLoc =>Position+Vector2.UnitY*hoffset;
   float hoffset; 
+  bool freeze;
   public TemplateCassetteBlock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateCassetteBlock(EntityData d, Vector2 offset, int depthoffset)
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
+    freeze = d.Bool("freeze",false);
     channel = d.Attr("channel","");
     prop = prop&~Propagation.Inside;
     doBoost = d.Bool("do_boost",false);
@@ -38,9 +40,9 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
     base.Added(scene);
     ChannelState.watch(this);
     setChVal(ChannelState.readChannel(channel));
-    if(CassetteMaterialLayer.layers.TryGetValue(channel,out var layer)){
+    if(CassetteMaterialLayer.layers.TryGetValue(channel,out var layer) || freeze){
       AddAllChildren(todraw);
-      layer.dump(todraw);
+      if(layer != null)layer.dump(todraw);
     }
   }
   public void tryManifest(){
@@ -69,6 +71,9 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       if(!flag) return;
     }
     if(inLayer)layer.removeTrying(this);
+    if(freeze) {
+      foreach(Entity e in todraw) e.Active = true;
+    }
     there = State.there;
     prop|=Propagation.Inside;
     setVisCol(true,true);
@@ -99,6 +104,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       }
       there = State.gone;
       prop&=~Propagation.Inside;
+      if(freeze)foreach(Entity e in todraw)e.Active = false;
     } else {
       there = State.trying;
       tryManifest();

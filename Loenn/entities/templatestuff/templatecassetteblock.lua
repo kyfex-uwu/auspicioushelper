@@ -12,7 +12,8 @@ entity.placements = {
     data = {
       template = "",
       depthoffset=5,
-      channel = ""
+      channel = "",
+      freeze = false
     }
   }
 }
