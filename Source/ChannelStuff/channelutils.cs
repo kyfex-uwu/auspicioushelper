@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Celeste.Editor;
 using Celeste.Mod.auspicioushelper;
 using FMOD;
 using Monocle;
@@ -47,24 +48,42 @@ public static class ChannelState{
     }
   }
   struct modifierDesc{
-    string outname;
-    List
+    public string outname;
+    List<modifier> ops = new List<modifier>();
+    public int apply(int val){}
+    public modifierDesc(string nch){
+      outname = nch;
+      int idx=0;
+      for(;idx<nch.Length;idx++) if(nch[idx]=='[')break;
+      string stuff = nch.Substring(idx+1; nch.Length-idx-2);
+      foreach(string sub in stuff.Split(",")){
+        var m = new modifier(sub, out var success);
+        if(success)ops.Add(m);
+        else if(sub!="")DebugConsole.Write($"Improper modifier operation {sub}");
+      }
+    }
   }
+  static Dictionary<string, List<modifierDesc>> modifiers = new Dictionary<string, List<modifierDesc>>();
   public static int readChannel(string ch){
-    int v=0;
-    channelStates.TryGetValue(ch, out v);
-    return v;
+    if(channelStates.TryGetValue(ch, out var v)) return v;
+    else return addModifier(ch);
   }
-  public static void SetChannel(string ch, int state){
+  static void SetChannelRaw(string ch, int state){
     if(readChannel(ch) == state) return;
     channelStates[ch] = state;
-    // foreach(ChannelBaseEntity b in Engine.Scene.Tracker.GetEntities<ChannelBaseEntity>()){
-    //   if(b.channel == ch)b.setChVal(state);
-    // }
     if (watching.TryGetValue(ch, out var list)) {
       foreach(IChannelUser b in list){
         b.setChVal(state);
       }
+    }
+  }
+  public static void SetChannel(string ch, int state){
+    int idx=0;
+    for(;idx<ch.Length;idx++) if(ch[idx]=='[')break;
+    string clean = ch.Substring(0,idx);
+    SetChannelRaw(clean,state);
+    if(modifiers.TryGetValue(clean, out var ms)){
+      foreach(var m in ms) SetChannelRaw(m.outname,m.apply(state));
     }
   }
   public static void unwatchNow(IChannelUser b){
@@ -72,18 +91,52 @@ public static class ChannelState{
       list.Remove(b);
     }
   }
-  public static void watch(IChannelUser b){
+  public static int watch(IChannelUser b){
     //DebugConsole.Write("watching new thing");
     if (!watching.TryGetValue(b.channel, out var list)) {
       list = new List<IChannelUser>();
       watching[b.channel] = list;
     }
     list.Add(b);
+    return readChannel(b.channel);
+  }
+  static void clearModifiers(HashSet<string> except = null){
+    Dictionary<string, List<modifierDesc>> nlist = new Dictionary<string, List<modifierDesc>>();
+    foreach(var pair in modifiers){
+      List<modifierDesc> keep = new List<modifierDesc>();
+      foreach(var mod in pair.Value){
+        if(except == null || !except.Contains(mod.outname))channelStates.Remove(mod.outname);
+        else keep.Add(mod);
+      }
+      if(keep.Count>0) nlist[pair.Key] = keep;
+    }
+    modifiers = nlist;
   }
   public static void unwatchAll(){
     watching.Clear();
+    clearModifiers();
+  }
+  static int addModifier(string ch){
+    int idx=0;
+    for(;idx<ch.Length;idx++) if(ch[idx]=='[')break;
+    string clean = ch.Substring(0,idx);
+
+    if(clean!=ch && ch[ch.Length-1] == ']'){
+      List<modifierDesc> mods =null;
+      if(!modifiers.TryGetValue(clean,out mods)){
+        modifiers.Add(clean, mods = new List<modifierDesc>());
+      }
+      modifierDesc mod = new modifierDesc(ch);
+      mods.Add(mod);
+      return mod.apply(readChannel(clean));
+    } else {
+      channelStates.Add(ch,0);
+      return 0;
+    }
   }
   public static void unwatchTemporary(){
+    clearModifiers();
+    List<string> toRemove = new List<string>();
     foreach(var pair in watching){
       var newlist = new List<IChannelUser>();
       foreach(IChannelUser e in pair.Value){
@@ -91,7 +144,12 @@ public static class ChannelState{
           newlist.Add(e);
         }
       }
-      watching[pair.Key] = newlist;
+      if(newlist.Count>0){
+        watching[pair.Key] = newlist;
+        addModifier(pair.Key);
+      }
+      else toRemove.Add(pair.Key);
     }
+    foreach(var ch in toRemove) watching.Remove(ch);
   }
 }
