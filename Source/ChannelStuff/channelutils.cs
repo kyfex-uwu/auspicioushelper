@@ -3,9 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using Celeste.Editor;
+using System.Text.RegularExpressions;
 using Celeste.Mod.auspicioushelper;
-using FMOD;
 using Monocle;
 
 namespace Celeste.Mods.auspicioushelper;
@@ -13,13 +12,44 @@ public static class ChannelState{
   public static Dictionary<string, int> channelStates = new Dictionary<string, int>();
   public static Dictionary<string, List<IChannelUser>> watching = new Dictionary<string, List<IChannelUser>>();
   enum Ops{
-    none, not, lnot, xor, and, or, add, sub, mult, div, mrecip, mod, safemod, min, max, ge, le, gt, lt, eq, ne
+    none, not, lnot, xor, and, or, add, sub, mult, div, mrecip, mod, safemod, 
+    min, max, ge, le, gt, lt, eq, ne,rshift, lshift, shiftr, shiftl
   }
-  struct modifier{
+  struct Modifier{
     int y;
     Ops op;
-    public modifier(string s){
-
+    Regex prefixSuffix = new Regex("^\\s*(.[^-\\d])(\\d*)\\s*");
+    public Modifier(string s, out bool success){
+      Match m = prefixSuffix.Match(s);
+      int.TryParse(m.Groups[2].ToString(),out y);
+      success = true;
+      switch(m.Groups[1].ToString()){
+        case "~":op=Ops.not; break;
+        case "!":op=Ops.lnot; break;
+        case "^":op=Ops.xor; break;
+        case "&":op=Ops.and; break;
+        case "|":op=Ops.or; break;
+        case "+":op=Ops.add; break;
+        case "-":op=Ops.sub; break;
+        case "*":op=Ops.mult; break;
+        case "/":op=Ops.div; break;
+        case "recip": case "d": case "x/":op=Ops.mrecip; break;
+        case "%":op=Ops.mod; break;
+        case "%s": case "r": op=Ops.safemod; break;
+        case "min":op=Ops.min; break;
+        case "max":op=Ops.max; break;
+        case ">":op=Ops.gt; break;
+        case "<":op=Ops.lt; break;
+        case ">=":op=Ops.ge; break;
+        case "<=":op=Ops.le; break;
+        case "==":op=Ops.eq; break;
+        case "!=":op=Ops.ne; break;
+        case "<<":op=Ops.lshift; break;
+        case ">>":op=Ops.rshift; break;
+        case "x<<":op=Ops.shiftl; break;
+        case "x>>":op=Ops.shiftr; break;
+        default: success = false; break;
+      }
     }
     public int apply(int x){
       switch(op){
@@ -43,27 +73,34 @@ public static class ChannelState{
         case Ops.lt: return x<y?1:0;
         case Ops.eq: return x==y?1:0;
         case Ops.ne: return x!=y?1:0;
+        case Ops.lshift: return x<<y;
+        case Ops.rshift: return x>>y;
+        case Ops.shiftl: return y<<x;
+        case Ops.shiftr: return y>>x;
         default: return x;
       }
     }
   }
-  struct modifierDesc{
+  class ModifierDesc{
     public string outname;
-    List<modifier> ops = new List<modifier>();
-    public int apply(int val){}
-    public modifierDesc(string nch){
+    List<Modifier> ops = new List<Modifier>();
+    public ModifierDesc(string nch){
       outname = nch;
       int idx=0;
       for(;idx<nch.Length;idx++) if(nch[idx]=='[')break;
-      string stuff = nch.Substring(idx+1; nch.Length-idx-2);
+      string stuff = nch.Substring(idx+1, nch.Length-idx-2);
       foreach(string sub in stuff.Split(",")){
-        var m = new modifier(sub, out var success);
+        var m = new Modifier(sub, out var success);
         if(success)ops.Add(m);
         else if(sub!="")DebugConsole.Write($"Improper modifier operation {sub}");
       }
     }
+    public int apply(int val){
+      foreach(var op in ops) val = op.apply(val);
+      return val;
+    }
   }
-  static Dictionary<string, List<modifierDesc>> modifiers = new Dictionary<string, List<modifierDesc>>();
+  static Dictionary<string, List<ModifierDesc>> modifiers = new Dictionary<string, List<ModifierDesc>>();
   public static int readChannel(string ch){
     if(channelStates.TryGetValue(ch, out var v)) return v;
     else return addModifier(ch);
@@ -101,9 +138,9 @@ public static class ChannelState{
     return readChannel(b.channel);
   }
   static void clearModifiers(HashSet<string> except = null){
-    Dictionary<string, List<modifierDesc>> nlist = new Dictionary<string, List<modifierDesc>>();
+    Dictionary<string, List<ModifierDesc>> nlist = new Dictionary<string, List<ModifierDesc>>();
     foreach(var pair in modifiers){
-      List<modifierDesc> keep = new List<modifierDesc>();
+      List<ModifierDesc> keep = new List<ModifierDesc>();
       foreach(var mod in pair.Value){
         if(except == null || !except.Contains(mod.outname))channelStates.Remove(mod.outname);
         else keep.Add(mod);
@@ -122,11 +159,11 @@ public static class ChannelState{
     string clean = ch.Substring(0,idx);
 
     if(clean!=ch && ch[ch.Length-1] == ']'){
-      List<modifierDesc> mods =null;
+      List<ModifierDesc> mods =null;
       if(!modifiers.TryGetValue(clean,out mods)){
-        modifiers.Add(clean, mods = new List<modifierDesc>());
+        modifiers.Add(clean, mods = new List<ModifierDesc>());
       }
-      modifierDesc mod = new modifierDesc(ch);
+      ModifierDesc mod = new ModifierDesc(ch);
       mods.Add(mod);
       return mod.apply(readChannel(clean));
     } else {

@@ -224,5 +224,5 @@ public class ConditionalStrawb:Entity, IStrawberry{
     On.Celeste.Player.ctor += playerCtorHook;
   }, void ()=>{
     On.Celeste.Player.ctor -= playerCtorHook;
-  });
+  }).enable();
 }

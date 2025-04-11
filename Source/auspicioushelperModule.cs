@@ -40,7 +40,8 @@ public class auspicioushelperModule : EverestModule {
 
         On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         DebugConsole.Write("Loading");
-        ConditionalStrawb.hooks.enable();
+        EntityMarkingFlag.hooks.enable();
+        
         //TrackedCassette.hooks.enable();
     }
     public static void tinyCleanup(){
