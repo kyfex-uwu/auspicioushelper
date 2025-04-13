@@ -42,12 +42,15 @@ public class BasicMultient:Entity, ITemplateChild{
     }
   }
   List<EntEnt> ents = new List<EntEnt>();
+  int depthoffset;
   public BasicMultient(Template t):base(t.virtLoc){
     parent = t;
     Depth = -9000+t.depthoffset;
+    depthoffset = t.depthoffset;
   }
   public void add(Entity e, Vector2 offset){
     ents.Add(new EntEnt(e,offset));
+    e.Depth+=depthoffset;
     if(e.Scene == null && this.Scene != null) Scene.Add(e);
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){

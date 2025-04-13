@@ -31,7 +31,7 @@ public static class DebugConsole {
             while (true) {
                 string message = messageQueue.Take();
                 if (message == null) break;
-                writer.WriteLine(message);
+                if(open)try{writer.WriteLine(message);}catch(Exception){}
             }
         }) {
             IsBackground = true

@@ -42,4 +42,20 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       MapHider.uncache();
     }
   } 
+  // private Dictionary<int, string> hideRulesDict {get; set;} = new();
+  // [SettingIgnore]
+  // public HideruleMenu hideruleMenu {get;set;} = new();
+  // [SettingSubMenu]
+  // public class HideruleMenu{
+  //   [SettingIgnore]
+  //   public bool Dummy {get;set;}
+  //   public Dictionary<int,TextMenu.Button> items = new();
+  //   public void CreateDummyEntry(TextMenuExt.SubMenu menu, bool ingame){
+  //     Dictionary<int, string> rules = auspicioushelperModule.Settings.hideRulesDict;
+  //     foreach((int i, string s) in rules){
+  //       TextMenu.Button entry = new(i.ToString(), )
+  //       entry.Change()
+  //     }
+  //   }
+  // }
 }
