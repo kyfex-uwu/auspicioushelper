@@ -30,8 +30,9 @@ public static class MarkedRoomParser{
         t.setTiles(l.Solids,l.Bg);
       }
       if(d.Name == "auspicioushelper/EntityMarkingFlag"){
+        DebugConsole.Write("HERE");
         EntityMarkingFlag.hooks.enable();
-        
+        EntityMarkingFlag.watch(d.Attr("path"),d.Attr("identifier"));
       }
     }
     foreach(EntityData d in l.Entities){
@@ -84,6 +85,7 @@ public static class MarkedRoomParser{
   }
   public static void parseMapdata(MapData m){
     templates.Clear();
+    EntityMarkingFlag.flagged.Clear();
     foreach(LevelData l in m.Levels){
       if(l.Name.StartsWith(sigstr+"-")||l.Name == sigstr){
         DebugConsole.Write("Parsing "+l.Name);

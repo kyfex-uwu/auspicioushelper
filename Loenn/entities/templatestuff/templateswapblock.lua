@@ -21,6 +21,6 @@ entity.placements = {
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x-2, entity.y-2, 4, 4)
 end
-entity.fillColor = {0.3,1,0.3}
+entity.borderColor = {0.3,1,0.3}
 
 return entity

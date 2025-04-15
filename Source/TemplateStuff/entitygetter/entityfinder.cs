@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Celeste.Mod.Entities;
 using Iced.Intel;
 using Microsoft.Xna.Framework;
@@ -21,32 +22,36 @@ public class EntityMarkingFlag:Entity{
   public EntityMarkingFlag(EntityData d):base(Vector2.Zero){}
   public override void Added(Scene s){base.Added(s);RemoveSelf();}
 
-  static Dictionary<int, List<List<int>>> flagged = new();
-  public static void watch(string sig){
+  public static Dictionary<string, string> flagged = new();
+  public static void watch(string sig, string identifier){
     try{
-      List<int> looking = sig.Split("/").Select(s=>int.Parse(s.Trim())).ToList();
-      if(!flagged.TryGetValue(looking[0], out var list)){
-        if(looking.Count == 1) flagged.Add(looking[0], null);
-        else flagged.Add(looking[0], list=new List<List<int>>());
-      }
-      if(looking.Count>1){
-        if(list == null) flagged[looking[0]] = list = new List<List<int>>();
-        looking.RemoveAt(0);
-        list.Add(looking);
-      }
+      //List<int> looking = sig.Split("/").Select(s=>int.Parse(s.Trim())).ToList();
+      // if(!flagged.TryGetValue(looking[0], out var list)){
+      //   if(looking.Count == 1) flagged.Add(looking[0], null);
+      //   else flagged.Add(looking[0], list=new List<List<int>>());
+      // }
+      // if(looking.Count>1){
+      //   if(list == null) flagged[looking[0]] = list = new List<List<int>>();
+      //   looking.RemoveAt(0);
+      //   list.Add(looking);
+      // }
+      string cl = Regex.Replace(sig,@"\s+","");
+      flagged[cl] = identifier;
+      DebugConsole.Write($"Registered looker for {sig} of {identifier}");
     } catch(Exception ex){
       DebugConsole.Write($"Your ID path could not be parsed: {sig} causes error \n{ex}\n"+
       "Please remember to format your path to match: \\d+(/\\d+)*");
     }
   }
-
   public static void StartingLoad(EntityData d){
-    DebugConsole.Write($"Start Ld {d.ID} {d.Name}");
-    finding = new FoundEntity(d.ID,d);
-    last = null;
+    //DebugConsole.Write($"Start Ld {d.ID} {d.Name}");
+    last = null; finding = null;
+    if(flagged.TryGetValue(d.ID.ToString(), out var ident)){
+      DebugConsole.Write($"Looking for entity on path {d.ID} for ident {ident}");
+      finding = new FoundEntity(d, ident);
+    }
   }
   public static void EndingLoad(EntityData d){
-    DebugConsole.Write($"End Ld {d?.ID} {d?.Name}");
     if(finding!=null) finding.finalize(last);
     finding = null;
     last = null;
@@ -80,8 +85,8 @@ public class EntityMarkingFlag:Entity{
   static ILHook llhook;
   public static void AddHook(On.Monocle.Scene.orig_Add_Entity orig, Scene self, Entity e){
     if(self is Level l){
-      if(e!=null)DebugConsole.Write("Add "+ e?.ToString());
-      if(finding!=null)last = e;
+      //if(e!=null)DebugConsole.Write("Add "+ e?.ToString());
+      if(finding!=null)last = e??last;
     }
     orig(self, e);
   } 
