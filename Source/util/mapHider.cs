@@ -37,14 +37,16 @@ public static class MapHider{
     //DebugConsole.Write("here");
     if(rules == null){
       rules = new List<Tuple<string,Regex>>();
-      try{
-        foreach(var pair in Util.kvparseflat(auspicioushelperModule.Settings.hideRules)){
-          string str = Util.stripEnclosure(pair.Value);
-          DebugConsole.Write($"Registered hiding rule {pair.Key} as {str}");
-          rules.Add(new Tuple<string, Regex>(pair.Key,new Regex(str)));
+      int i=-1;
+      foreach(var rule in auspicioushelperModule.Settings.hideRulesList){
+        i++;
+        if(rule == "") continue;
+        try{
+          rules.Add(new Tuple<string, Regex>(i.ToString(),new Regex(rule, RegexOptions.IgnoreCase)));
+          DebugConsole.Write($"Registered hiding rule {i.ToString()} as {rule}");
+        }catch(Exception ex){
+          DebugConsole.Write($"your rule {i} was bad - error message {ex}");
         }
-      } catch(Exception ex){
-        DebugConsole.Write("Your map hiding rules are bad "+ex.ToString());
       }
     }
     List<string> toremove = new List<string>();

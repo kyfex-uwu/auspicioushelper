@@ -29,6 +29,10 @@ public static class MarkedRoomParser{
         DebugConsole.Write(id);
         t.setTiles(l.Solids,l.Bg);
       }
+      if(d.Name == "auspicioushelper/EntityMarkingFlag"){
+        EntityMarkingFlag.hooks.enable();
+        
+      }
     }
     foreach(EntityData d in l.Entities){
       if(d.Name == "auspicioushelper/templateFiller") continue;

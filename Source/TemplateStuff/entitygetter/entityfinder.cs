@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Celeste.Mod.Entities;
 using Iced.Intel;
@@ -20,6 +21,24 @@ public class EntityMarkingFlag:Entity{
   public EntityMarkingFlag(EntityData d):base(Vector2.Zero){}
   public override void Added(Scene s){base.Added(s);RemoveSelf();}
 
+  static Dictionary<int, List<List<int>>> flagged = new();
+  public static void watch(string sig){
+    try{
+      List<int> looking = sig.Split("/").Select(s=>int.Parse(s.Trim())).ToList();
+      if(!flagged.TryGetValue(looking[0], out var list)){
+        if(looking.Count == 1) flagged.Add(looking[0], null);
+        else flagged.Add(looking[0], list=new List<List<int>>());
+      }
+      if(looking.Count>1){
+        if(list == null) flagged[looking[0]] = list = new List<List<int>>();
+        looking.RemoveAt(0);
+        list.Add(looking);
+      }
+    } catch(Exception ex){
+      DebugConsole.Write($"Your ID path could not be parsed: {sig} causes error \n{ex}\n"+
+      "Please remember to format your path to match: \\d+(/\\d+)*");
+    }
+  }
 
   public static void StartingLoad(EntityData d){
     DebugConsole.Write($"Start Ld {d.ID} {d.Name}");
@@ -68,11 +87,12 @@ public class EntityMarkingFlag:Entity{
   } 
   public static HookManager hooks = new HookManager(()=>{
     MethodInfo oll = typeof(Level).GetMethod("orig_LoadLevel",BindingFlags.Public |BindingFlags.Instance);
-    if(oll == null) DebugConsole.Write("could not find orig_LoadLevel");
-    else llhook = new ILHook(oll, LLILHook);
+    llhook = new ILHook(oll, LLILHook);
     On.Monocle.Scene.Add_Entity+=AddHook;
+    DebugConsole.Write("enabling");
   },void ()=>{
     llhook?.Dispose();
     On.Monocle.Scene.Add_Entity-=AddHook;
-  });
+    DebugConsole.Write("disabling");
+  }, auspicioushelperModule.OnEnterMap);
 }

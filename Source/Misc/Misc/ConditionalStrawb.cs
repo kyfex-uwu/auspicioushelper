@@ -105,7 +105,7 @@ public class ConditionalStrawb:Entity, IStrawberry{
     Add(new Coroutine(Fly(otherpos??new Vector2(Position.X,Position.Y-1000000))));
   }
   public void OnDash(Vector2 dir){
-    if(winged && state==Strawb.idling && (otherpos is Vector2 o) &&Vector2.Distance(o,Position)>1.0f){
+    if(winged && state==Strawb.idling && (((otherpos is Vector2 o) &&Vector2.Distance(o,Position)>1.0f)||otherpos==null)){
       Fly();
     }
     if(wingedFollower && state == Strawb.following){
@@ -216,6 +216,7 @@ public class ConditionalStrawb:Entity, IStrawberry{
   }
   public static void playerCtorHook(On.Celeste.Player.orig_ctor orig, Player p, Vector2 pos, PlayerSpriteMode s){
     orig(p,pos,s);
+    //DebugConsole.Write("here in strawb");
     foreach(var e in auspicioushelperModule.Session.PersistentFollowers){
       if(e.data.Name == "auspicioushelper/ConditionalStrawb") restoreFollowerLikeJesus(p,e);
     }
@@ -224,5 +225,5 @@ public class ConditionalStrawb:Entity, IStrawberry{
     On.Celeste.Player.ctor += playerCtorHook;
   }, void ()=>{
     On.Celeste.Player.ctor -= playerCtorHook;
-  }).enable();
+  });
 }

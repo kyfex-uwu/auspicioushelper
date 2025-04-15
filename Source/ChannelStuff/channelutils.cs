@@ -18,7 +18,7 @@ public static class ChannelState{
   struct Modifier{
     int y;
     Ops op;
-    Regex prefixSuffix = new Regex("^\\s*(.[^-\\d])(\\d*)\\s*");
+    Regex prefixSuffix = new Regex("^\\s*(-|[^-\\d]+)([-\\d]*)\\s*");
     public Modifier(string s, out bool success){
       Match m = prefixSuffix.Match(s);
       int.TryParse(m.Groups[2].ToString(),out y);
@@ -49,6 +49,9 @@ public static class ChannelState{
         case "x<<":op=Ops.shiftl; break;
         case "x>>":op=Ops.shiftr; break;
         default: success = false; break;
+      }
+      if(!success && s.Length>0){
+        DebugConsole.Write($"Improper modifier {s} - parsed as op {m} and val {y}");
       }
     }
     public int apply(int x){
@@ -92,7 +95,6 @@ public static class ChannelState{
       foreach(string sub in stuff.Split(",")){
         var m = new Modifier(sub, out var success);
         if(success)ops.Add(m);
-        else if(sub!="")DebugConsole.Write($"Improper modifier operation {sub}");
       }
     }
     public int apply(int val){
@@ -120,7 +122,9 @@ public static class ChannelState{
     string clean = ch.Substring(0,idx);
     SetChannelRaw(clean,state);
     if(modifiers.TryGetValue(clean, out var ms)){
-      foreach(var m in ms) SetChannelRaw(m.outname,m.apply(state));
+      foreach(var m in ms){
+        SetChannelRaw(m.outname,m.apply(state));
+      }
     }
   }
   public static void unwatchNow(IChannelUser b){
@@ -165,7 +169,7 @@ public static class ChannelState{
       }
       ModifierDesc mod = new ModifierDesc(ch);
       mods.Add(mod);
-      return mod.apply(readChannel(clean));
+      return channelStates[ch] = mod.apply(readChannel(clean));
     } else {
       channelStates.Add(ch,0);
       return 0;

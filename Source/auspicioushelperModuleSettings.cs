@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using Celeste.Mod.UI;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
+using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
@@ -17,6 +19,7 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       else DebugConsole.Close();
     }}
   private bool _tryQuietShader = false;
+  [SettingSubText("Use compression-friendly shaders when available (not reccomended or intended)")]
   public bool UseQuietShader{
     get=>_tryQuietShader;
     set{
@@ -24,38 +27,56 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
     }
   }
   private bool _hideHelperMaps = false;
-  public bool hideHelperMaps {
+  [SettingSubText("Choose rules for hiding maps below")]
+  public bool HideHelperMaps {
     get=>_hideHelperMaps;
     set{
       _hideHelperMaps = value;
-      if(value)MapHider.hideListed();
+      if(value) MapHider.hideListed();
       else MapHider.revealListed();
     }
   }
-
-  private string _hideRules = "0:\"\\/t$\"";
-  [SettingMaxLength(600)]
-  public string hideRules {
-    get=>_hideRules;
-    set{
-      _hideRules = value;
-      MapHider.uncache();
+  public List<string> hideRulesList {get; set;} = new();
+  [SettingIgnore]
+  [SettingSubText("Regex rules to match maps to hide")]
+  public HideruleMenu HideRules {get;set;} = new();
+  [SettingSubMenu]
+  public class HideruleMenu{
+    [SettingIgnore]
+    public bool Dummy {get;set;}
+    List<string> rules;
+    TextMenu.Item makePressHandler(string s, int i){
+      string val = s;
+      TextMenu.Item entry = new TextMenu.Button(i.ToString()+": "+s).Pressed(()=>{
+        Audio.Play(SFX.ui_main_savefile_rename_start);
+        (Engine.Instance.scene as Overworld)?.Goto<OuiModOptionString>().Init<OuiModOptions>(
+          s, (string value)=>{
+            val = value;
+          },(bool confirm)=>{
+            if(confirm){
+              rules[i] = val;
+              MapHider.uncache();
+              if(auspicioushelperModule.Settings._hideHelperMaps){
+                MapHider.revealListed();
+                MapHider.hideListed();
+              }
+            }
+            else val = rules[i];
+          }, 100, 0
+        );
+      });
+      return entry;
     }
-  } 
-  // private Dictionary<int, string> hideRulesDict {get; set;} = new();
-  // [SettingIgnore]
-  // public HideruleMenu hideruleMenu {get;set;} = new();
-  // [SettingSubMenu]
-  // public class HideruleMenu{
-  //   [SettingIgnore]
-  //   public bool Dummy {get;set;}
-  //   public Dictionary<int,TextMenu.Button> items = new();
-  //   public void CreateDummyEntry(TextMenuExt.SubMenu menu, bool ingame){
-  //     Dictionary<int, string> rules = auspicioushelperModule.Settings.hideRulesDict;
-  //     foreach((int i, string s) in rules){
-  //       TextMenu.Button entry = new(i.ToString(), )
-  //       entry.Change()
-  //     }
-  //   }
-  // }
+    public void CreateDummyEntry(TextMenuExt.SubMenu menu, bool ingame){
+      rules = auspicioushelperModule.Settings.hideRulesList;
+      rules.RemoveAll(string.IsNullOrEmpty);
+      if(rules.Count == 0) rules.Add("/t$");
+      int i = 0;
+      foreach(string s in rules){
+        menu.Add(makePressHandler(s,i++));
+      }
+      rules.Add("");
+      menu.Add(makePressHandler("",i));
+    }
+  }
 }

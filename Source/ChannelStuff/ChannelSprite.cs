@@ -41,7 +41,7 @@ public class ChannelSprite:ChannelBaseEntity{
   public override void setChVal(int val){
     if(val<0 || val>=num){
       switch(ty){
-        case edgeTypes.loop: val=val%num; break;
+        case edgeTypes.loop: val=(val%num+num)%num; break;
         case edgeTypes.clamp: val=Math.Clamp(val,0,num-1);break;
         default:
           sprite.Visible=false;

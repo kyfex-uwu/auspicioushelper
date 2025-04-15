@@ -106,7 +106,7 @@ public class ChannelMathController:Entity{
           ridx=op[iptr++];
           len=op[iptr++];
           channel = Encoding.ASCII.GetString(op, iptr, len);
-          if(debug) DebugConsole.Write(channel+" "+reg[ridx].ToString());
+          if(debug) DebugConsole.Write("setting channel: "+channel+" "+reg[ridx].ToString());
           ChannelState.SetChannel(channel, reg[ridx]);
           iptr+=len;
           break;

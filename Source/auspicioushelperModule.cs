@@ -40,6 +40,8 @@ public class auspicioushelperModule : EverestModule {
 
         On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         DebugConsole.Write("Loading");
+        ConditionalStrawb.hooks.enable();
+        MapHider.uncache();
         //EntityMarkingFlag.hooks.enable();
         
         //TrackedCassette.hooks.enable();
@@ -72,21 +74,22 @@ public class auspicioushelperModule : EverestModule {
         OnReset.run();
     }
     static void OnEnter(Session session, bool fromSave){
-        Session?.load(!fromSave);
         ChannelState.unwatchAll();
         JumpListener.releaseHooks();
         portalHooks.unsetupHooks();
-        MarkedRoomParser.parseMapdata(session.MapData);
-        DebugConsole.Write("Entered Level");
 
         OnReset.run();
         OnNewScreen.run();
         OnEnterMap.run();
+        
+        Session?.load(!fromSave);
+        MarkedRoomParser.parseMapdata(session.MapData);
+        DebugConsole.Write("Entered Level");
     }
     static void OnReload(bool silent){
-        DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.hideHelperMaps}");
+        DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.HideHelperMaps}");
         //foreach (ModAsset item in Everest.Content.Map.Values.Where((ModAsset asset) => asset.Type == typeof(AssetTypeMap)))
-        if(Settings.hideHelperMaps)MapHider.hideListed();
+        if(Settings.HideHelperMaps)MapHider.hideListed();
         //DebugConsole.Write(Engine.Instance.scene.ToString());
         ChannelState.unwatchAll();
         if(Engine.Instance.scene is LevelLoader l){

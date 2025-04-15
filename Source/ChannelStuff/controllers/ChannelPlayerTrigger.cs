@@ -65,7 +65,6 @@ public class ChannelPlayerTrigger:Trigger{
     });
   }
   public override void OnEnter(Player player){
-    DebugConsole.Write("here");
     base.OnEnter(player);
     if(activateOnEnter) activate();
   }

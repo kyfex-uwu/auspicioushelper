@@ -9,12 +9,12 @@ Todo:
  - [done] Recursive templates
  - RcbFixer!
  - Entity idifier and cmc reflection
- - mod hider
+ - [done] mod hider
  - Portal staticmover enable/disable stuff
- - [wip] Channel access modifiers
+ - [done] Channel access modifiers
  - Cassette gate
  - shake for templates
- - Ensure hookmanagers work as expected lmao
+ - [done - they don't] Ensure hookmanagers work as expected lmao
 
 
 [done] hook cleanup for flingbird/channeltheo

@@ -29,7 +29,7 @@ public class TemplateSwapblock:Template{
   :base(d.Attr("template",""),d.Position+offset,depthoffset){
     dat=d;
     this.offset=offset;
-    DebugConsole.Write($"{t.childEntities.Count}");
+    //DebugConsole.Write($"{t.childEntities.Count}");
   }
   public override void Update(){
     base.Update();
