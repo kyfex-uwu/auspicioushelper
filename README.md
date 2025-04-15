@@ -8,7 +8,7 @@ Todo:
  - [done] Inside check for cassette thing, 
  - [done] Recursive templates
  - RcbFixer!
- - Entity idifier and cmc reflection
+ - [done] Entity idifier and cmc reflection
  - [done] mod hider
  - Portal staticmover enable/disable stuff
  - [done] Channel access modifiers
@@ -16,6 +16,3 @@ Todo:
  - shake for templates
  - [done - they don't] Ensure hookmanagers work as expected lmao
 
-
-[done] hook cleanup for flingbird/channeltheo
-graphics :/ (they're improving with every commit, except loenn)

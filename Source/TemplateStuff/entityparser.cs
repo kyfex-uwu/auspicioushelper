@@ -60,13 +60,18 @@ public static class EntityParser{
     if(etype == Types.unable) return null;
     return new EWrap(e,etype);
   }
-  public static Entity create(EWrap d, Level l, LevelData ld, Vector2 simoffset, Template t){
+  public static Entity create(EWrap d, Level l, LevelData ld, Vector2 simoffset, Template t, string path){
     if(d.t == Types.unable) return null;
     
     loaders.TryGetValue(d.d.Name, out var loader);
     if(loader == null && !Level.EntityLoaders.TryGetValue(d.d.Name, out loader)) return null;
     Entity e = loader(l,ld,simoffset,d.d);
     if(e==null) return null;
+    else{
+      if(path!=null && EntityMarkingFlag.flagged.TryGetValue(path+$"/{d.d.ID}",out var ident)){
+        new FoundEntity(d.d,ident).finalize(e);
+      }
+    }
     switch(d.t){
       case Types.platformbasic:
         if(e is Platform p){

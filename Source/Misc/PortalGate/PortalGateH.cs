@@ -178,6 +178,8 @@ public class PortalGateH:Entity{
   public List<uint> handles = new List<uint>();
   public Color color;
   public bool giveRCB;
+  public Vector2 drawoffset1 =Vector2.Zero;
+  public Vector2 drawoffset2 =Vector2.Zero;
   
   public PortalGateH(EntityData d, Vector2 offset):base(d.Position+offset){
     portalHooks.hooks.enable();
@@ -203,6 +205,9 @@ public class PortalGateH:Entity{
           bool d = solid.CollideRect(new Rectangle((int)Math.Floor(Position.X), (int)Position.Y, 1, (int)height));
           if(c==n1dir && d!=n1dir)s1=solid;
           return c!=d;
+        },
+        OnShake = (Vector2 amount)=>{
+          drawoffset1 = amount;
         }
       });
       Add(new StaticMover(){
@@ -212,6 +217,9 @@ public class PortalGateH:Entity{
           bool d = solid.CollideRect(new Rectangle((int)Math.Floor(npos.X), (int)npos.Y, 1, (int)height));
           if(c==n2dir && d!=n2dir)s2=solid;
           return c!=d;
+        },
+        OnShake = (Vector2 amount)=>{
+          drawoffset2=amount;
         }
       });
     }
@@ -315,9 +323,10 @@ public class PortalGateH:Entity{
       float alpha = Math.Min(1,Math.Max(0,ogen.sample(handles[i]))+0.2f);
       if(alpha<0) continue;
       float length = ogen.sample(handles[i+1])*10+20;
-      texture.Draw(Position+new Vector2(0,i), offset, color*alpha, new Vector2(wrec1 * length, 8), 0);
-      texture.Draw(npos+new Vector2(0,i), offset, color*alpha, new Vector2(wrec2 * length, 8), 0);
+      texture.Draw(Position+new Vector2(0,i)+drawoffset1, offset, color*alpha, new Vector2(wrec1 * length, 8), 0);
+      texture.Draw(npos+new Vector2(0,i)+drawoffset2, offset, color*alpha, new Vector2(wrec2 * length, 8), 0);
     }
+    
   }
   public override void Update(){
     base.Update();

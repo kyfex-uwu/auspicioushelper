@@ -18,7 +18,7 @@ public class TemplateChannelmover:Template, IChannelUser{
   public override Vector2 virtLoc => Position+prog*movevec;
   public TemplateChannelmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateChannelmover(EntityData d, Vector2 offset, int depthoffset)
-  :base(d.Attr("template",""),d.Position+offset,depthoffset){
+  :base(d.Attr("template",""),d.Position+offset,depthoffset,d.ID){
     movevec = d.Nodes[0]-d.Position;
     channel = d.Attr("channel","");
     relspd = 1/d.Float("move_time",1);

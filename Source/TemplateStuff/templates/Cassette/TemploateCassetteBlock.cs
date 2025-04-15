@@ -29,7 +29,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
   bool freeze;
   public TemplateCassetteBlock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateCassetteBlock(EntityData d, Vector2 offset, int depthoffset)
-  :base(d.Attr("template",""),d.Position+offset,depthoffset){
+  :base(d.Attr("template",""),d.Position+offset,depthoffset,d.ID){
     freeze = d.Bool("freeze",false);
     channel = d.Attr("channel","");
     prop = prop&~Propagation.Inside;

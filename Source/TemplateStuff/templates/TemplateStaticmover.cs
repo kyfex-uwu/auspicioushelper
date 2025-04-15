@@ -19,7 +19,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   bool averageSmear;
   string channel="";
   public TemplateStaticmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
-  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d.Attr("template",""),d.Position+offset,depthoffset){
+  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d.Attr("template",""),d.Position+offset,depthoffset,d.ID){
     smearamount = d.Int("liftspeed_smear",4);
     averageSmear = d.Bool("smear_average",false);
     channel = d.Attr("channel","");
