@@ -12,7 +12,7 @@ entity.placements = {
     data = {
       compiled_operations = "",
       run_immediately = false,
-      every_frame = false,
+      custom_polling_rate = "",
       debug = false
     }
   }

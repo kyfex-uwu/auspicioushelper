@@ -55,7 +55,4 @@ public class ChannelSprite:ChannelBaseEntity{
     base.Added(scene);
     setChVal(ChannelState.readChannel(channel));
   }
-  public void move(Vector2 amount){
-    DebugConsole.Write(amount.ToString());
-  }
 }

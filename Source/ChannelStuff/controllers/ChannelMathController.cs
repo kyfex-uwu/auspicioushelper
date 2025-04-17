@@ -27,12 +27,18 @@ public class ChannelMathController:Entity{
   }
   List<string> usedChannels = new List<string>();
   bool runImmediately;
-  bool runEveryFrame;
   bool needsrun=false;
   bool debug=false;
+  int period=0;
+  int periodTimer=0;
   public ChannelMathController(EntityData d, Vector2 offset):base(new Vector2(0,0)){
     runImmediately = d.Bool("run_immediately",false);
-    runEveryFrame = d.Bool("every_frame",false);
+    int p = d.Int("custom_polling_rate",0);
+    if(d.Bool("every_frame")) p=1;
+    if(p>0){
+      period = p;
+      periodTimer = 1;
+    }
     debug = d.Bool("debug",false);
     var bin=Convert.FromBase64String(d.Attr("compiled_operations",""));
     DebugConsole.Write(bin.Length.ToString());
@@ -78,9 +84,10 @@ public class ChannelMathController:Entity{
   }
   public override void Update(){
     base.Update();
-    if(runEveryFrame || (!runImmediately && needsrun)){
+    if((period != 0 && --periodTimer<=0) || (period == 0 && !runImmediately && needsrun)){
       run8bitsimple();
       needsrun = false;
+      periodTimer = period;
     }
   }
   public void run8bitsimple(){
@@ -191,6 +198,17 @@ public class ChannelMathController:Entity{
         case Op.iopssi: reg[op[iptr++]] = interop(2,1,ref iptr); break;
         case Op.iopssii: reg[op[iptr++]] = interop(2,2,ref iptr); break;
         case Op.iopvsvi: reg[op[iptr++]] = interop(op[iptr++],op[iptr++],ref iptr); break;
+
+        case Op.jnz:
+          if(reg[op[iptr++]]!=0) goto case Op.j;
+          iptr+=4; break;
+        case Op.jz:
+          if(reg[op[iptr++]]==0) goto case Op.j;
+          iptr+=4; break;
+        case Op.j:
+          iptr = BitConverter.ToInt32(op,iptr);
+          break;
+        
         default: break;
       }
     }
@@ -278,7 +296,7 @@ public class ChannelMathController:Entity{
         case "speedy": return (int)p.Speed.Y;
         case "posx": return (int)p.Position.X;
         case "posy": return (int)p.Position.Y;
-        default: return 0;
+        default: return FoundEntity.reflectGet(p,strs,ints);
       }
     });
     registerInterop("killPlayer",(List<string> strs, List<int> ints)=>{
@@ -286,6 +304,9 @@ public class ChannelMathController:Entity{
       Vector2 dir = ints.Count>=3?new Vector2(0.1f*(float)ints[1],0.1f*(float)ints[2]):Vector2.Zero;
       if(ints[0]!=0) p.Die(dir);
       return (p!=null && ints[0]!=0)?1:0;
+    });
+    registerInterop("reflectGet",(List<string> strs, List<int> ints)=>{
+      return FoundEntity.sreflectGet(strs, ints);
     });
   }
 

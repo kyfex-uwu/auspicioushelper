@@ -19,7 +19,10 @@ namespace Celeste.Mod.auspicioushelper;
 public class EntityMarkingFlag:Entity{
   static FoundEntity finding = null;
   static Entity last = null;
-  public EntityMarkingFlag(EntityData d):base(Vector2.Zero){}
+  public EntityMarkingFlag(EntityData d):base(Vector2.Zero){
+    watch(d.Attr("path"),d.Attr("identifier"));
+    hooks.enable();
+  }
   public override void Added(Scene s){base.Added(s);RemoveSelf();}
 
   public static Dictionary<string, string> flagged = new();

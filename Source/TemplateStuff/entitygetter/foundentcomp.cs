@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Monocle;
@@ -34,11 +35,25 @@ public class FoundEntity:Component{
     base.Removed(entity);
     found.Remove(ident);
   }
-  public int reflectGet(List<string> path, List<int> args){
-    object o = Entity;
+  public static int reflectGet(Entity e, List<string> path, List<int> args){
+    object o = e;
+    int j=0;
     for(int i=2; i<path.Count; i++){
       if(o == null) return 0;
       Type type = o.GetType();
+      if(path[i] == "__index__"){
+        if(o is IList list) o = list[args[j]];
+        else if(o is IEnumerable enumer){
+          int k=0;
+          o=null;
+          foreach(object c in enumer){
+            if(k == args[j]){
+              o=c; break;
+            }
+          }
+        }
+        j++;continue;
+      }
       FieldInfo field = type.GetField(path[i], BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
       if(field!=null){
         o=field.GetValue(o); continue;
@@ -47,7 +62,7 @@ public class FoundEntity:Component{
       if(prop != null){
         o = prop.GetValue(o); continue;
       }
-      DebugConsole.Write($"The reflection process on entity {Entity?.ToString()} failed at index {i} looking for {path[i]}");
+      DebugConsole.Write($"The reflection process on entity {e?.ToString()} failed at index {i} looking for {path[i]} on {o?.ToString()}");
       return 0;
     }
     try {
@@ -56,11 +71,14 @@ public class FoundEntity:Component{
       return o==null?0:1;
     }
   }
+  public int reflectGet(List<string> path, List<int> args){
+    return reflectGet(Entity,path,args);
+  }
   public static int sreflectGet(List<string> path, List<int> args){
     if(!found.TryGetValue(path[1], out var f)){
       DebugConsole.Write($"Entity with attached identifier {path[1]} not found");
       return 0;
     }
-    return f.reflectGet(path, args);
+    return reflectGet(f.Entity, path, args);
   }
 }

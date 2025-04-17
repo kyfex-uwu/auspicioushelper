@@ -14,8 +14,18 @@ using Monocle;
 
 namespace Celeste.Mods.auspicioushelper;
 
-[CustomEntity("auspicioushelper/ConditionalStrawb")]
+[CustomEntity("auspicioushelper/ConditionalStrawbTracked")]
 [RegisterStrawberry(true, true)]
+public class ConditionalStrawbTracked:ConditionalStrawb{
+  public ConditionalStrawbTracked(EntityData data, Vector2 offset, EntityID id):base(data,offset,id){}
+}
+[CustomEntity("auspicioushelper/ConditionalStrawb")]
+[RegisterStrawberry(false, true)]
+public class ConditionalStrawbUntracked:ConditionalStrawb{
+  public ConditionalStrawbUntracked(EntityData data, Vector2 offset, EntityID id):base(data,offset,id){}
+}
+
+
 [Tracked]
 public class ConditionalStrawb:Entity, IStrawberry{
   public string idstr;

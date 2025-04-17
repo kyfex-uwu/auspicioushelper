@@ -30,7 +30,6 @@ public static class MarkedRoomParser{
         t.setTiles(l.Solids,l.Bg);
       }
       if(d.Name == "auspicioushelper/EntityMarkingFlag"){
-        DebugConsole.Write("HERE");
         EntityMarkingFlag.hooks.enable();
         EntityMarkingFlag.watch(d.Attr("path"),d.Attr("identifier"));
       }
