@@ -26,6 +26,10 @@ public class EntityMarkingFlag:Entity{
   public override void Added(Scene s){base.Added(s);RemoveSelf();}
 
   public static Dictionary<string, string> flagged = new();
+  public static void clear(){
+    flagged.Clear();
+    FoundEntity.clear();
+  }
   public static void watch(string sig, string identifier){
     try{
       //List<int> looking = sig.Split("/").Select(s=>int.Parse(s.Trim())).ToList();

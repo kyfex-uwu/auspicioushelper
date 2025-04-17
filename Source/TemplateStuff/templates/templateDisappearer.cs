@@ -15,7 +15,7 @@ public class TemplateDisappearer:Template{
   bool selfCol = true;
   bool parentVis = true;
   bool parentCol = true;
-  public TemplateDisappearer(string templateStr, Vector2 pos, int depthoffset):base(templateStr,pos,depthoffset){
+  public TemplateDisappearer(string templateStr, Vector2 pos, int depthoffset, int idp=-2):base(templateStr,pos,depthoffset,idp){
   }
   int permute(bool action, ref bool activator, bool other){
     if(action == activator){

@@ -10,10 +10,11 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
+[Tracked]
 public class FoundEntity:Component{
   int id;
   EntityData d;
-  string ident;
+  public string ident;
   static Dictionary<string, FoundEntity> found = new();
   public FoundEntity(EntityData d, string identifier):base(false,false){
     id=d.ID; this.d=d; ident = identifier;
@@ -73,6 +74,14 @@ public class FoundEntity:Component{
   }
   public int reflectGet(List<string> path, List<int> args){
     return reflectGet(Entity,path,args);
+  }
+  public static void clear(Scene refill = null){
+    found.Clear();
+    if(refill!=null){
+      foreach(FoundEntity f in refill.Tracker.GetComponents<FoundEntity>()){
+        found[f.ident] = f;
+      }
+    }
   }
   public static int sreflectGet(List<string> path, List<int> args){
     if(!found.TryGetValue(path[1], out var f)){

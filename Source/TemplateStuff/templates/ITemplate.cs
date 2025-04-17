@@ -47,6 +47,7 @@ public class Template:Entity, ITemplateChild{
   public List<ITemplateChild> children = new List<ITemplateChild>();
   public int depthoffset;
   public Template parent{get;set;} = null;
+  public int ownidpath;
   [Flags]
   public enum Propagation
   {
@@ -66,12 +67,13 @@ public class Template:Entity, ITemplateChild{
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
   public DashCollision OnDashCollide = null;
-  public Template(string templateStr, Vector2 pos, int depthoffset):base(pos){
+  public Template(string templateStr, Vector2 pos, int depthoffset, int ownidpath=-2):base(pos){
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
       DebugConsole.Write("No template found with identifier "+templateStr);
     }
     this.depthoffset = depthoffset;
     this.Visible = false;
+    this.ownidpath=ownidpath;
   }
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
@@ -87,6 +89,9 @@ public class Template:Entity, ITemplateChild{
     if(sceneadd)Scene.Add(ce);
     children.Add(c);
     c.parent = this;
+    if(c is Template ct){
+      ct.depthoffset+=depthoffset;
+    }
   }
   public void setOffset(Vector2 ppos){
     this.toffset = Position-ppos;
@@ -107,8 +112,9 @@ public class Template:Entity, ITemplateChild{
     if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, virtLoc, depthoffset),true);
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.virtLoc-t.origin;
+    string fp = fullpath;
     foreach(EntityParser.EWrap w in t.childEntities){
-      Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this);
+      Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this,fp);
       if(e is ITemplateChild c){
         addEnt(c);
         c.addTo(scene);
@@ -162,4 +168,5 @@ public class Template:Entity, ITemplateChild{
       c.parentChangeStat(vis,col);
     }
   }
+  string fullpath=>parent==null?ownidpath.ToString():parent.fullpath+$"/{ownidpath}";
 }

@@ -73,6 +73,7 @@ public static class SpeedrunToolIop{
         foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
           ChannelState.watch(t);
         }
+        FoundEntity.clear(Engine.Instance.scene);
         DebugConsole.Write($"Finished successfully");
       };
 
