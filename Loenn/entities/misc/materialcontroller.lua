@@ -11,6 +11,12 @@ materialcontroller.placements = {
     name = "Material Controller",
     data = {
       path="",
+      identifier="",
+      depth = 0,
+      independent = true,
+      simple = false,
+      always = false,
+      useprev = false,
       reload=false
     }
   }

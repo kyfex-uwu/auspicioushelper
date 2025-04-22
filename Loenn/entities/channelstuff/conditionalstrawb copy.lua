@@ -3,14 +3,14 @@ local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/ConditionalStrawb"
+entity.name = "auspicioushelper/ConditionalStrawbTracked"
 entity.depth = 2000
 entity.nodeLimits = {0,1}
 entity.nodeLineRenderType = "line"
 
 entity.placements = {
   {
-    name = "Conditional Strawberry",
+    name = "Conditional Strawberry (Tracked)",
     data = {
       strawberry_id = "",
       appear_on_ch=false,
@@ -38,7 +38,6 @@ entity.fieldInformation = {
     fieldType="integer"
   }
 }
-
 entity.texture = "objects/auspicioushelper/conditionalstrawb/silverwinged/wings00"
 
 function entity.rectangle(room, entity)

@@ -8,7 +8,7 @@ namespace Celeste.Mod.auspicioushelper;
 public static class DebugConsole {
     private static Thread consoleThread;
     private static readonly BlockingCollection<string> messageQueue = new BlockingCollection<string>();
-    public static bool open;
+    public static bool open=false;
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool AllocConsole();
