@@ -6,11 +6,11 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
-public static class MarkedRoomParser{
+internal static class MarkedRoomParser{
 
-  public static Dictionary<string, templateFiller> templates = new Dictionary<string, templateFiller>();
-  public static string sigstr = "zztemplates";
-  public static void parseLeveldata(LevelData l, string prefix){
+  internal static Dictionary<string, templateFiller> templates = new Dictionary<string, templateFiller>();
+  internal static string sigstr = "zztemplates";
+  internal static void parseLeveldata(LevelData l, string prefix){
     var rects = new StaticCollisiontree();
     var handleDict = new Dictionary<int, string>();
     foreach(EntityData d in l.Entities){
@@ -82,7 +82,7 @@ public static class MarkedRoomParser{
       }
     }
   }
-  public static void parseMapdata(MapData m){
+  internal static void parseMapdata(MapData m){
     templates.Clear();
     EntityMarkingFlag.clear();
     foreach(LevelData l in m.Levels){

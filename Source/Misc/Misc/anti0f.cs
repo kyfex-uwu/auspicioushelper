@@ -18,12 +18,22 @@ namespace Celeste.Mod.auspicioushelper;
 [Tracked]
 public class Anti0fZone:Entity{
   public FloatRect bounds;
-  const float maxstep = 4;
+  float maxstep = 4;
+  bool ctriggers;
+  bool cplayercolliders;
+  bool cthrowables;
   public Anti0fZone(EntityData d, Vector2 offset):base(d.Position+offset){
     bounds = new FloatRect(Position.X,Position.Y,d.Width,d.Height);
+    maxstep = d.Int("step",4);
     hooks.enable();
   }
-
+  public struct ACol{
+    FloatRect.FRCollision f;
+    object o;
+    public ACol(FloatRect.FRCollision info, object col){
+      f=info; o=col;
+    }
+  }
 
   public static bool PlayerUpdateDetour(Player p){
     //DebugConsole.Write("In update hook");
@@ -32,52 +42,71 @@ public class Anti0fZone:Entity{
     Vector2 ospeed = p.Speed;
     Vector2 step = ospeed*Engine.DeltaTime;
     FloatRect r = new FloatRect(p);
-    bool flag = false;
+    Anti0fZone hits = null;
     foreach(Anti0fZone a in p.Scene.Tracker.GetEntities<Anti0fZone>()){
       if(a.bounds.CollideRectSweep(r,step)){
-        flag = true;
+        hits=a;
         break;
       }
     }
-    if(!flag){
+    if(hits==null){
       return false;
     }
-    //We use L1 distance
-    float length = Math.Max(Math.Abs(step.X),Math.Abs(step.Y));
-    int steps = (int)Math.Ceiling(length/maxstep);
-    DebugConsole.Write("Inside 0f "+length.ToString()+" "+steps.ToString());
-    Vector2 substep = step/(float)steps;
-    for(int i=0; i<steps; i++){
-      if(p.StateMachine.state != state || p.Speed.Y!=ospeed.Y || p.Speed.X!=ospeed.X || p.Dead) return true;
-      if(i!=0){
-        if(state != 18) foreach(Trigger t in p.Scene.Tracker.GetEntities<Trigger>()){
-          if(p.CollideCheck(t)){
-            if(!t.Triggered){
-              t.Triggered = true;
-              p.triggersInside.Add(t);
-              t.OnEnter(p);
+    if(hits.maxstep>0){
+      //We use L1 distance
+      float length = Math.Max(Math.Abs(step.X),Math.Abs(step.Y));
+      int steps = (int)Math.Ceiling(length/hits.maxstep);
+      DebugConsole.Write("Inside 0f "+length.ToString()+" "+steps.ToString());
+      Vector2 substep = step/(float)steps;
+      for(int i=0; i<steps; i++){
+        if(p.StateMachine.state != state || p.Speed.Y!=ospeed.Y || p.Speed.X!=ospeed.X || p.Dead) return true;
+        if(i!=0){
+          if(hits.cthrowables&&(state == 0 || state == 2 || state == 7)){
+            foreach(Holdable c in p.Scene.Tracker.GetComponents<Holdable>()){
+              if(c.Check(p) && c.Pickup(p)){
+                p.StateMachine.state = 8;
+                return true;
+              }
             }
-          } else if(t.Triggered) {
-            p.triggersInside.Remove(t);
-            t.Triggered=false;
-            t.OnLeave(p);
           }
-        }
-        Collider g = p.Collider;
-        p.Collider=p.hurtbox;
-        if(!p.Dead && state!=21)foreach(PlayerCollider c in p.Scene.Tracker.GetComponents<PlayerCollider>()){
-          if(c.Check(p) && p.Dead){
-            p.Collider=g;
-            return true;
+
+          if(state != 18 && hits.ctriggers){
+            foreach(Trigger t in p.Scene.Tracker.GetEntities<Trigger>()){
+              if(p.CollideCheck(t)){
+                if(!t.Triggered){
+                  t.Triggered = true;
+                  p.triggersInside.Add(t);
+                  t.OnEnter(p);
+                }
+              } else if(t.Triggered) {
+                p.triggersInside.Remove(t);
+                t.Triggered=false;
+                t.OnLeave(p);
+              }
+            }
           }
+          
+          Collider g = p.Collider;
+          p.Collider=p.hurtbox;
+          if(!p.Dead && state!=21 && hits.cplayercolliders){
+            foreach(PlayerCollider c in p.Scene.Tracker.GetComponents<PlayerCollider>()){
+              if(c.Check(p) && p.Dead){
+                p.Collider=g;
+                return true;
+              }
+            }
+          }
+          p.Collider=g;
+          
         }
-        p.Collider=g;
-        
+        p.MoveH(substep.X,p.onCollideH,null);
+        p.MoveV(substep.Y,p.onCollideV,null);
       }
-      p.MoveH(substep.X,p.onCollideH,null);
-      p.MoveV(substep.Y,p.onCollideV,null);
+    } else {
+      foreach(Holdable h in )
     }
     return true;
+    
   }
   static ILHook updateHook;
   static void ILUpdateHook(ILContext ctx){

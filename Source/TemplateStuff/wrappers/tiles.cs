@@ -8,7 +8,7 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-public static class TileHooks{
+internal static class TileHooks{
   static Rectangle hookAnimT(On.Celeste.AnimatedTiles.orig_GetClippedRenderTiles orig, AnimatedTiles a, int extend){
     Rectangle r = orig(a,extend);
     if(a.Entity is IBoundsHaver e){
@@ -43,7 +43,7 @@ public interface IBoundsHaver{
   }
 }
 
-public class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
+internal class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.None;
   public Template parent {get;set;}
   public Vector2 toffset;
@@ -69,7 +69,7 @@ public class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
   }
 }
 
-public class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
+internal class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.All;
   public Template parent {get;set;}
   public Vector2 toffset;

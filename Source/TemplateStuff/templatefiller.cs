@@ -15,18 +15,18 @@ namespace Celeste.Mod.auspicioushelper;
 [CustomEntity("auspicioushelper/templateFiller")]
 public class templateFiller:Entity{
   
-  public string name;
-  public LevelData roomdat;
+  internal string name;
+  internal LevelData roomdat;
   Rectangle tr;
   // char[,] fgtiles;
   // char[,] bgtiles;
-  public VirtualMap<char> fgt;
-  public VirtualMap<char> bgt;
-  public Vector2 offset;
-  public Vector2 origin=>-offset+Position;
-  public List<DecalData> decals = new List<DecalData>();
-  public List<EntityParser.EWrap> childEntities = new List<EntityParser.EWrap>();
-  public templateFiller(EntityData d, Vector2 offset):base(d.Position){
+  internal VirtualMap<char> fgt;
+  internal VirtualMap<char> bgt;
+  internal Vector2 offset;
+  internal Vector2 origin=>-offset+Position;
+  internal List<DecalData> decals = new List<DecalData>();
+  internal List<EntityParser.EWrap> childEntities = new List<EntityParser.EWrap>();
+  internal templateFiller(EntityData d, Vector2 offset):base(d.Position){
     this.Collider = new Hitbox(d.Width, d.Height);
     name = d.Attr("template_name","");
     tr = new Rectangle((int)d.Position.X/8, (int)d.Position.Y/8, d.Width/8,d.Height/8);
@@ -35,12 +35,12 @@ public class templateFiller:Entity{
   public override void Awake(Scene scene){
     RemoveSelf();  
   }
-  // public AnimatedTiles bgaTiles = null;
-  // public TileGrid bgsTiles = null;
-  // public AnimatedTiles fgaTiles = null;
-  // public TileGrid fgsTiles = null;
+  // internal AnimatedTiles bgaTiles = null;
+  // internal TileGrid bgsTiles = null;
+  // internal AnimatedTiles fgaTiles = null;
+  // internal TileGrid fgsTiles = null;
 
-  public void setTiles(string fg, string bg){
+  internal void setTiles(string fg, string bg){
     Regex regex = new Regex("\\r\\n|\\n\\r|\\n|\\r");
     char[,] fgtiles = new char[tr.Width,tr.Height];
     char[,] bgtiles = new char[tr.Width,tr.Height];

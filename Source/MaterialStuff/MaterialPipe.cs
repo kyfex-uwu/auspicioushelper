@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Mono.Cecil.Cil;
 using Monocle;
+using MonoMod.Cil;
 
 namespace Celeste.Mod.auspicioushelper;
 
@@ -14,6 +16,7 @@ public static class MaterialPipe {
   public static List<IMaterialLayer> layers = new List<IMaterialLayer>();
   public static bool dirty;
   public static GraphicsDevice gd;
+  static bool orderFlipped;
   public static void setup(){
     dirty=true;
   }
@@ -24,12 +27,12 @@ public static class MaterialPipe {
     On.Celeste.GameplayRenderer.Render-= GameplayRender;
   }
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
+    orderFlipped = false;
     if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
       orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
       //DebugConsole.Write("default rend");
       return;
     }
-    //DebugConsole.Write("fancy rend");
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
 
     SpriteBatch sb = Draw.SpriteBatch;
@@ -49,16 +52,19 @@ public static class MaterialPipe {
     }
     //strawberries change their depth for the sole reason of making my life harder...;
     if(!sorted){
-      //DebugConsole.Write("ENTITYLIST NOT SORTED (resorting, kms)");
-      //oh god whyyy are they not using a tree for this like this is literally the most tree-ish 
-      //problem ever. My head hurts my head hurts my head hurts my head hurts my head hurts
-      //yes let's just resort the entire list every time we change a single depth or add any entities
-      //truely a handsome and stylish methodology
       scene.Entities.entities.Sort(EntityList.CompareDepth);
     }
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
     foreach(IMaterialLayer l in layers){
+      if(l.usesbg && !orderFlipped && Engine.Instance.scene is Level v){
+        gd.SetRenderTarget(GameplayBuffers.Level);
+        gd.Clear(v.BackgroundColor);
+        v.Background.Render(v);
+        orderFlipped = true;
+        gd.SetRenderTarget(GameplayBuffers.Gameplay);
+        bgReorderer.enable();
+      }
       if(l.independent){
         if(l.checkdo())l.render(self.Camera,sb);
         else l.diddraw = false;
@@ -141,4 +147,25 @@ public static class MaterialPipe {
     //   DebugConsole.Write("fish");
     // }
   }
+
+  static void reorderBg(ILContext ctx){
+    ILCursor c = new ILCursor(ctx);
+    if(!c.TryGotoNext(MoveType.After,itr=>itr.MatchLdsfld<VirtualRenderTarget>("Level"),itr=>itr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))) goto bad;
+    ILCursor d = c.Clone();
+    if(!d.TryGotoNext(MoveType.Before,itr=>itr.MatchLdsfld<VirtualRenderTarget>("Gameplay"))) goto bad;
+    Instruction target = d.Next;
+    c.EmitDelegate(backdropReorderDetour);
+    c.EmitBrtrue(target);
+    bad:
+    DebugConsole.Write($"Failed to add background reordering hook");
+  }
+
+  public static bool backdropReorderDetour(){
+    return orderFlipped;
+  }
+  static HookManager bgReorderer = new HookManager(()=>{
+    IL.Celeste.Level.Render += reorderBg;
+  }, void ()=>{
+    IL.Celeste.Level.Render -= reorderBg;
+  }, auspicioushelperModule.OnEnterMap);
 }

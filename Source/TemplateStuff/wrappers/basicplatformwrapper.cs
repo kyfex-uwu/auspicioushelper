@@ -9,7 +9,7 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-public class BasicPlatform:Entity, ITemplateChild{
+internal class BasicPlatform:Entity, ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.All;
   Platform p;

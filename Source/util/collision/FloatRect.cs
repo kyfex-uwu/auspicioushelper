@@ -8,17 +8,38 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
+
 public struct FloatRect{
+  public struct FRCollision{
+    public float enter = float.PositiveInfinity;
+    public float exit = float.NegativeInfinity;
+    public FRCollision(){}
+    public FRCollision(float t1, float t2){
+      enter = t1; exit=t2;
+    }
+    public bool collides=>enter<exit && exit>0;
+    public bool collidesOne=>enter<exit && exit>0 && enter<=1;
+    public void union(FRCollision o){
+      enter = MathF.Min(enter,o.enter);
+      exit = MathF.Max(exit,o.exit);
+    }
+    public FRCollision union(params FRCollision[] a){
+      FRCollision f=a[0];
+      for(int i=1; i<a.Length; i++){
+        f.union(a[i]);
+      }
+      return f;
+    }
+  }
+
   public float x;
   public float y;
   public float w;
   public float h;
-  public Vector2 tlc{
-    get=>new Vector2(x,y);
-  }
-  public Vector2 brc{
-    get=>new Vector2(x+w,y+h);
-  }
+  public Vector2 tlc=>new Vector2(x,y);
+  public Vector2 brc=>new Vector2(x+w,y+h);
+  public Vector2 trc=>new Vector2(x+w,y);
+  public Vector2 blc=>new Vector2(x,y+h);
   public Vector2 center {
     get=>new Vector2(x+w/2,y+h/2);
   }
@@ -71,6 +92,15 @@ public struct FloatRect{
     float max = Math.Min(maxs.X,maxs.Y);
     return min<max && min<1 && max>0;
   }
+  public FRCollision ICollideRay(Vector2 p, Vector2 dir){
+    Vector2 t1 = (tlc-p)/dir;
+    Vector2 t2 = (brc-p)/dir;
+    Vector2 maxs = Vector2.Max(t1,t2);
+    Vector2 mins = Vector2.Min(t1,t2);
+    float min = Math.Max(mins.X,mins.Y);
+    float max = Math.Min(maxs.X,maxs.Y);
+    return new FRCollision(min,max);
+  }
   public bool CollideLine(Vector2 a, Vector2 b){
     Vector2 dir = b-a;
     return CollideRay(a,dir);
@@ -86,6 +116,53 @@ public struct FloatRect{
   public bool CollideRectSweep(FloatRect o, Vector2 sweep){
     FloatRect expanded = new FloatRect(x-o.w,y-o.h,w+o.w,h+o.h);
     return expanded.CollideRay(o.tlc,sweep);
+  }
+  public FRCollision ICollideRectSweep(FloatRect o, Vector2 sweep){
+    FloatRect expanded = new FloatRect(x-o.w,y-o.h,w+o.w,h+o.h);
+    return expanded.ICollideRay(o.tlc,sweep);
+  }
+  FRCollision ccircle(float r, Vector2 p, Vector2 dir){
+    FRCollision f=new FRCollision();
+    var c=Vector2.Dot(p,dir);
+    var d=p.X*p.X+p.Y*p.Y-r*r;
+    var a=dir.X*dir.X+dir.Y*dir.Y;
+    var det = c*c-d*a;
+    if(det<0) return f;
+    var l = MathF.Sqrt(det);
+    f.enter = (-c-l)/a;
+    f.exit = (-c+l)/a;
+    return f;
+  }
+  public FRCollision ICollideCircleSweep(float r, Vector2 p, Vector2 sweep, float m=float.PositiveInfinity){
+    FloatRect a = _expand(r,r);
+    FRCollision f = a.ICollideRay(p,sweep);
+    if(!f.collides || f.enter>m) return f;
+    f=_expandX(r).ICollideRay(p,sweep);
+    f.union(_expandY(r).ICollideRay(p,sweep));
+    f.union(ccircle(r,p-tlc,sweep));
+    f.union(ccircle(r,p-trc,sweep));
+    f.union(ccircle(r,p-blc,sweep));
+    f.union(ccircle(r,p-brc,sweep));
+    return f;
+  }
+  public bool CollideCircleSweep(float r, Vector2 p, Vector2 sweep){
+    return ICollideCircleSweep(r,p,sweep,1).collidesOne;
+  }
+  public FRCollision ISweep(Collider c, Vector2 s){
+    if(c is Hitbox h){
+      return ICollideRectSweep(new FloatRect(c.AbsoluteLeft,c.AbsoluteTop,c.Width,c.Height),s);
+    }
+    if(c is Circle r){
+      return ICollideCircleSweep(r.Radius, r.AbsolutePosition, s);
+    }
+    if(c is ColliderList l){
+      var f = new FRCollision();
+      foreach(var cl in l.colliders){
+        f.union(ISweep(cl,s));
+      }
+      return f;
+    }
+    throw new NotImplementedException();
   }
   public bool CollideCollider(Collider c){
     if(c is Hitbox h){
@@ -127,5 +204,14 @@ public struct FloatRect{
     var c1 = Vector2.Max(tlc,o.tlc);
     var c2 = Vector2.Min(brc, o.brc);
     return fromCorners(c1,c2);
+  }
+  public FloatRect _expandX(float amount){
+    return new FloatRect(x-amount, y, w+amount*2, h);
+  }
+  public FloatRect _expandY(float amount){
+    return new FloatRect(x, y-amount, w, h+2*amount);
+  }
+  public FloatRect _expand(float xe, float ye){
+    return new FloatRect(x-xe,y-ye,x+xe*2,y+ye*2);
   }
 }
