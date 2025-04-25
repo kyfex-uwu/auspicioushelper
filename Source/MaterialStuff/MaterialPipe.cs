@@ -106,10 +106,9 @@ public static class MaterialPipe {
         sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White);
       } else {
         sb.End();
-        DebugConsole.Write("Generating pastable layer");
         l.render(c,sb,t);
         begin(c, sb, t);
-        sb.Draw(l.outtex, Vector2.Zero,Color.White);
+        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White);
       }
     }
   }

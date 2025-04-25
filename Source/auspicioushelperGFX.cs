@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Xml;
 
@@ -30,6 +31,29 @@ public static class auspicioushelperGFX {
       return returnV;
     }catch(Exception err){
       DebugConsole.Write("Failed to load shader "+path+" with exception "+ err.ToString());
+    }
+    return null;
+  }
+  public static Tuple<Effect,Effect> LoadExternEffect(string path){
+    if (graphicsDeviceService == null)  
+      graphicsDeviceService = Engine.Instance.Content.ServiceProvider.GetService(typeof(IGraphicsDeviceService)) as IGraphicsDeviceService;
+    ModAsset asset = Everest.Content.Get("Effects/"+path+".cso",true);
+    if (asset == null){
+      DebugConsole.Write("Failed to fetch shader at Effects/"+path);
+      return null;
+    }
+    try{
+      Effect returnV = new Effect(graphicsDeviceService.GraphicsDevice, asset.Data);
+      Effect returnQ = null;
+      try {
+        ModAsset qasset = Everest.Content.Get("Effects/"+path+"_quiet.cso",true);
+        if(qasset!=null) returnQ = new Effect(graphicsDeviceService.GraphicsDevice, qasset.Data);
+      }catch(Exception err2){
+        DebugConsole.Write("Failed to load quiet shader Effects/"+path+"_quiet with exception "+ err2.ToString());
+      }
+      return new Tuple<Effect, Effect>(returnV,returnQ);
+    }catch(Exception err){
+      DebugConsole.Write("Failed to load shader Effects/"+path+" with exception "+ err.ToString());
     }
     return null;
   }

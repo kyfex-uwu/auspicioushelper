@@ -30,7 +30,7 @@ public class BasicMaterialLayer:IMaterialLayer{
   public bool independent {get;set;}
   public float depth {get;set;}
   public RenderTarget2D mattex;
-  public RenderTarget2D outtex {get;}
+  public RenderTarget2D outtex {get; private set;}
   public List<IMaterialObject> willDraw = new List<IMaterialObject>();
   public Effect normalShader;
   public bool both;
@@ -51,7 +51,7 @@ public class BasicMaterialLayer:IMaterialLayer{
     diddraw=false;
     independent = _independent;
   }
-  public void planDraw(IMaterialObject obj){
+  public virtual void planDraw(IMaterialObject obj){
     if(enabled)willDraw.Add(obj);
   }
   public virtual void render(Camera c, SpriteBatch sb){
@@ -102,5 +102,10 @@ public class BasicMaterialLayer:IMaterialLayer{
   }
   public virtual bool checkdo(){
     return enabled && (always || willDraw.Count>0 || diddraw);
+  }
+  public RenderTarget2D swapOuttex(RenderTarget2D other){
+    RenderTarget2D temp = outtex;
+    if(other != null)outtex = other;
+    return temp;
   }
 }

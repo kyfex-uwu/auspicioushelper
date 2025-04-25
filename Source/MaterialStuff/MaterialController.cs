@@ -10,24 +10,30 @@ namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/MaterialController")]
 [Tracked]
-public class MaterialController:Entity{
+internal class MaterialController:Entity{
   static Dictionary<string, IMaterialLayer> loadedMats = new Dictionary<string, IMaterialLayer>();
   public MaterialController(EntityData e,Vector2 v):base(new Vector2(0,0)){
     string path=e.Attr("path","");
+    string identifier=e.Attr("identifier");
+    if(string.IsNullOrWhiteSpace(identifier)) identifier = path;
     bool reload = e.Bool("reload",false);
     if(path.Length == 0)return;
-    if(reload && loadedMats.TryGetValue(path, out var l)){
+    IMaterialLayer l = null;
+    if(reload && loadedMats.TryGetValue(identifier, out l)){
       if(l.enabled) MaterialPipe.removeLayer(l);
-      loadedMats.Remove(path);
+      loadedMats.Remove(identifier);
     }
-    if(!loadedMats.ContainsKey(path)){
-      if(path == "auspicioushelper/ChannelMatsEN"){
-        loadedMats[path]= (ChannelBaseEntity.layerA = new ChannelMaterialsA());
+    if(!loadedMats.ContainsKey(identifier)){
+      if(identifier == "auspicioushelper/ChannelMatsEN"){
+        loadedMats[identifier]= (ChannelBaseEntity.layerA = new ChannelMaterialsA());
       } else {
-        return;
+        l = UserLayer.make(e);
+        if(l!=null){
+          loadedMats[identifier]=l;
+        }
       }
     }
-    MaterialPipe.addLayer(loadedMats[path]);
+    if(l!=null)MaterialPipe.addLayer(loadedMats[identifier]);
   }
   public override void Added(Scene scene){
     RemoveSelf();
