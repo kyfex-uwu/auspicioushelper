@@ -18,10 +18,12 @@ entity.placements = {
   }
 }
 
+entity.texture = "loenn/auspicioushelper/template/tcass"
+
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-2, entity.y-2, 4, 4)
+  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
 end
-entity.fillColor = {0.5,0,1}
+--entity.fillColor = {0.5,0,1}
 
 
 
