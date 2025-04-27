@@ -52,10 +52,10 @@ public class Anti0fZone:Entity{
     if(hits==null){
       return false;
     }
-    if(hits.maxstep>0){
+    if(hits.maxstep>0 || PortalGateH.intersections.ContainsKey(p)){
       //We use L1 distance
       float length = Math.Max(Math.Abs(step.X),Math.Abs(step.Y));
-      int steps = (int)Math.Ceiling(length/hits.maxstep);
+      int steps = (int)Math.Ceiling(length/MathF.Max(hits.maxstep,1));
       DebugConsole.Write("Inside 0f "+length.ToString()+" "+steps.ToString());
       Vector2 substep = step/(float)steps;
       for(int i=0; i<steps; i++){
@@ -103,7 +103,9 @@ public class Anti0fZone:Entity{
         p.MoveV(substep.Y,p.onCollideV,null);
       }
     } else {
-      foreach(Holdable h in )
+      foreach(Holdable h in p.Scene.Tracker.GetComponent<Holdable>()){
+
+      }
     }
     return true;
     

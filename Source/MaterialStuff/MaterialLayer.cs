@@ -18,6 +18,7 @@ public interface IMaterialLayer{
   public RenderTarget2D outtex {get;}
   public bool independent {get;}
   public bool diddraw {get;set;}
+  public bool usesbg=>false;
   public void render(Camera c, SpriteBatch sb){
     render(c,sb,null);
   }
