@@ -103,7 +103,7 @@ public class Anti0fZone:Entity{
         p.MoveV(substep.Y,p.onCollideV,null);
       }
     } else {
-      foreach(Holdable h in p.Scene.Tracker.GetComponent<Holdable>()){
+      foreach(Holdable h in p.Scene.Tracker.GetComponents<Holdable>()){
 
       }
     }

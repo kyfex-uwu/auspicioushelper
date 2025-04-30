@@ -7,17 +7,24 @@ namespace Celeste.Mod.auspicioushelper;
 [Tracked]
 public class ChannelTracker : Component, IChannelUser{
   public string channel {get; set;}
+  public int value;
   Action<int> onChannelChange;
   public ChannelTracker(string channel, Action<int> onChannelChange):base(true, false){
     this.channel=channel;
     this.onChannelChange=onChannelChange;
     ChannelState.watch(this);
+    value = ChannelState.readChannel(channel);
   }
   public void setChVal(int val){
+    value = val;
     onChannelChange(val);
   }
+  public override void Removed(Entity entity){
+    base.Removed(entity);
+    ChannelState.unwatchNow(this);
+  }
   public override void EntityRemoved(Scene scene){
-      base.EntityRemoved(scene);
-      ChannelState.unwatchNow(this);
+    base.EntityRemoved(scene);
+    ChannelState.unwatchNow(this);
   }
 }

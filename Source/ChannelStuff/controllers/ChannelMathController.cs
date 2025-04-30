@@ -213,8 +213,7 @@ public class ChannelMathController:Entity{
       }
     }
   }
-  public delegate int iopFunc(List<string> args,List<int> values);
-  static Dictionary<string, iopFunc> iopFuncs = new Dictionary<string, iopFunc>();
+  static Dictionary<string, Func<List<string>,List<int>,int>> iopFuncs = new();
   public int interop(int stringCount, int intCount, ref int iptr){
     List<string> strs = new List<string>();
     List<int> ints = new List<int>();
@@ -226,7 +225,7 @@ public class ChannelMathController:Entity{
     for(int i=0; i<intCount; i++){
       ints.Add(reg[op[iptr++]]);
     }
-    if(!iopFuncs.TryGetValue(strs[0], out iopFunc f)){
+    if(!iopFuncs.TryGetValue(strs[0], out var f)){
       DebugConsole.Write($"Interop function {strs[0]} not yet registered");
       return 0;
     }
@@ -237,12 +236,12 @@ public class ChannelMathController:Entity{
       return 0;
     }
   }
-  public static void registerInterop(string identifier, iopFunc function){
+  public static void registerInterop(string identifier, Func<List<string>,List<int>,int> function){
     if(!iopFuncs.TryAdd(identifier,function)){
       DebugConsole.Write($"Interop registration collision at {identifier}");
     }
   }
-  public static void deregisterInterop(string identifier, iopFunc function){
+  public static void deregisterInterop(string identifier, Func<List<string>,List<int>,int> function){
     if(!iopFuncs.TryGetValue(identifier, out var f)){
       DebugConsole.Write($"No registered interop function at {identifier}");
       return;

@@ -90,8 +90,8 @@ public static class MaterialPipe {
       rlayer(self.Camera, sb, t, layers[ldx++]);
     }
     //sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)self.Camera.Position.X,(int)self.Camera.Position.Y,10,10),Draw.Pixel.ClipRect,Color.White);
-    gd.SamplerStates[0]=SamplerState.LinearClamp;
     gd.SamplerStates[1]=SamplerState.LinearClamp;
+    gd.SamplerStates[2]=SamplerState.LinearClamp;
     sb.End();
   }
 
