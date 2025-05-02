@@ -9,8 +9,6 @@ using Monocle;
 
 namespace Celeste.Mods.auspicioushelper;
 public static class ChannelState{
-  public static Dictionary<string, int> channelStates = new Dictionary<string, int>();
-  public static Dictionary<string, List<IChannelUser>> watching = new Dictionary<string, List<IChannelUser>>();
   enum Ops{
     none, not, lnot, xor, and, or, add, sub, mult, div, mrecip, mod, safemod, 
     min, max, ge, le, gt, lt, eq, ne,rshift, lshift, shiftr, shiftl
@@ -102,12 +100,16 @@ public static class ChannelState{
       return val;
     }
   }
+
   static Dictionary<string, List<ModifierDesc>> modifiers = new Dictionary<string, List<ModifierDesc>>();
+  private static Dictionary<string, int> channelStates = new Dictionary<string, int>();
+  private static Dictionary<string, List<IChannelUser>> watching = new Dictionary<string, List<IChannelUser>>();
   public static int readChannel(string ch){
     if(channelStates.TryGetValue(ch, out var v)) return v;
     else return addModifier(ch);
   }
   static void SetChannelRaw(string ch, int state){
+    //DebugConsole.Write($"{ch}: {readChannel(ch)} -> {state}");
     if(readChannel(ch) == state) return;
     channelStates[ch] = state;
     if (watching.TryGetValue(ch, out var list)) {
@@ -133,7 +135,6 @@ public static class ChannelState{
     }
   }
   public static int watch(IChannelUser b){
-    //DebugConsole.Write("watching new thing");
     if (!watching.TryGetValue(b.channel, out var list)) {
       list = new List<IChannelUser>();
       watching[b.channel] = list;
@@ -142,6 +143,7 @@ public static class ChannelState{
     return readChannel(b.channel);
   }
   static void clearModifiers(HashSet<string> except = null){
+    DebugConsole.Write("clearing modifiers");
     Dictionary<string, List<ModifierDesc>> nlist = new Dictionary<string, List<ModifierDesc>>();
     foreach(var pair in modifiers){
       List<ModifierDesc> keep = new List<ModifierDesc>();
@@ -159,6 +161,7 @@ public static class ChannelState{
   }
   static int addModifier(string ch){
     int idx=0;
+    DebugConsole.Write(ch);
     for(;idx<ch.Length;idx++) if(ch[idx]=='[')break;
     string clean = ch.Substring(0,idx);
 
@@ -192,5 +195,33 @@ public static class ChannelState{
       else toRemove.Add(pair.Key);
     }
     foreach(var ch in toRemove) watching.Remove(ch);
+  }
+  public static void clearChannels(string prefix = ""){
+    int idx=0;
+    for(;idx<prefix.Length;idx++) if(prefix[idx]=='[')break;
+    prefix = prefix.Substring(0,idx);
+    List<string> toremove = new();
+    foreach(var pair in channelStates){
+      if(prefix == "" || pair.Key.StartsWith(prefix)) toremove.Add(pair.Key);
+    }
+    foreach(string s in toremove){
+      channelStates.Remove(s);
+      modifiers.Remove(s);
+    }
+  }
+  public static Dictionary<string,int> save(){
+    Dictionary<string,int> s=new();
+    foreach(var pair in channelStates){
+      int idx=0;
+      for(;idx<pair.Key.Length;idx++) if(pair.Key[idx]=='[')break;
+      string clean = pair.Key.Substring(0,idx);
+      if(pair.Key == clean) s.Add(pair.Key,pair.Value);
+    }
+    return s;
+  }
+  public static void load(Dictionary<string,int> s){
+    clearChannels();
+    unwatchAll();
+    foreach(var pair in s) channelStates[pair.Key] = pair.Value;
   }
 }

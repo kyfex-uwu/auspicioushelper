@@ -12,7 +12,11 @@ entity.placements = {
     name = "Anti 0f zone",
     data = {
       width = 8,
-      height = 8
+      height = 8,
+      step = 4,
+      holdables=false,
+      player_colliders = true,
+      triggers = true
     }
   }
 }

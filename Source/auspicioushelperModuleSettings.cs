@@ -32,11 +32,13 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
     get=>_hideHelperMaps;
     set{
       _hideHelperMaps = value;
-      if(value) MapHider.hideListed();
+      if(value){
+        if(hideRulesList.Count>0) MapHider.hideListed();
+      }
       else MapHider.revealListed();
     }
   }
-  public List<string> hideRulesList {get; set;} = new();
+  public List<string> hideRulesList {get; set;} = new(["/t$"]);
   [SettingIgnore]
   [SettingSubText("Regex rules to match maps to hide")]
   public HideruleMenu HideRules {get;set;} = new();
@@ -70,7 +72,6 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
     public void CreateDummyEntry(TextMenuExt.SubMenu menu, bool ingame){
       rules = auspicioushelperModule.Settings.hideRulesList;
       rules.RemoveAll(string.IsNullOrEmpty);
-      if(rules.Count == 0) rules.Add("/t$");
       int i = 0;
       foreach(string s in rules){
         menu.Add(makePressHandler(s,i++));

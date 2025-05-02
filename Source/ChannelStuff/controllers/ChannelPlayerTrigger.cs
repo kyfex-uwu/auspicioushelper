@@ -20,17 +20,22 @@ public class ChannelPlayerTrigger:Trigger{
   public int value;
   bool activateOnEnter=false;
   bool activateOnleave=false;
+  bool onlyOnce;
 
   public ChannelPlayerTrigger(EntityData data, Vector2 offset):base(data, offset){
-    
+    onlyOnce = data.Bool("only_once",false);
     channel = data.Attr("channel","");
     value = data.Int("value",1);
     switch(data.Attr("action")){
       case "dash":
-        Add(new DashListener((Vector2 d)=>activate()));
+        Add(new DashListener((Vector2 d)=>{
+          if(PlayerIsInside)activate();
+        }));
         break;
       case "jump":
-        Add(new JumpListener((int t)=>activate()));
+        Add(new JumpListener((int t)=>{
+          if(PlayerIsInside)activate();
+        }));
         break;
       case "enter":
         activateOnEnter=true; break;
@@ -50,7 +55,6 @@ public class ChannelPlayerTrigger:Trigger{
     };
   }
   public void activate(){
-    if(!PlayerIsInside) return;
     int oldval = ChannelState.readChannel(channel);
     //DebugConsole.Write(op.ToString());
     ChannelState.SetChannel(channel, op switch {
@@ -63,6 +67,7 @@ public class ChannelPlayerTrigger:Trigger{
       Op.min => Math.Min(value, oldval),
       _=>oldval
     });
+    if(onlyOnce) RemoveSelf();
   }
   public override void OnEnter(Player player){
     base.OnEnter(player);

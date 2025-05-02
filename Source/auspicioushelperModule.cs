@@ -74,17 +74,27 @@ public class auspicioushelperModule : EverestModule {
         OnReset.run();
     }
     static void OnEnter(Session session, bool fromSave){
-        ChannelState.unwatchAll();
-        JumpListener.releaseHooks();
-        portalHooks.unsetupHooks();
+        try{
+            ChannelState.unwatchAll();
+            JumpListener.releaseHooks();
+            portalHooks.unsetupHooks();
 
-        OnReset.run();
-        OnNewScreen.run();
-        OnEnterMap.run();
-        
-        Session?.load(!fromSave);
-        MarkedRoomParser.parseMapdata(session.MapData);
-        DebugConsole.Write("Entered Level");
+            OnReset.run();
+            OnNewScreen.run();
+            OnEnterMap.run();
+            
+            //Session?.load(!fromSave);
+
+            if(session?.MapData!=null){
+                DebugConsole.Write($"Mapdata: {(session.MapData==null?"null":session.MapData.ToString())}");
+                MarkedRoomParser.parseMapdata(session.MapData);
+                DebugConsole.Write("Entered Level");
+            } else {
+                DebugConsole.Write("Session or mapdata null");
+            }
+        }catch(Exception ex){
+            DebugConsole.Write(ex.ToString());
+        }
     }
     static void OnReload(bool silent){
         DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.HideHelperMaps}");

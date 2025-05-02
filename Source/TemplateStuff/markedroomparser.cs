@@ -85,6 +85,7 @@ internal static class MarkedRoomParser{
   internal static void parseMapdata(MapData m){
     templates.Clear();
     EntityMarkingFlag.clear();
+    DebugConsole.Write($"Levels: {(m.Levels==null?"null":(m.Levels.ToString()+m.Levels.Count))}");
     foreach(LevelData l in m.Levels){
       if(l.Name.StartsWith(sigstr+"-")||l.Name == sigstr){
         DebugConsole.Write("Parsing "+l.Name);

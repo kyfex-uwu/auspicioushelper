@@ -39,11 +39,11 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
   public override void Added(Scene scene){
     base.Added(scene);
     ChannelState.watch(this);
-    setChVal(ChannelState.readChannel(channel));
     if(CassetteMaterialLayer.layers.TryGetValue(channel,out var layer) || freeze){
       AddAllChildren(todraw);
       if(layer != null)layer.dump(todraw);
     }
+    setChVal(ChannelState.readChannel(channel));
   }
   public void tryManifest(){
     Player p = Scene?.Tracker.GetEntity<Player>();

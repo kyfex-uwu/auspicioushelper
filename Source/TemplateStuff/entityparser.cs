@@ -145,6 +145,7 @@ public static class EntityParser{
     
     clarify("lamp",Types.basic,(Level l, LevelData ld, Vector2 offset, EntityData e)=>new Lamp(offset + e.Position, e.Bool("broken")));
     clarify("hangingLamp",Types.basic,(Level l, LevelData ld, Vector2 offset, EntityData e)=>new HangingLamp(e,offset+e.Position));
+    clarify("seeker",Types.basic,static (Level l, LevelData d, Vector2 o, EntityData e)=>new Seeker(e, o));
 
     parseMap["refill"] = Types.unwrapped;
     loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Wrappers.RefillW(e,offset);

@@ -12,7 +12,8 @@ trigger.placements = {
       channel = "",
       value = 1,
       op = "set",
-      action = "dash"
+      action = "dash",
+      only_once = false
     }
 }
 trigger.fieldInformation = {

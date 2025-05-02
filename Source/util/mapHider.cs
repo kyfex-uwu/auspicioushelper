@@ -35,6 +35,7 @@ public static class MapHider{
   }
   public static void hideListed(){
     //DebugConsole.Write("here");
+    if(auspicioushelperModule.Settings.hideRulesList == null) return;
     if(rules == null){
       rules = new List<Tuple<string,Regex>>();
       int i=-1;
@@ -66,6 +67,7 @@ public static class MapHider{
     if(toremove.Count != 0) AssetReloadHelper.ReloadAllMaps();
   }
   public static void revealListed(){
+    if(hidden == null || hidden.Count==0)return;
     foreach(var pair in hidden){
       Everest.Content.Map[pair.Key] = pair.Value;
     }

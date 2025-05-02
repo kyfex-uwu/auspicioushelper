@@ -23,20 +23,14 @@ public class auspicioushelperModuleSession : EverestModuleSession {
 
   public void save(){
     DebugConsole.Write("Saving channel state");
-    channelData.Clear();
-    foreach(KeyValuePair<string, int> p in ChannelState.channelStates){
-      channelData.Add(p.Key, p.Value);
-    }
+    channelData = ChannelState.save();
   }
   public void load(bool initialize){
     DebugConsole.Write("Loading channel state");
     if(initialize){
       channelData.Clear();
     }
-    ChannelState.channelStates.Clear();
-    foreach(KeyValuePair<string,int> p in channelData){
-      ChannelState.channelStates.Add(p.Key,p.Value);
-    }
+    ChannelState.load(channelData);
     if(initialize) save();
   } 
 }

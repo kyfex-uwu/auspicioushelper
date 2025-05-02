@@ -23,9 +23,10 @@ internal class MaterialController:Entity{
       if(l.enabled) MaterialPipe.removeLayer(l);
       loadedMats.Remove(identifier);
     }
+    DebugConsole.Write($"Loading material shader from {path} as {identifier}");
     if(!loadedMats.ContainsKey(identifier)){
       if(identifier == "auspicioushelper/ChannelMatsEN"){
-        loadedMats[identifier]= (ChannelBaseEntity.layerA = new ChannelMaterialsA());
+        l = loadedMats[identifier] = (ChannelBaseEntity.layerA = new ChannelMaterialsA());
       } else {
         l = UserLayer.make(e);
         if(l!=null){
@@ -33,7 +34,7 @@ internal class MaterialController:Entity{
         }
       }
     }
-    if(l!=null)MaterialPipe.addLayer(loadedMats[identifier]);
+    if(loadedMats.TryGetValue(identifier, out var layer))MaterialPipe.addLayer(layer);
   }
   public override void Added(Scene scene){
     RemoveSelf();
