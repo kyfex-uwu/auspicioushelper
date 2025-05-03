@@ -54,6 +54,7 @@ public class auspicioushelperModule : EverestModule {
         Session.load(false);
         ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
+        MaterialPipe.onDie();
         tinyCleanup();
 
         OnReset.run();

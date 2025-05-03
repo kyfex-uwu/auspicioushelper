@@ -44,6 +44,9 @@ public static class SpeedrunToolIop{
         ChannelState.unwatchAll();
         PortalGateH.intersections.Clear();
         TemplateCassetteManager.unfrickMats(level);
+        foreach(ChannelTracker c in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
+          ChannelState.watch(c);
+        }
         foreach(Entity e in Engine.Instance.scene.Entities){
           if(e is PortalGateH portalgateh){
             portalHooks.hooks.enable();

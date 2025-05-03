@@ -26,7 +26,7 @@ internal static class MarkedRoomParser{
         int handle = rects.add(new FloatRect(t));
         handleDict.Add(handle, id);
         templates.Add(id,t);
-        DebugConsole.Write(id);
+        //DebugConsole.Write(id);
         t.setTiles(l.Solids,l.Bg);
       }
       if(d.Name == "auspicioushelper/EntityMarkingFlag"){

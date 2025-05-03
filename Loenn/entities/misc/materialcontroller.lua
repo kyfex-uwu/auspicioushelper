@@ -6,7 +6,7 @@ local materialcontroller = {}
 materialcontroller.name = "auspicioushelper/MaterialController"
 materialcontroller.depth = 2000
 
-local ftypes = {"Always","Never","Linear","Cosine"}
+local ftypes = {"Always","Never","Linear","Cosine","Sqrt"}
 materialcontroller.placements = {
   {
     name = "Material Controller",

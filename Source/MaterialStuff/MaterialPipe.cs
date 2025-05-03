@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Celeste.Editor;
+using Celeste.Mod.Helpers;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -130,16 +131,11 @@ public static class MaterialPipe {
       camAt = Calc.Approach(camAt, 1f, Engine.DeltaTime / NextTransitionDuration);
       yield return null;
     }
-    List<IMaterialLayer> nlayers = new();
-    foreach(var l in layers) if(!leaving.Contains(l)) nlayers.Add(l);
-    layers = nlayers;
-    DebugConsole.Write("transition complete");
+    remLeaving();
     transroutine = null;
-    leaving.Clear();
     yield break;
   }
   public static void addLayer(IMaterialLayer l){
-    DebugConsole.Write($"adding new layer. is in leaving: {leaving.Contains(l)}");
     if(!leaving.Remove(l))entering.Add(l);
     if(layers.Contains(l)) return; //we do not allow that, no sir
     dirty = true;
@@ -150,6 +146,15 @@ public static class MaterialPipe {
     layers.Remove(l);
     l.enabled=false;
     l.onRemove();
+  }
+  public static void onDie(){
+    foreach(var l in layers) leaving.Add(l);
+  }
+  public static void remLeaving(){
+    List<IMaterialLayer> nlayers = new();
+    foreach(var l in layers) if(!leaving.Contains(l)) nlayers.Add(l);
+    layers = nlayers;
+    leaving.Clear();
   }
   public static Rectangle obtainInvertedRectangle(Camera c){
     Matrix m = Matrix.Invert(c.Matrix);
@@ -162,9 +167,16 @@ public static class MaterialPipe {
 
   static void reorderBg(ILContext ctx){
     ILCursor c = new ILCursor(ctx);
-    if(!c.TryGotoNext(MoveType.After,itr=>itr.MatchLdsfld<VirtualRenderTarget>("Level"),itr=>itr.MatchCallvirt<GraphicsDevice>("SetRenderTarget"))) goto bad;
+    //DebugConsole.DumpIl(c,0,50);
+    if(!c.TryGotoNextBestFit(MoveType.After,
+      itr=>itr.MatchLdsfld(typeof(GameplayBuffers),"Level"),
+      itr => itr.MatchCall(out _),
+      itr=>itr.MatchCallvirt<GraphicsDevice>("SetRenderTarget")
+    ))goto bad;
     ILCursor d = c.Clone();
-    if(!d.TryGotoNext(MoveType.Before,itr=>itr.MatchLdsfld<VirtualRenderTarget>("Gameplay"))) goto bad;
+    if(!d.TryGotoNext(MoveType.Before,
+      itr=>itr.MatchLdsfld(typeof(GameplayBuffers),"Gameplay")
+    )) goto bad;
     Instruction target = d.Next;
     c.EmitDelegate(backdropReorderDetour);
     c.EmitBrtrue(target);
@@ -175,12 +187,18 @@ public static class MaterialPipe {
     dirty=true;
     hooks.enable();
   }
+  public static void playerCtorHook(On.Celeste.Player.orig_ctor orig, Player p, Vector2 pos, PlayerSpriteMode s){
+    orig(p,pos,s);
+    remLeaving();
+  }
   static HookManager hooks = new HookManager(()=>{
     On.Celeste.GameplayRenderer.Render += GameplayRender;
     On.Celeste.Level.TransitionTo += ontrans;
+    On.Celeste.Player.ctor += playerCtorHook;
   }, void ()=>{
     On.Celeste.GameplayRenderer.Render-= GameplayRender;
     On.Celeste.Level.TransitionTo -= ontrans;
+    On.Celeste.Player.ctor -= playerCtorHook;
   });
 
   public static bool backdropReorderDetour(){

@@ -11,7 +11,7 @@ namespace Celeste.Mod.auspicioushelper;
 
 public interface IFadingLayer{
   enum FadeTypes {
-    Always, Never, Linear, Cos
+    Always, Never, Linear, Cos, Sqrt
   }
   FadeTypes fadeTypeIn {get;set;}
   FadeTypes fadeTypeOut {get;set;}
@@ -24,11 +24,22 @@ public interface IFadingLayer{
       FadeTypes.Never=>0,
       FadeTypes.Linear=>fac,
       FadeTypes.Cos=>(1-MathF.Cos(fac*3.141592f))/2,
+      FadeTypes.Sqrt=>MathF.Sqrt(fac),
       _=>1
     };
   }
   float getTransAlpha(bool leaving, float camAt){
     return leaving?getFade(fadeTypeOut,1-camAt):getFade(fadeTypeIn,camAt);
+  }
+  static FadeTypes fromString(string s){
+    return s switch{
+      "Never"=>IFadingLayer.FadeTypes.Never,
+      "Linear"=>IFadingLayer.FadeTypes.Linear,
+      "Cosine"=>IFadingLayer.FadeTypes.Cos,
+      "Always"=>IFadingLayer.FadeTypes.Always,
+      "Sqrt"=>IFadingLayer.FadeTypes.Sqrt,
+      _=>IFadingLayer.FadeTypes.Always,
+    };
   }
 }
 public interface ISettableDepth{
@@ -78,17 +89,7 @@ internal class MaterialController:Entity{
     else MaterialPipe.addLayer(l);
     if(l!=null){
       if(l is IFadingLayer u){
-        u.setFade(e.Attr("Fade_in","")switch{
-          "Never"=>IFadingLayer.FadeTypes.Never,
-          "Linear"=>IFadingLayer.FadeTypes.Linear,
-          "Cosine"=>IFadingLayer.FadeTypes.Cos,
-          _=>IFadingLayer.FadeTypes.Always
-        }, e.Attr("fadeOut","")switch{
-          "Never"=>IFadingLayer.FadeTypes.Never,
-          "Linear"=>IFadingLayer.FadeTypes.Linear,
-          "Cosine"=>IFadingLayer.FadeTypes.Cos,
-          _=>IFadingLayer.FadeTypes.Always
-        });
+        u.setFade(IFadingLayer.fromString(e.Attr("Fade_in","")), IFadingLayer.fromString(e.Attr("fadeOut","")));
       }
       if(l is ISettableDepth d){
         d.depth = e.Int("depth",0);

@@ -153,6 +153,15 @@ public static class ChannelState{
       }
       if(keep.Count>0) nlist[pair.Key] = keep;
     }
+    HashSet<string> toRemove = new();
+    foreach(var pair in channelStates){
+      if(except!=null && except.Contains(pair.Key)) continue;
+      int idx=0;
+      for(;idx<pair.Key.Length;idx++) if(pair.Key[idx]=='[')break;
+      string clean = pair.Key.Substring(0,idx);
+      if(clean != pair.Key) toRemove.Add(pair.Key);
+    }
+    foreach(var s in toRemove) channelStates.Remove(s);
     modifiers = nlist;
   }
   public static void unwatchAll(){
