@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Celeste.Mod.auspicioushelper;
 using Monocle;
@@ -143,7 +144,6 @@ public static class ChannelState{
     return readChannel(b.channel);
   }
   static void clearModifiers(HashSet<string> except = null){
-    DebugConsole.Write("clearing modifiers");
     Dictionary<string, List<ModifierDesc>> nlist = new Dictionary<string, List<ModifierDesc>>();
     foreach(var pair in modifiers){
       List<ModifierDesc> keep = new List<ModifierDesc>();
@@ -161,7 +161,7 @@ public static class ChannelState{
   }
   static int addModifier(string ch){
     int idx=0;
-    DebugConsole.Write(ch);
+    //DebugConsole.Write(ch);
     for(;idx<ch.Length;idx++) if(ch[idx]=='[')break;
     string clean = ch.Substring(0,idx);
 
@@ -221,7 +221,16 @@ public static class ChannelState{
   }
   public static void load(Dictionary<string,int> s){
     clearChannels();
+    DebugConsole.Write($"Loading channels: {s.Count}");
     unwatchAll();
     foreach(var pair in s) channelStates[pair.Key] = pair.Value;
   }
+  public static void writeAll(){
+    DebugConsole.Write("");
+    DebugConsole.Write("===CHANNEL STATE===");
+    foreach(var pair in channelStates){
+      DebugConsole.Write($"{pair.Key} {pair.Value}");
+    }
+    DebugConsole.Write("===================");
+  } 
 }

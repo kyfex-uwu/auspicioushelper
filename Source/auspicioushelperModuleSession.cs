@@ -22,11 +22,9 @@ public class auspicioushelperModuleSession : EverestModuleSession {
   public HashSet<int> openedGates = new HashSet<int>();
 
   public void save(){
-    DebugConsole.Write("Saving channel state");
     channelData = ChannelState.save();
   }
   public void load(bool initialize){
-    DebugConsole.Write("Loading channel state");
     if(initialize){
       channelData.Clear();
     }

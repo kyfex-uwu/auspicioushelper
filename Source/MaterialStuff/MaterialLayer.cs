@@ -12,19 +12,24 @@ namespace Celeste.Mods.auspicioushelper;
 
 
 public interface IMaterialLayer{
-  public bool enabled {get;set;}
-  public bool removeNext {get;set;}
-  public float depth {get;}
-  public RenderTarget2D outtex {get;}
-  public bool independent {get;}
-  public bool diddraw {get;set;}
-  public bool usesbg=>false;
-  public void render(Camera c, SpriteBatch sb){
+  bool enabled {get;set;}
+  float depth {get;}
+  RenderTarget2D outtex {get;}
+  bool independent {get;}
+  bool diddraw {get;set;}
+  float transalpha(bool leaving, float camAt){
+    //DebugConsole.Write($"Roomchange: {leaving} {camAt}");
+    return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
+  }
+  bool usesbg(){
+    return false;
+  }
+  void render(Camera c, SpriteBatch sb){
     render(c,sb,null);
   }
-  public void render(Camera c, SpriteBatch sb, RenderTarget2D back);
-  public bool checkdo();
-  public void onRemove(){}
+  void render(Camera c, SpriteBatch sb, RenderTarget2D back);
+  bool checkdo();
+  void onRemove(){}
 }
 
 public class BasicMaterialLayer:IMaterialLayer{
@@ -33,13 +38,17 @@ public class BasicMaterialLayer:IMaterialLayer{
   public RenderTarget2D mattex;
   public RenderTarget2D outtex {get; private set;}
   public List<IMaterialObject> willDraw = new List<IMaterialObject>();
+  public virtual bool matsToDraw=>willDraw.Count>0;
   public Effect normalShader;
   public bool both;
   public bool always;
   public bool diddraw {get;set;}
   public bool enabled {get;set;}
-  public bool removeNext {get;set;}
   public Effect quietShader = null;
+  public virtual bool usesbg(){return false;}
+  public virtual float transalpha(bool leaving, float camAt){
+    return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
+  }
   public BasicMaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     if(!outonly){
@@ -83,12 +92,18 @@ public class BasicMaterialLayer:IMaterialLayer{
       //DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
       photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
     } 
+    if(usesbg()){
+      MaterialPipe.gd.Textures[3] = GameplayBuffers.Level;
+      MaterialPipe.gd.SamplerStates[3] = SamplerState.PointClamp;
+    }
 
     MaterialPipe.gd.SetRenderTarget(both?mattex:outtex);
     MaterialPipe.gd.Clear(Color.Transparent);
-    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
-    rasterMats(sb,c);
-    sb.End();
+    if(matsToDraw){
+      sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+      rasterMats(sb,c);
+      sb.End();
+    }
     if(both){
       //DebugConsole.Write("doing deferred shader");
       MaterialPipe.gd.Textures[1] = mattex;

@@ -1,5 +1,8 @@
 
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Celeste.Editor;
 using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,17 +20,10 @@ public static class MaterialPipe {
   public static bool dirty;
   public static GraphicsDevice gd;
   static bool orderFlipped;
-  public static void setup(){
-    dirty=true;
-  }
-  public static void registerPipe(){
-    On.Celeste.GameplayRenderer.Render += GameplayRender;
-  }
-  public static void deregisterPipe(){
-    On.Celeste.GameplayRenderer.Render-= GameplayRender;
-  }
+
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orderFlipped = false;
+    if(transroutine!=null) transroutine.Update();
     if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
       orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
       //DebugConsole.Write("default rend");
@@ -57,7 +53,7 @@ public static class MaterialPipe {
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
     foreach(IMaterialLayer l in layers){
-      if(l.usesbg && !orderFlipped && Engine.Instance.scene is Level v){
+      if(l.usesbg() && !orderFlipped && Engine.Instance.scene is Level v){
         gd.SetRenderTarget(GameplayBuffers.Level);
         gd.Clear(v.BackgroundColor);
         v.Background.Render(v);
@@ -101,19 +97,50 @@ public static class MaterialPipe {
   }
   public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, IMaterialLayer l){
     if(l.checkdo()){
+      float alpha = transroutine == null? 1:(
+        leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
+      );
       if(l.independent){
         //DebugConsole.Write("pasting prerendered layer");
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White);
+        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha);
       } else {
         sb.End();
         l.render(c,sb,t);
         begin(c, sb, t);
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White);
+        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha);
       }
     }
   }
+
+  static float camAt;
+  static float NextTransitionDuration = 0.65f;
+  static HashSet<IMaterialLayer> entering = new();
+  static HashSet<IMaterialLayer> leaving = new();
+  static Coroutine transroutine = null;
+  static void ontrans(On.Celeste.Level.orig_TransitionTo orig, Level self, LevelData next, Vector2 dir){
+    camAt = 0;
+    entering.Clear();
+    foreach(var l in layers) leaving.Add(l);
+    NextTransitionDuration = self.NextTransitionDuration;
+    orig(self, next, dir);
+    transroutine = new Coroutine(transitionRoutine());
+  }
+  static IEnumerator transitionRoutine(){
+    while(camAt<1){
+      camAt = Calc.Approach(camAt, 1f, Engine.DeltaTime / NextTransitionDuration);
+      yield return null;
+    }
+    List<IMaterialLayer> nlayers = new();
+    foreach(var l in layers) if(!leaving.Contains(l)) nlayers.Add(l);
+    layers = nlayers;
+    DebugConsole.Write("transition complete");
+    transroutine = null;
+    leaving.Clear();
+    yield break;
+  }
   public static void addLayer(IMaterialLayer l){
-    l.removeNext=false;
+    DebugConsole.Write($"adding new layer. is in leaving: {leaving.Contains(l)}");
+    if(!leaving.Remove(l))entering.Add(l);
     if(layers.Contains(l)) return; //we do not allow that, no sir
     dirty = true;
     layers.Add(l);
@@ -122,6 +149,7 @@ public static class MaterialPipe {
   public static void removeLayer(IMaterialLayer l){
     layers.Remove(l);
     l.enabled=false;
+    l.onRemove();
   }
   public static Rectangle obtainInvertedRectangle(Camera c){
     Matrix m = Matrix.Invert(c.Matrix);
@@ -130,21 +158,6 @@ public static class MaterialPipe {
     return new Rectangle(
       (int)c1.X, (int)c1.Y, (int)(c2.X-c1.X), (int)(c2.Y-c2.Y)
     );
-  }
-  public static void redoLayers(){
-    var newLayers = new List<IMaterialLayer>();
-    foreach(IMaterialLayer l in layers){
-      if(!l.removeNext) newLayers.Add(l);
-      else{
-        l.enabled = false;
-        l.onRemove();
-      }
-      l.removeNext=true;
-    }
-    layers=newLayers;
-    // foreach(MaterialController c in Engine.Instance.scene.Tracker.GetEntities<MaterialController>()){
-    //   DebugConsole.Write("fish");
-    // }
   }
 
   static void reorderBg(ILContext ctx){
@@ -158,6 +171,17 @@ public static class MaterialPipe {
     bad:
     DebugConsole.Write($"Failed to add background reordering hook");
   }
+  public static void setup(){
+    dirty=true;
+    hooks.enable();
+  }
+  static HookManager hooks = new HookManager(()=>{
+    On.Celeste.GameplayRenderer.Render += GameplayRender;
+    On.Celeste.Level.TransitionTo += ontrans;
+  }, void ()=>{
+    On.Celeste.GameplayRenderer.Render-= GameplayRender;
+    On.Celeste.Level.TransitionTo -= ontrans;
+  });
 
   public static bool backdropReorderDetour(){
     return orderFlipped;

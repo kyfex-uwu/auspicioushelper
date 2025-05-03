@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -125,4 +126,14 @@ public static class Util{
     }
     return str;
   }
+  public static float[] csparseflat(string str){
+    return str.Split(",").Select(s=>{
+      float.TryParse(s, out var l);
+      return l;
+    }).ToArray();
+  }
+  public static float[] toArray(Vector2 x)=>new float[]{x.X,x.Y};
+  public static float[] toArray(Vector3 x)=>new float[]{x.X,x.Y,x.Z};
+  public static float[] toArray(Vector4 x)=>new float[]{x.X,x.Y,x.Z,x.W};
+
 }

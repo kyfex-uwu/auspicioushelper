@@ -6,17 +6,22 @@ local materialcontroller = {}
 materialcontroller.name = "auspicioushelper/MaterialController"
 materialcontroller.depth = 2000
 
+local ftypes = {"Always","Never","Linear","Cosine"}
 materialcontroller.placements = {
   {
     name = "Material Controller",
     data = {
       path="",
       identifier="",
+      params="",
       depth = 0,
+      Fade_in = "Linear",
+      fadeOut = "Linear",
       independent = true,
       simple = false,
       always = false,
       useprev = false,
+      usebg = false,
       reload=false
     }
   }
@@ -27,15 +32,16 @@ materialcontroller.fieldInformation = {
   },
   value = {
     fieldType="integer"
+  },
+  Fade_in = {
+    options = ftypes
+  },
+  fadeOut = {
+    options = ftypes
   }
 }
-function materialcontroller.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(-4, -4, 8,8) 
-  sprite.color = color 
-  return sprite
-end
+materialcontroller.texture = "loenn/auspicioushelper/controllers/material"
+
 
 function materialcontroller.rectangle(room, entity)
   return utils.rectangle(entity.x-4, entity.y-4, 8,8)

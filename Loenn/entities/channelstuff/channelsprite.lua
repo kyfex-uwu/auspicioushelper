@@ -39,13 +39,7 @@ entity.fieldInformation = {
     fieldType="integer"
   }
 }
-function entity.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, 8, 8) 
-  sprite.color = color 
-  return sprite
-end
+entity.texture = "loenn/auspicioushelper/controllers/sprite"
 
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x, entity.y, 8, 8)

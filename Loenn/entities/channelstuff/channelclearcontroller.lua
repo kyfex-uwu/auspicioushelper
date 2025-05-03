@@ -25,14 +25,7 @@ channelclearcontroller.fieldInformation = {
     fieldType="integer"
   }
 }
-function channelclearcontroller.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(-4, -4, 8,8) 
-  sprite.color = color 
-  return sprite
-end
-
+channelclearcontroller.texture = "loenn/auspicioushelper/controllers/clear"
 function channelclearcontroller.rectangle(room, entity)
   return utils.rectangle(entity.x-4, entity.y-4, 8,8)
 end

@@ -26,7 +26,7 @@ public class ConditionalStrawbUntracked:ConditionalStrawb{
 }
 
 
-[Tracked]
+[Tracked(true)]
 public class ConditionalStrawb:Entity, IStrawberry{
   public string idstr;
   public Follower follower;

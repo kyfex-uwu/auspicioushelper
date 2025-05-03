@@ -31,21 +31,6 @@ public class auspicioushelperModule : EverestModule {
     public static ActionList OnNewScreen = new ActionList();
     public static ActionList OnReset = new ActionList();
 
-    public override void Load() {
-        Everest.Events.Level.OnTransitionTo += OnTransition;
-        Everest.Events.Player.OnDie += OnDie;
-        Everest.Events.Level.OnEnter += OnEnter;
-        Everest.Events.Level.OnLoadLevel += EverestOnLoadLevel;
-        Everest.Events.AssetReload.OnAfterReload += OnReload;
-
-        On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
-        DebugConsole.Write("Loading");
-        ConditionalStrawb.hooks.enable();
-        MapHider.uncache();
-        //EntityMarkingFlag.hooks.enable();
-        
-        //TrackedCassette.hooks.enable();
-    }
     public static void tinyCleanup(){
         PortalGateH.intersections.Clear();
     }
@@ -83,10 +68,11 @@ public class auspicioushelperModule : EverestModule {
             OnNewScreen.run();
             OnEnterMap.run();
             
-            //Session?.load(!fromSave);
+            Session?.load(!fromSave);
+            //ChannelState.writeAll();
 
             if(session?.MapData!=null){
-                DebugConsole.Write($"Mapdata: {(session.MapData==null?"null":session.MapData.ToString())}");
+                //DebugConsole.Write($"Mapdata: {(session.MapData==null?"null":session.MapData.ToString())}");
                 MarkedRoomParser.parseMapdata(session.MapData);
                 DebugConsole.Write("Entered Level");
             } else {
@@ -114,10 +100,6 @@ public class auspicioushelperModule : EverestModule {
             }
         }
     }
-    static void EverestOnLoadLevel(Level level, Player.IntroTypes t, bool fromLoader){
-        //trash is called after constructors
-        MaterialPipe.redoLayers();
-    }
 
     public override void LoadContent(bool firstLoad){
         base.LoadContent(firstLoad);
@@ -125,14 +107,32 @@ public class auspicioushelperModule : EverestModule {
         auspicioushelperGFX.loadContent();
         MaterialPipe.setup();
     }
+    public static void GiveUp(On.Celeste.Level.orig_GiveUp orig, Level l,int returnIndex, bool restartArea, bool minimal, bool showHint){
+        ChannelState.clearChannels();
+        orig(l,returnIndex,restartArea,minimal,showHint);
+    }
     
+    public override void Load() {
+        Everest.Events.Level.OnTransitionTo += OnTransition;
+        Everest.Events.Player.OnDie += OnDie;
+        Everest.Events.Level.OnEnter += OnEnter;
+        Everest.Events.AssetReload.OnAfterReload += OnReload;
+        On.Celeste.Level.GiveUp += GiveUp;
 
+        On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
+        DebugConsole.Write("Loading");
+        ConditionalStrawb.hooks.enable();
+        MapHider.uncache();
+        //EntityMarkingFlag.hooks.enable();
+        
+        //TrackedCassette.hooks.enable();
+    }
     public override void Unload() {
         Everest.Events.Level.OnTransitionTo -= OnTransition;
         Everest.Events.Player.OnDie -= OnDie;
         Everest.Events.Level.OnEnter -= OnEnter;
-        Everest.Events.Level.OnLoadLevel -= EverestOnLoadLevel;
         Everest.Events.AssetReload.OnAfterReload -= OnReload;
+        On.Celeste.Level.GiveUp -= GiveUp;
 
         HookManager.disableAll();
         DebugConsole.Close();

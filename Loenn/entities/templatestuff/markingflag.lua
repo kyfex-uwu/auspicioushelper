@@ -16,10 +16,11 @@ entity.placements = {
   }
 }
 
+entity.texture = "loenn/auspicioushelper/controllers/marker"
+
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x-4, entity.y-4, 6, 6)
 end
-entity.borderColor = {0.3,1,0.4}
 
 
 
