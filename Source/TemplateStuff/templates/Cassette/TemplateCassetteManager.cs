@@ -13,7 +13,7 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateCassetteManager")]
-public class TemplateCassetteManager:Entity, IChannelUser{
+public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   Dictionary<string, string> material = null;
   static Dictionary<string,string> nameTrans = new Dictionary<string, string>{
     {"small","event:/game/general/cassette_block_switch_1"},
@@ -97,24 +97,15 @@ public class TemplateCassetteManager:Entity, IChannelUser{
       MaterialPipe.addLayer(other);
     }
   }
+  public void declareLayers(){
+    inimaterials();
+  }
   public static void unfrickMats(Scene s){
-    List<CassetteMaterialLayer> toremove = new List<CassetteMaterialLayer>();
-    foreach(var l in MaterialPipe.layers){
-      if(l is CassetteMaterialLayer la)toremove.Add(la);
-    }
-    foreach(var la in toremove){
-      MaterialPipe.removeLayer(la);
-    }
-    foreach(Entity e in Engine.Instance.scene.Entities){
-      if(e is TemplateCassetteManager m) m.inimaterials();
-    }
-    foreach(Entity e in Engine.Instance.scene.Entities){
-      if(e is TemplateCassetteBlock c){
-        if(CassetteMaterialLayer.layers.TryGetValue(c.channel,out var layer)){
-          var l = new List<Entity>();
-          c.AddAllChildren(l);
-          layer.dump(l);
-        }
+    foreach(TemplateCassetteBlock c in Engine.Instance.scene.Tracker.GetEntities<TemplateCassetteBlock>()){
+      if(CassetteMaterialLayer.layers.TryGetValue(c.channel,out var layer)){
+        var l = new List<Entity>();
+        c.AddAllChildren(l);
+        layer.dump(l);
       }
     }
   }

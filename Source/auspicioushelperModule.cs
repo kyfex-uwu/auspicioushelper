@@ -62,8 +62,6 @@ public class auspicioushelperModule : EverestModule {
     static void OnEnter(Session session, bool fromSave){
         try{
             ChannelState.unwatchAll();
-            JumpListener.releaseHooks();
-            portalHooks.unsetupHooks();
 
             OnReset.run();
             OnNewScreen.run();

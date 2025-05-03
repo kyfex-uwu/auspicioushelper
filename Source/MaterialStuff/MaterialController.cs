@@ -45,15 +45,19 @@ public interface IFadingLayer{
 public interface ISettableDepth{
   float depth {set;}
 }
+public interface IDeclareLayers{
+  void declareLayers();
+}
 
 [CustomEntity("auspicioushelper/MaterialController")]
 [Tracked]
-internal class MaterialController:Entity{
+internal class MaterialController:Entity, IDeclareLayers{
   static Dictionary<string, IMaterialLayer> loadedMats = new Dictionary<string, IMaterialLayer>();
   EntityData e;
-  public static IMaterialLayer load(EntityData e){
+  internal string identifier;
+  public IMaterialLayer load(EntityData e){
     string path=e.Attr("path","");
-    string identifier=e.Attr("identifier");
+    identifier=e.Attr("identifier");
     if(string.IsNullOrWhiteSpace(identifier)) identifier = path+"###"+e.Attr("params","");
     bool reload = e.Bool("reload",false);
     if(path.Length == 0)return null;
@@ -82,11 +86,11 @@ internal class MaterialController:Entity{
   public MaterialController(EntityData e,Vector2 v):base(new Vector2(0,0)){
     this.e=e;
   }
-  IMaterialLayer l;
-  public override void Added(Scene scene){
-    base.Added(scene);
-    if(l == null) l = load(e);
-    else MaterialPipe.addLayer(l);
+  public void declareLayers(){
+    if(!string.IsNullOrEmpty(identifier) && loadedMats.TryGetValue(identifier, out var l)){
+      MaterialPipe.addLayer(l);
+    }else l = load(e);
+
     if(l!=null){
       if(l is IFadingLayer u){
         u.setFade(IFadingLayer.fromString(e.Attr("Fade_in","")), IFadingLayer.fromString(e.Attr("fadeOut","")));
@@ -96,5 +100,9 @@ internal class MaterialController:Entity{
         MaterialPipe.dirty = true;
       }
     }
+  }
+  public override void Added(Scene scene){
+    base.Added(scene);
+    declareLayers();
   }
 }

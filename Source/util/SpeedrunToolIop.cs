@@ -18,11 +18,8 @@ internal static class SpeedrunToolIop{
     int? lastUsed = ChannelBooster.lastUsed?.id;
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
-    TemplateCassetteManager.unfrickMats(level);
+    MaterialPipe.layers.Clear();
     foreach(Entity e in Engine.Instance.scene.Entities){
-      if(e is PortalGateH portalgateh){
-        portalHooks.hooks.enable();
-      }
       if(e is IChannelUser e_){
         if(e_ is ChannelBooster b && b.id == lastUsed){
           ChannelBooster.lastUsed = b;
@@ -30,24 +27,29 @@ internal static class SpeedrunToolIop{
         }
         ChannelState.watch(e_);
       }
-      if(e is PortalOthersider m){
-        m.RemoveSelf();
+      if(e is PortalOthersider m) m.RemoveSelf();
+      if(e is PortalGateH portalgateh){
+        portalHooks.hooks.enable();
       }
       if(e is Actor a){
         PortalGateH.SurroundingInfoH s = PortalGateH.evalEnt(a);
         PortalIntersectInfoH info = null;
         if(a.Left<s.leftl) {
           PortalGateH.intersections[a]=(info = new PortalIntersectInfoH(s.leftn, s.left,a));
-          PortalOthersider mn = info.addOthersider();
         } else if(a.Right>s.rightl){
           PortalGateH.intersections[a]=(info = new PortalIntersectInfoH(s.rightn, s.right, a));
-          PortalOthersider mn = info.addOthersider();
         }
+        if(info!=null) info.addOthersider();
+      }
+      if(e is IDeclareLayers idl){
+        if(idl is MaterialController ma) DebugConsole.Write($"material controlner {ma.identifier}");
+        idl.declareLayers();
       }
     }
     foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
       ChannelState.watch(t);
     }
+    TemplateCassetteManager.unfrickMats(level);
     FoundEntity.clear(Engine.Instance.scene);
     DebugConsole.Write($"Finished successfully");
   }
@@ -90,6 +92,7 @@ internal static class SpeedrunToolIop{
     }while(false);
   }
 
+  #pragma warning disable CS0649
   [ModImportName("SpeedrunTool.SaveLoad")]
   internal static class SpeedrunToolImport {
     public static Func<
@@ -104,31 +107,29 @@ internal static class SpeedrunToolIop{
     public static Action<object> Unregister;
     public static Func<object, object> DeepClone;
   }
+  #pragma warning restore CS0649
   internal static void srtloaduseapi(){
+    DebugConsole.Write("Doing srt setup");
     typeof(SpeedrunToolImport).ModInterop();
     if(SpeedrunToolImport.RegisterStaticTypes!=null){
       try{
-        foreach(var o in staticTypes)
-          toDeregister.Add(SpeedrunToolImport.RegisterStaticTypes((Type)o[0], (string[])o[1]));
+        foreach(var o in staticTypes) toDeregister.Add(SpeedrunToolImport.RegisterStaticTypes((Type)o[0], (string[])o[1]));
       } catch(Exception ex){
         DebugConsole.Write($"Failed to register static types: {ex}");
       }
     }
     if(SpeedrunToolImport.RegisterSaveLoadAction!=null){
       try{
-        SpeedrunToolImport.RegisterSaveLoadAction(null,loadState,null,null,null,null);
+        toDeregister.Add(SpeedrunToolImport.RegisterSaveLoadAction(null,loadState,null,null,null,null));
       }catch(Exception ex){
         DebugConsole.Write($"Failed to register action: {ex}");
       }
     }
   }
-  internal static HookManager hooks = new HookManager(speedruntoolinteropload, void()=>{
-    if(interoptype == null) return; 
-    MethodInfo deregisterfn = interoptype.GetMethod("Unregister");
-    Logger.Log("[auspicious]","We are unloading");
+  internal static HookManager hooks = new HookManager(srtloaduseapi, void()=>{
     try{
       foreach(object o in toDeregister){
-        deregisterfn.Invoke(null,new object[]{o});
+        SpeedrunToolImport.Unregister(o);
       }
     } catch(Exception ex){
       DebugConsole.Write($"Deregistration failed with {ex}");

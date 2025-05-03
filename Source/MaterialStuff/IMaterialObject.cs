@@ -11,3 +11,4 @@ public interface IMaterialObject{
   public void registerMaterials(){}
   public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c);
 }
+

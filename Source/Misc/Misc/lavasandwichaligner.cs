@@ -26,7 +26,7 @@ public class lavasandwichAligner:Entity{
     if(usedinscene != self.Scene) return f;
     return ncentery-90;
   }
-  HookManager hooks = new HookManager(()=>{
+  static HookManager hooks = new HookManager(()=>{
     MethodInfo lavacentermethod = typeof(SandwichLava).GetMethod(
         "get_centerY",
         BindingFlags.Instance | BindingFlags.NonPublic

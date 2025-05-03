@@ -48,7 +48,7 @@ public class ChannelReskinnedSpinner:Entity, IMaterialObject{
     randomSeed = Calc.Random.Next();
   }
   public override void Awake(Scene scene){
-    if(ChannelBaseEntity.layerA.enabled) otherVisible = false;
+    if(ChannelBaseEntity.layerA?.enabled??false) otherVisible = false;
   }
   private bool InView(){
     Camera c = (base.Scene as Level).Camera;

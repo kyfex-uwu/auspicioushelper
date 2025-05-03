@@ -14,6 +14,7 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateCassetteBlock")]
+[Tracked(true)]
 public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChannelUser, ITemplateChild{
   
   public string channel{get;set;}
@@ -49,11 +50,11 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
     Player p = Scene?.Tracker.GetEntity<Player>();
     if(there!=State.trying) return;
     bool inLayer = CassetteMaterialLayer.layers.TryGetValue(channel,out var layer);
-    if(getParentCol() && p!=null && hasInside(p)){
+    if(getParentCol() && p!=null && !p.Dead && hasInside(p)){
       p.Position.Y-=4;
-      bool inside = hasInside(p);
+      bool inside = !p.Dead && hasInside(p);
       p.Position.Y+=4;
-      bool flag = false;
+      bool flag = p.Dead;
       if(!inside){
         setCollidability(true);
         for(int i=0; i<4; i++){
@@ -64,6 +65,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
           }
         }
         if(!flag)setCollidability(false);
+        //else p.LiftSpeed = parentLiftspeed+new Vector2(0,-50);
       }
       if(inLayer){
         layer.addTrying(this);
