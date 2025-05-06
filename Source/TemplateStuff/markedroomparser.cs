@@ -39,7 +39,7 @@ internal static class MarkedRoomParser{
       //DebugConsole.Write("Looking at entity "+d.Name);
       var hits = rects.collidePointAll(d.Position);
       EntityParser.EWrap w = null;
-      if(hits.Count >0) w = EntityParser.makeWrapper(d);
+      if(hits.Count >0) w = EntityParser.makeWrapper(d, l);
       if(w == null) continue;
       foreach(int handle in hits){
         string tid = handleDict[handle];

@@ -11,7 +11,7 @@ namespace Celeste.Mod.auspicioushelper;
 
 public interface ITemplateChild{
   Template parent {get; set;}
-  Template.Propagation prop {get;}
+  Template.Propagation prop {get=>Template.Propagation.All;}
   void relposTo(Vector2 loc, Vector2 liftspeed);
   void addTo(Scene s){}
   void parentChangeStat(int vis, int col);
@@ -84,6 +84,7 @@ public class Template:Entity, ITemplateChild{
       c.relposTo(loc, liftspeed);
     }
   }
+  internal Wrappers.FgTiles fgt = null;
   public void addEnt(ITemplateChild c, bool sceneadd=false){
     Entity ce = c as Entity;
     if(sceneadd)Scene.Add(ce);
@@ -109,7 +110,7 @@ public class Template:Entity, ITemplateChild{
 
     if(t==null) return;
     if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset),true);
-    if(t.fgt!=null) addEnt(new Wrappers.FgTiles(t, virtLoc, depthoffset),true);
+    if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset),true);
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.virtLoc-t.origin;
     string fp = fullpath;

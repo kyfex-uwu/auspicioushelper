@@ -55,4 +55,7 @@ public class TemplateDisappearer:Template{
   public bool getParentCol(){
     return parentCol;
   }
+  public bool getSelfCol(){
+    return selfCol;
+  }
 }

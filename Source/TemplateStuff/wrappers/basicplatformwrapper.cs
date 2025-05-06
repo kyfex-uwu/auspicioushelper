@@ -12,19 +12,27 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 internal class BasicPlatform:Entity, ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.All;
-  Platform p;
-  Vector2 toffset;
+  public Platform p;
+  public Vector2 toffset;
   public BasicPlatform(Platform p, Template t, Vector2 offset):base(t.virtLoc){
     p.Depth += t.depthoffset;
     this.p=p;
     parent = t;
     toffset = offset;
     Visible = false;
-    p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
+    if(p.OnDashCollide == null)
+      p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
+    lpos = p.Position;
   }
-  public void relposTo(Vector2 loc, Vector2 liftspeed){
-    if(p == null)return;
+  public Vector2 lpos;
+  public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
+    if(p == null||p.Scene==null)return;
+    if(lpos!=p.Position){
+      //DebugConsole.Write($"changing tpos {lpos} {p.Position}     {toffset} {toffset+p.Position-lpos}");
+      toffset+=p.Position-lpos;
+    }
     p.MoveTo(loc+toffset, liftspeed);
+    lpos = p.Position;
   }
   public void addTo(Scene scene){
     scene.Add(this);
@@ -43,15 +51,33 @@ internal class BasicPlatform:Entity, ITemplateChild{
     return false;
   }
   public bool hasInside(Actor a){
+    if(p == null||p.Scene==null)return false;
     return (p is Solid) && p.Collider.Collide(a.Collider);
   }
   public void AddAllChildren(List<Entity> l){
     l.Add(p);
   }
   public void parentChangeStat(int vis, int col){
+    if(p == null||p.Scene==null)return;
     if(vis!=0)p.Visible = vis>0;
     if(col!=0)p.Collidable = col>0;
     if(col>0) p.EnableStaticMovers();
     else if(col<0) p.DisableStaticMovers();
+  }
+}
+
+internal class BasicPlatformDisobedient:BasicPlatform{
+  Vector2 origpos;
+  Vector2 origtoffset;
+  public BasicPlatformDisobedient(Platform p, Template t, Vector2 offset):base(p,t,offset){
+    origpos = p.Position;
+    origtoffset = toffset;
+  }
+  public override void relposTo(Vector2 loc, Vector2 liftspeed){
+    if(lpos!=p.Position){
+      toffset=origtoffset+(p.Position-origpos);
+    }
+    p.MoveTo(loc+toffset, liftspeed);
+    lpos = p.Position;
   }
 }

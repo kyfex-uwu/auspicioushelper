@@ -51,13 +51,19 @@ public class auspicioushelperModule : EverestModule {
         }
     }
     static void OnDie(Player player){
-        Session.load(false);
-        ChannelState.unwatchAll();
         ConditionalStrawb.handleDie(player);
         MaterialPipe.onDie();
-        tinyCleanup();
+    }
+    static void LoadLevlHook(On.Celeste.Level.orig_LoadLevel orig, Level l, Player.IntroTypes playerIntro, bool isFromLoader = false){
+        DebugConsole.Write($"{playerIntro}");
+        if(playerIntro == Player.IntroTypes.Respawn){
+            Session.load(false);
+            ChannelState.unwatchAll();
+            tinyCleanup();
 
-        OnReset.run();
+            OnReset.run();
+        }
+        orig(l,playerIntro,isFromLoader);
     }
     static void OnEnter(Session session, bool fromSave){
         try{
@@ -117,6 +123,7 @@ public class auspicioushelperModule : EverestModule {
         Everest.Events.Level.OnEnter += OnEnter;
         Everest.Events.AssetReload.OnAfterReload += OnReload;
         On.Celeste.Level.GiveUp += GiveUp;
+        On.Celeste.Level.LoadLevel += LoadLevlHook;
 
         On.Celeste.ChangeRespawnTrigger.OnEnter += ChangerespawnHandler;
         DebugConsole.Write("Loading");
@@ -132,6 +139,7 @@ public class auspicioushelperModule : EverestModule {
         Everest.Events.Level.OnEnter -= OnEnter;
         Everest.Events.AssetReload.OnAfterReload -= OnReload;
         On.Celeste.Level.GiveUp -= GiveUp;
+        On.Celeste.Level.LoadLevel -= LoadLevlHook;
 
         HookManager.disableAll();
         DebugConsole.Close();

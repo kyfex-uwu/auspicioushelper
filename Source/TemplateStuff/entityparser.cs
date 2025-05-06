@@ -12,6 +12,7 @@ public static class EntityParser{
   public enum Types{
     unable,
     platformbasic,
+    platformdisobedient,
     unwrapped,
     basic,
     removeSMbasic,
@@ -30,7 +31,7 @@ public static class EntityParser{
     parseMap[name] = t;
     loaders[name] = loader;
   }
-  public static EWrap makeWrapper(EntityData e){
+  public static EWrap makeWrapper(EntityData e, LevelData ldat = null){
     Types etype;
     if(!parseMap.TryGetValue(e.Name, out etype)){
       bool bad=true;
@@ -38,14 +39,14 @@ public static class EntityParser{
         Entity t=null;
         if(Level.EntityLoaders.TryGetValue(e.Name, out var loader)){
           try{
-            t = loader(null, null, Vector2.Zero, e);
+            t = loader(null, ldat, Vector2.Zero, e);
           } catch(Exception ex){
             DebugConsole.Write(e.Name+" entityloader found and failed with cause "+ex.ToString());
           }
         }
         if(t==null && skitzoGuess(e)){
           loader = loaders[e.Name];
-          t = loader(null, null, Vector2.Zero, e);
+          t = loader(null, ldat, Vector2.Zero, e);
         }
 
         if(t is Platform){
@@ -88,8 +89,10 @@ public static class EntityParser{
       }
     }
     switch(d.t){
-      case Types.platformbasic:
+      case Types.platformbasic: case Types.platformdisobedient:
         if(e is Platform p){
+          if(d.t == Types.platformdisobedient)
+            return new Wrappers.BasicPlatformDisobedient(p,t,simoffset+d.d.Position-t.virtLoc);
           return new Wrappers.BasicPlatform(p,t,simoffset+d.d.Position-t.virtLoc);
         }else{
           DebugConsole.Write("Wrongly classified!!! "+d.d.Name);
@@ -115,37 +118,46 @@ public static class EntityParser{
   }
   static EntityParser(){
     parseMap["dreamBlock"] = Types.platformbasic;
-    loaders["dreamBlock"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
+    loaders["dreamBlock"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
     parseMap["jumpThru"] = Types.platformbasic;
-    loaders["jumpThru"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
+    loaders["jumpThru"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
     parseMap["glider"] = Types.unwrapped;
-    loaders["glider"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
+    loaders["glider"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
     parseMap["seekerBarrier"] = Types.platformbasic;
-    loaders["seekerBarrier"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
+    loaders["seekerBarrier"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new SeekerBarrier(e,offset);
     
     parseMap["spikesUp"] = Types.removeSMbasic;
-    loaders["spikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Up);
+    loaders["spikesUp"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Up);
     parseMap["spikesDown"] = Types.removeSMbasic;
-    loaders["spikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Down);
+    loaders["spikesDown"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Down);
     parseMap["spikesLeft"] = Types.removeSMbasic;
-    loaders["spikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Left);
+    loaders["spikesLeft"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Left);
     parseMap["spikesRight"] = Types.removeSMbasic;
-    loaders["spikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Right);
+    loaders["spikesRight"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Spikes(e,offset,Spikes.Directions.Right);
     parseMap["triggerSpikesUp"] = Types.removeSMbasic;
-    loaders["triggerSpikesUp"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Up);
+    loaders["triggerSpikesUp"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Up);
     parseMap["triggerSpikesDown"] = Types.removeSMbasic;
-    loaders["triggerSpikesDown"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Down);
+    loaders["triggerSpikesDown"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Down);
     parseMap["triggerSpikesLeft"] = Types.removeSMbasic;
-    loaders["triggerSpikesLeft"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Left);
+    loaders["triggerSpikesLeft"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Left);
     parseMap["triggerSpikesRight"] = Types.removeSMbasic;
-    loaders["triggerSpikesRight"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
+    loaders["triggerSpikesRight"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new TriggerSpikes(e,offset,TriggerSpikes.Directions.Right);
     clarify("spring", Types.removeSMbasic, (Level l, LevelData ld, Vector2 offset, EntityData e)=>new Spring(e,offset,Spring.Orientations.Floor));
     clarify("wallSpringLeft", Types.removeSMbasic, (Level l, LevelData ld, Vector2 offset, EntityData e)=>new Spring(e,offset,Spring.Orientations.WallLeft));
     clarify("wallSpringRight", Types.removeSMbasic, (Level l, LevelData ld, Vector2 offset, EntityData e)=>new Spring(e,offset,Spring.Orientations.WallRight));
+    clarify("spinner", Types.unwrapped, static (Level l, LevelData ld, Vector2 offset, EntityData e)=>new Wrappers.Spinner(e,offset));
     
     clarify("lamp",Types.basic,(Level l, LevelData ld, Vector2 offset, EntityData e)=>new Lamp(offset + e.Position, e.Bool("broken")));
     clarify("hangingLamp",Types.basic,(Level l, LevelData ld, Vector2 offset, EntityData e)=>new HangingLamp(e,offset+e.Position));
     clarify("seeker",Types.basic,static (Level l, LevelData d, Vector2 o, EntityData e)=>new Seeker(e, o));
+    clarify("dashSwitchH",Types.unwrapped,static (Level l, LevelData d, Vector2 o, EntityData e)=>new Wrappers.DashSwitchW(e,o,new EntityID(d.Name,e.ID)));
+    clarify("dashSwitchV",Types.unwrapped,static (Level l, LevelData d, Vector2 o, EntityData e)=>new Wrappers.DashSwitchW(e,o,new EntityID(d.Name,e.ID)));
+    clarify("lightning", Types.basic, static (Level l, LevelData d, Vector2 o, EntityData e)=>{
+      if(!e.Bool("perLevel") && l.Session.GetFlag("disable_lightning")) return null;
+      LightningRenderer lr = l.Tracker.GetEntity<LightningRenderer>();
+      if(lr!=null) lr.StartAmbience();
+      return new Lightning(e,o);
+    });
 
     parseMap["refill"] = Types.unwrapped;
     loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Wrappers.RefillW(e,offset);
@@ -279,7 +291,9 @@ public static class EntityParser{
       case "playbackBillboard": loaders["playbackBillboard"]=static (Level l, LevelData d, Vector2 o, EntityData e)=>new PlaybackBillboard(e, o); return true;
       case "cutsceneNode": loaders["cutsceneNode"]=static (Level l, LevelData d, Vector2 o, EntityData e)=>new CutsceneNode(e, o); return true;
       case "kevins_pc": loaders["kevins_pc"]=static (Level l, LevelData d, Vector2 o, EntityData e)=>new KevinsPC(e, o); return true;
+      case "templeGate": loaders["templeGate"]=static (Level l, LevelData d, Vector2 o, EntityData e)=>new TempleGate(e,o, d.Name); return true;
     }
     return false;
   }
+  static Level l___;
 }

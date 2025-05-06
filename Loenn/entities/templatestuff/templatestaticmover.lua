@@ -14,7 +14,8 @@ entity.placements = {
       depthoffset=5,
       channel = "",
       liftspeed_smear = 4,
-      smear_average = false
+      smear_average = false,
+      ridingTrigger = true
     }
   }
 }
