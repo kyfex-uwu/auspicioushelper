@@ -148,8 +148,10 @@ public struct FloatRect{
   public bool CollideCircleSweep(float r, Vector2 p, Vector2 sweep){
     return ICollideCircleSweep(r,p,sweep,1).collidesOne;
   }
+  
+  //this function is NOT TIGHT for grids; The returned collision will always be a superset of actual collision
   public FRCollision ISweep(Collider c, Vector2 s){
-    if(c is Hitbox h){
+    if(c is Hitbox h || c is Grid g){
       return ICollideRectSweep(new FloatRect(c.AbsoluteLeft,c.AbsoluteTop,c.Width,c.Height),s);
     }
     if(c is Circle r){
