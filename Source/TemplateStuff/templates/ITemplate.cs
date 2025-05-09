@@ -14,7 +14,7 @@ public interface ITemplateChild{
   Template.Propagation prop {get=>Template.Propagation.All;}
   void relposTo(Vector2 loc, Vector2 liftspeed);
   void addTo(Scene s){}
-  void parentChangeStat(int vis, int col);
+  void parentChangeStat(int vis, int col, int act);
   bool hasRiders<T>() where T : Actor{
     return false;
   }
@@ -40,6 +40,7 @@ public interface ITemplateChild{
   void AddAllChildren(List<Entity> list);
   void setOffset(Vector2 ppos){}
   void shake(Vector2 amount){}
+  void destroy(bool particles);
 }
 
 public class Template:Entity, ITemplateChild{
@@ -47,7 +48,7 @@ public class Template:Entity, ITemplateChild{
   public List<ITemplateChild> children = new List<ITemplateChild>();
   public int depthoffset;
   public Template parent{get;set;} = null;
-  public int ownidpath;
+  public string ownidpath;
   [Flags]
   public enum Propagation
   {
@@ -67,12 +68,13 @@ public class Template:Entity, ITemplateChild{
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
   public DashCollision OnDashCollide = null;
-  public Template(string templateStr, Vector2 pos, int depthoffset, int ownidpath=-2):base(pos){
+  public Template(string templateStr, Vector2 pos, int depthoffset, string ownidpath="NULL"):base(pos){
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
       DebugConsole.Write("No template found with identifier "+templateStr);
     }
     this.depthoffset = depthoffset;
     this.Visible = false;
+    Depth = 10000+depthoffset;
     this.ownidpath=ownidpath;
   }
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
@@ -85,10 +87,10 @@ public class Template:Entity, ITemplateChild{
     }
   }
   internal Wrappers.FgTiles fgt = null;
-  public void addEnt(ITemplateChild c, bool sceneadd=false){
-    Entity ce = c as Entity;
-    if(sceneadd)Scene.Add(ce);
+  public void addEnt(ITemplateChild c){
     children.Add(c);
+    c.addTo(Scene);
+    c.setOffset(virtLoc);
     c.parent = this;
     if(c is Template ct){
       ct.depthoffset+=depthoffset;
@@ -109,8 +111,8 @@ public class Template:Entity, ITemplateChild{
     scene.Add(this);
 
     if(t==null) return;
-    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset),true);
-    if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset),true);
+    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset));
+    if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset));
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.virtLoc-t.origin;
     string fp = fullpath;
@@ -118,8 +120,6 @@ public class Template:Entity, ITemplateChild{
       Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this,fp);
       if(e is ITemplateChild c){
         addEnt(c);
-        c.addTo(scene);
-        c.setOffset(virtLoc);
       }
       else if(e!=null)scene.Add(e);
     }
@@ -163,11 +163,21 @@ public class Template:Entity, ITemplateChild{
     foreach(ITemplateChild c in children){
       c.AddAllChildren(l);
     }
+    if(!(this is TemplateDisappearer)) l.Add(this);
   }
-  public virtual void parentChangeStat(int vis, int col){
+  public virtual void parentChangeStat(int vis, int col, int act){
     foreach(ITemplateChild c in children){
-      c.parentChangeStat(vis,col);
+      c.parentChangeStat(vis,col,act);
     }
   }
-  string fullpath=>parent==null?ownidpath.ToString():parent.fullpath+$"/{ownidpath}";
+  public virtual void destroy(bool particles){
+    foreach(ITemplateChild c in children){
+      c.destroy(particles);
+    }
+    RemoveSelf();
+  }
+  public string fullpath=>parent==null?ownidpath.ToString():parent.fullpath+$"/{ownidpath}";
+  public static string getOwnID(EntityData e){
+    return e.ID.ToString();
+  }
 }

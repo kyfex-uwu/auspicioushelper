@@ -17,6 +17,7 @@ public interface IMaterialLayer{
   RenderTarget2D outtex {get;}
   bool independent {get;}
   bool diddraw {get;set;}
+  float alpha {get=>1;}
   float transalpha(bool leaving, float camAt){
     //DebugConsole.Write($"Roomchange: {leaving} {camAt}");
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
@@ -45,6 +46,8 @@ public class BasicMaterialLayer:IMaterialLayer{
   public bool diddraw {get;set;}
   public bool enabled {get;set;}
   public Effect quietShader = null;
+  public bool clearWilldraw = true;
+  public virtual float alpha=>1;
   public virtual bool usesbg(){return false;}
   public virtual float transalpha(bool leaving, float camAt){
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
@@ -75,26 +78,28 @@ public class BasicMaterialLayer:IMaterialLayer{
   public virtual void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     //DebugConsole.Write("Rendering layer");
     Effect shader = auspicioushelperModule.Settings.UseQuietShader && quietShader!=null? quietShader:normalShader;
-    if(back != null){
-      MaterialPipe.gd.Textures[2]=back;
-    }
-    EffectParameter timeUniform = shader.Parameters["time"];
-    if(timeUniform != null){
-      //DebugConsole.Write((Engine.Scene as Level).TimeActive.ToString());
-      timeUniform.SetValue((Engine.Scene as Level).TimeActive+2);
-    } 
-    EffectParameter camPosUniform = shader.Parameters["cpos"];
-    if(camPosUniform != null){
-      camPosUniform.SetValue(c.Position);
-    } 
-    EffectParameter photoSensitive = shader.Parameters["quiet"];
-    if(photoSensitive != null){
-      //DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
-      photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
-    } 
-    if(usesbg()){
-      MaterialPipe.gd.Textures[3] = GameplayBuffers.Level;
-      MaterialPipe.gd.SamplerStates[3] = SamplerState.PointClamp;
+    if(shader!=null){
+      if(back != null){
+        MaterialPipe.gd.Textures[2]=back;
+      }
+      EffectParameter timeUniform = shader.Parameters["time"];
+      if(timeUniform != null){
+        //DebugConsole.Write((Engine.Scene as Level).TimeActive.ToString());
+        timeUniform.SetValue((Engine.Scene as Level).TimeActive+2);
+      } 
+      EffectParameter camPosUniform = shader.Parameters["cpos"];
+      if(camPosUniform != null){
+        camPosUniform.SetValue(c.Position);
+      } 
+      EffectParameter photoSensitive = shader.Parameters["quiet"];
+      if(photoSensitive != null){
+        //DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
+        photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
+      } 
+      if(usesbg()){
+        MaterialPipe.gd.Textures[3] = GameplayBuffers.Level;
+        MaterialPipe.gd.SamplerStates[3] = SamplerState.PointClamp;
+      }
     }
 
     MaterialPipe.gd.SetRenderTarget(both?mattex:outtex);
@@ -113,7 +118,7 @@ public class BasicMaterialLayer:IMaterialLayer{
       sb.Draw(mattex,Vector2.Zero,Color.White);
       sb.End();
     }
-    willDraw.Clear();
+    if(clearWilldraw)willDraw.Clear();
     diddraw = true;
   }
   public virtual bool checkdo(){

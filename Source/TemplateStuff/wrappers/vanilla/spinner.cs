@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
-public class Spinner:CrystalStaticSpinner, ISimpleChild{
+public class Spinner:CrystalStaticSpinner, ISimpleEnt{
   public Template parent {get;set;} 
   static int uidctr = 0;
   int id;
@@ -21,7 +21,6 @@ public class Spinner:CrystalStaticSpinner, ISimpleChild{
   public Spinner(EntityData d, Vector2 offset):base(d.Position+offset, false, GetColor(d)){
     id = uidctr++;
     hooks.enable();
-    DebugConsole.Write("here");
   }
   bool hvisible = true;
   public override void Update(){
@@ -31,12 +30,13 @@ public class Spinner:CrystalStaticSpinner, ISimpleChild{
     }
     base.Update();
   }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     if(vis!=0){
       hvisible = vis>0;
       Visible = vis>0;
     }
     if(col!=0) Collidable = col>0;
+    if(act!=0) Active = act>0;
   }
   Vector2 toffset;
   public void relposTo(Vector2 loc, Vector2 liftspeed){

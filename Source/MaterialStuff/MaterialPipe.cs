@@ -103,12 +103,12 @@ public static class MaterialPipe {
       );
       if(l.independent){
         //DebugConsole.Write("pasting prerendered layer");
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha);
+        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
       } else {
         sb.End();
         l.render(c,sb,t);
         begin(c, sb, t);
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha);
+        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
       }
     }
   }

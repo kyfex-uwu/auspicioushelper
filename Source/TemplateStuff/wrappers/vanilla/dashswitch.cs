@@ -8,7 +8,7 @@ using MonoMod.Core.Platforms;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-public class DashSwitchW:DashSwitch, ITemplateChild{
+public class DashSwitchW:DashSwitch, ISimpleEnt{
   public Template parent {get;set;}
   public Template.Propagation prop {get;set;} = Template.Propagation.All;
   Vector2 origtoffset;
@@ -51,9 +51,6 @@ public class DashSwitchW:DashSwitch, ITemplateChild{
     MoveTo(loc+toffset, liftspeed);
     lpos = Position;
   }
-  public void addTo(Scene scene){
-    scene.Add(this);
-  }
   public bool hasRiders<T>() where T:Actor{
     if(typeof(T) == typeof(Player)) return HasPlayerRider();
     if(typeof(T) == typeof(Actor)) return HasRider();
@@ -66,9 +63,10 @@ public class DashSwitchW:DashSwitch, ITemplateChild{
   public void AddAllChildren(List<Entity> l){
     l.Add(this);
   }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col,int act){
     if(vis!=0)Visible = vis>0;
     if(col!=0)Collidable = col>0;
+    if(act!=0)Active = act>0;
     if(col>0) EnableStaticMovers();
     else if(col<0) DisableStaticMovers();
   }

@@ -16,3 +16,9 @@ public interface ISimpleChild:ITemplateChild{
     s.Add((Entity) this);
   }
 }
+
+public interface ISimpleEnt:ISimpleChild{
+  void ITemplateChild.destroy(bool particles){
+    ((Entity) this).RemoveSelf();
+  }
+}

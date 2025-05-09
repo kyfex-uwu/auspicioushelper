@@ -4,7 +4,7 @@ local utils = require("utils")
 local entity = {}
 
 entity.name = "auspicioushelper/Anti0fZone"
-entity.depth = 2000
+entity.depth = -11000
 entity.nodeLimits = {0,1}
 
 entity.placements = {
@@ -13,24 +13,20 @@ entity.placements = {
     data = {
       width = 8,
       height = 8,
-      step = 4,
+      step = 1,
       holdables=false,
       player_colliders = true,
-      triggers = true
+      triggers = false,
+      solids = false,
+      cover_whole_room=false
     }
   }
 }
-function entity.sprite(room, entity)
-  color = {1, 1, 1, 0.3}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
-
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
 end
+entity.fillColor = {1,0.6,0.2,0.2}
+entity.borderColor = {0.7,0.4,0.1,0.7}
 
 
 return entity

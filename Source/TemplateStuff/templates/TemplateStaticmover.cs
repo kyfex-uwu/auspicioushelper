@@ -21,7 +21,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   bool ridingTrigger;
   
   public TemplateStaticmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
-  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d.Attr("template",""),d.Position+offset,depthoffset,d.ID){
+  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d.Attr("template",""),d.Position+offset,depthoffset,getOwnID(d)){
     smearamount = d.Int("liftspeed_smear",4);
     averageSmear = d.Bool("smear_average",false);
     channel = d.Attr("channel","");
@@ -77,7 +77,8 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
         return s.Collidable && !doNot.Contains(s) && s.CollidePoint(Position);
       },
       OnDestroy=()=>{
-        setVisCol(true,false);
+        setCollidability(false);
+        destroy(true);
         if(layer!=null) layer.removeTrying(this);
       },
       OnMove=(Vector2 move)=>{

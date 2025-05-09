@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-public class RefillW:Refill,ISimpleChild {
+public class RefillW:Refill,ISimpleEnt {
   public Template parent {get;set;}
   public Template.Propagation prop {get;}
   public RefillW(EntityData d, Vector2 offset):base(d,offset){
@@ -21,7 +21,7 @@ public class RefillW:Refill,ISimpleChild {
 
   bool selfCol = true;
   bool parentCol = true;
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     if(vis!=0)Visible = vis>0;
     if(col!=0){
       parentCol = col>0;
@@ -31,6 +31,7 @@ public class RefillW:Refill,ISimpleChild {
         Collidable = false;
       }
     }
+    if(act!=0) Active = act>0;
   }
 
   static void respawnHook(On.Celeste.Refill.orig_Respawn orig, Refill self){

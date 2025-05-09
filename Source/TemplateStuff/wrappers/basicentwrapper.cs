@@ -31,7 +31,7 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 //   }
 // }
 
-public class BasicMultient:Entity, ITemplateChild{
+public class BasicMultient:ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.Shake;
   public struct EntEnt{ //entity entry, say it faster
@@ -43,9 +43,9 @@ public class BasicMultient:Entity, ITemplateChild{
   }
   List<EntEnt> ents = new List<EntEnt>();
   int depthoffset;
-  public BasicMultient(Template t):base(t.virtLoc){
+  Scene Scene = null;
+  public BasicMultient(Template t){
     parent = t;
-    Depth = -9000+t.depthoffset;
     depthoffset = t.depthoffset;
   }
   public void add(Entity e, Vector2 offset){
@@ -60,7 +60,6 @@ public class BasicMultient:Entity, ITemplateChild{
   }
   public void sceneadd(Scene scene){
     this.Scene = scene;
-    scene.Add(this);
     foreach(EntEnt en in ents){
       scene.Add(en.e);
     }
@@ -68,7 +67,7 @@ public class BasicMultient:Entity, ITemplateChild{
   public void AddAllChildren(List<Entity> l){
     foreach(EntEnt ent in ents)l.Add(ent.e);
   }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     foreach(EntEnt ent in ents){
       if(vis!=0) ent.e.Visible = vis>0; 
       if(col!=0){
@@ -77,6 +76,12 @@ public class BasicMultient:Entity, ITemplateChild{
           if(c is PlayerCollider cl) cl.Active=col>0;
         }
       }
+      if(act!=0) ent.e.Active = act>0;
+    }
+  }
+  public void destroy(bool particles){
+    foreach(EntEnt ent in ents){
+      ent.e.RemoveSelf();
     }
   }
 }

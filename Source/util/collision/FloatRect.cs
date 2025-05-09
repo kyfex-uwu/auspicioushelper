@@ -30,6 +30,9 @@ public struct FloatRect{
       }
       return f;
     }
+    public override string ToString(){
+      return $"FRCol: {{{enter} {exit} {collides}}}";
+    }
   }
 
   public float x;
@@ -148,7 +151,7 @@ public struct FloatRect{
   public bool CollideCircleSweep(float r, Vector2 p, Vector2 sweep){
     return ICollideCircleSweep(r,p,sweep,1).collidesOne;
   }
-  
+
   //this function is NOT TIGHT for grids; The returned collision will always be a superset of actual collision
   public FRCollision ISweep(Collider c, Vector2 s){
     if(c is Hitbox h || c is Grid g){
@@ -214,6 +217,6 @@ public struct FloatRect{
     return new FloatRect(x, y-amount, w, h+2*amount);
   }
   public FloatRect _expand(float xe, float ye){
-    return new FloatRect(x-xe,y-ye,x+xe*2,y+ye*2);
+    return new FloatRect(x-xe,y-ye,w+xe*2,h+ye*2);
   }
 }

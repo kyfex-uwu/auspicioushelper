@@ -9,17 +9,16 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-internal class BasicPlatform:Entity, ITemplateChild{
+internal class BasicPlatform:ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.All;
   public Platform p;
   public Vector2 toffset;
-  public BasicPlatform(Platform p, Template t, Vector2 offset):base(t.virtLoc){
+  public BasicPlatform(Platform p, Template t, Vector2 offset){
     p.Depth += t.depthoffset;
     this.p=p;
     parent = t;
     toffset = offset;
-    Visible = false;
     if(p.OnDashCollide == null)
       p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
     lpos = p.Position;
@@ -35,7 +34,6 @@ internal class BasicPlatform:Entity, ITemplateChild{
     lpos = p.Position;
   }
   public void addTo(Scene scene){
-    scene.Add(this);
     scene.Add(p);
   }
   public bool hasRiders<T>() where T:Actor{
@@ -57,12 +55,16 @@ internal class BasicPlatform:Entity, ITemplateChild{
   public void AddAllChildren(List<Entity> l){
     l.Add(p);
   }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     if(p == null||p.Scene==null)return;
     if(vis!=0)p.Visible = vis>0;
     if(col!=0)p.Collidable = col>0;
+    if(act!=0)p.Active = col>0;
     if(col>0) p.EnableStaticMovers();
     else if(col<0) p.DisableStaticMovers();
+  }
+  public void destroy(bool particles){
+    p.RemoveSelf();
   }
 }
 

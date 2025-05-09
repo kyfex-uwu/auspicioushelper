@@ -20,6 +20,7 @@ public class auspicioushelperModuleSession : EverestModuleSession {
   public List<EntityDataId> PersistentFollowers = new List<EntityDataId>();
   public HashSet<string> collectedTrackedCassettes = new HashSet<string>();
   public HashSet<int> openedGates = new HashSet<int>();
+  public HashSet<string> brokenTempaltes = new();
 
   public void save(){
     channelData = ChannelState.save();

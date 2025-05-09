@@ -43,7 +43,7 @@ public interface IBoundsHaver{
   }
 }
 
-internal class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
+internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.None;
   public Template parent {get;set;}
   public Vector2 toffset;
@@ -60,16 +60,14 @@ internal class BgTiles:BackgroundTiles, ITemplateChild, IBoundsHaver{
     base.Added(scene);
     bounds = new FloatRect(SceneAs<Level>().Bounds);
   }
-  public void AddAllChildren(List<Entity> l){
-    l.Add(this);
-  }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     if(vis!=0)Visible = vis>0;
     if(col!=0)Collidable = col>0;
+    if(act!=0)Active = act>0;
   }
 }
 
-internal class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
+internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.All;
   public Template parent {get;set;}
   public Vector2 toffset;
@@ -171,12 +169,10 @@ internal class FgTiles:SolidTiles, ITemplateChild, IBoundsHaver{
       }
     }
   }
-  public void AddAllChildren(List<Entity> l){
-    l.Add(this);
-  }
-  public void parentChangeStat(int vis, int col){
+  public void parentChangeStat(int vis, int col, int act){
     if(vis!=0)Visible = vis>0;
     if(col!=0)Collidable = col>0;
+    if(act!=0)Active = act>0;
     if(col>0) EnableStaticMovers();
     else if(col<0) DisableStaticMovers();
   }

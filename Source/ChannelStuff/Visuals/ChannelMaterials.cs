@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
+namespace Celeste.Mod.auspicioushelper;
 //I have become the c# abstraction-enraptured person lmao like actually what is this haha
 //OK to be sort of fair I intended to do a custom rasterMats for this but decided not.
 public class ChannelMaterialsA:BasicMaterialLayer{
