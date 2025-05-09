@@ -61,18 +61,22 @@ public class TemplateFakewall:TemplateDisappearer{
       Player p = Scene.Tracker.GetEntity<Player>();
       if(p!=null && !p.Dead && hasInside(p)){
         setVisColAct(false,false,false);
+        auspicioushelperModule.Session.brokenTempaltes.Add(fullpath);
       }
       destroy(false);
     }
   }
+  bool disappearing = false;
   public override void Update(){
     base.Update();
+    if(disappearing) return;
     Player p = Scene.Tracker.GetEntity<Player>();
     if(p!=null && !p.Dead && hasInside(p)){
       Add(new Coroutine(disappearSequence()));
     }
   }
   IEnumerator disappearSequence(){
+    disappearing = true;
     Audio.Play("event:/game/general/secret_revealed", Position);
     auspicioushelperModule.Session.brokenTempaltes.Add(fullpath);
     List<Entity> c = new();

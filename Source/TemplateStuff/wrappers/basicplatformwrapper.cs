@@ -9,12 +9,12 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
-internal class BasicPlatform:ITemplateChild{
+internal class BasicPlatform:Entity,ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.All;
   public Platform p;
   public Vector2 toffset;
-  public BasicPlatform(Platform p, Template t, Vector2 offset){
+  public BasicPlatform(Platform p, Template t, Vector2 offset):base(t.virtLoc){
     p.Depth += t.depthoffset;
     this.p=p;
     parent = t;
@@ -35,6 +35,7 @@ internal class BasicPlatform:ITemplateChild{
   }
   public void addTo(Scene scene){
     scene.Add(p);
+    scene.Add(this);
   }
   public bool hasRiders<T>() where T:Actor{
     if(p == null || p.Scene==null) return false;
@@ -65,6 +66,7 @@ internal class BasicPlatform:ITemplateChild{
   }
   public void destroy(bool particles){
     p.RemoveSelf();
+    RemoveSelf();
   }
 }
 

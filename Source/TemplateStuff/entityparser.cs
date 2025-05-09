@@ -295,5 +295,4 @@ public static class EntityParser{
     }
     return false;
   }
-  static Level l___;
 }

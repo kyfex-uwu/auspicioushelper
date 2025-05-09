@@ -157,7 +157,7 @@ public class Template:Entity, ITemplateChild{
     return false;
   }
   public override void Removed(Scene scene){
-    foreach(ITemplateChild c in children) (c as Entity).RemoveSelf();
+    destroy(false);
   }
   public void AddAllChildren(List<Entity> l){
     foreach(ITemplateChild c in children){
