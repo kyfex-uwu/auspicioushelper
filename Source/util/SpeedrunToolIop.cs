@@ -3,7 +3,7 @@ using Celeste.Mod;
 using System.Linq;
 using System;
 using System.Reflection;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using System.Collections.Generic;
 using Monocle;
 using MonoMod.ModInterop;

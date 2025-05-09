@@ -1,6 +1,6 @@
 
 using System;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;

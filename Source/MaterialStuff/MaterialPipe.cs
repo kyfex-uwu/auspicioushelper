@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Celeste.Editor;
 using Celeste.Mod.Helpers;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;

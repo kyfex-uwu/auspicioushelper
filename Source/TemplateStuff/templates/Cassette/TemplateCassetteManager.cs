@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Celeste.Editor;
 using Celeste.Mod.Entities;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 

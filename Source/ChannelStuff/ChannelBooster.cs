@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Celeste;
 using Celeste.Mod.Entities;
 using System.Collections.Generic;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Monocle;
 using System.Collections;
 using Microsoft.Xna.Framework.Graphics;

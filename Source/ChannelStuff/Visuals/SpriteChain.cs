@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using Celeste;
 using Celeste.Mod.auspicioushelper;
 using Celeste.Mod.Entities;
-using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 [Tracked]
 [CustomEntity("auspicioushelper/SpriteAnimChain")]
 public class SpriteAnimChain:Entity, IMaterialObject{

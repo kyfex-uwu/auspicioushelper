@@ -4,11 +4,11 @@
 using System;
 using Celeste;
 using Celeste.Mod.Entities;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/ChannelPlayerWatcher")]
 public class ChannelPlayerWatcher:Entity{

@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using Monocle;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 
 internal class UserLayer:BasicMaterialLayer, IMaterialLayer, IFadingLayer, ISettableDepth{
   void setparamvalex(string key, bool t) {

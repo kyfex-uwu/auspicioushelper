@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.auspicioushelper;

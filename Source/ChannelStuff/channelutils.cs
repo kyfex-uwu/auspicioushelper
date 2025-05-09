@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using Celeste.Mod.auspicioushelper;
 using Monocle;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 public static class ChannelState{
   enum Ops{
     none, not, lnot, xor, and, or, add, sub, mult, div, mrecip, mod, safemod, 

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Celeste.Mods.auspicioushelper;
+using Celeste.Mod.auspicioushelper;
 using Celeste.Editor;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;

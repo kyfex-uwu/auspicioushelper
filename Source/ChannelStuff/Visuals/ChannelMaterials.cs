@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Celeste.Mod.auspicioushelper;
-using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;

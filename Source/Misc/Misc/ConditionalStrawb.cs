@@ -8,11 +8,10 @@ using Celeste;
 using Celeste.Mod;
 using Celeste.Mod.auspicioushelper;
 using Celeste.Mod.Entities;
-using Celeste.Mods.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/ConditionalStrawbTracked")]
 [RegisterStrawberry(true, true)]

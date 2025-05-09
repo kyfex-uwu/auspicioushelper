@@ -8,7 +8,7 @@ using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Celeste.Mod;
 
-namespace Celeste.Mods.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper;
 
 
 public interface IMaterialLayer{
