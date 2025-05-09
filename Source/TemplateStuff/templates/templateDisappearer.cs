@@ -22,7 +22,7 @@ public class TemplateDisappearer:Template{
   public override void Added(Scene scene){
     base.Added(scene);
     unenforced.Add(this);
-
+    hooks.enable();
   }
   int permute(bool action, ref bool activator, bool other){
     if(action == activator){
