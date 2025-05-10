@@ -26,8 +26,10 @@ public class Anti0fZone:Entity{
   bool cthrowables = false;
   bool csolids = false;
   bool cposexit = false;
+  bool alwayswjc = false;
   bool wholeroom = false;
   public Anti0fZone(EntityData d, Vector2 offset):base(d.Position+offset){
+    bool ci = d.Bool("completely_inside",false);
     bounds = new FloatRect(Position.X,Position.Y,d.Width,d.Height);
     maxstep = d.Int("step",1);
     hooks.enable();
@@ -35,7 +37,9 @@ public class Anti0fZone:Entity{
     cplayercolliders = d.Bool("player_colliders",true);
     ctriggers = d.Bool("triggers", false);
     csolids = d.Bool("solids", false);
+    alwayswjc = d.Bool("always_walljumpcheck", false);
     wholeroom = d.Bool("cover_whole_room",false);
+    Collider = ci?new Hitbox(d.Width-12,d.Height-12,6,6):new Hitbox(d.Width,d.Height);
   }
   public struct ACol<T>{
     public FloatRect.FRCollision f;
@@ -56,90 +60,17 @@ public class Anti0fZone:Entity{
     return null;
   }
 
-  // public static bool PlayerUpdateDetour(Player p){
-  //   //DebugConsole.Write("In update hook");
-  //   int state = p.StateMachine.state;
-  //   if(state == 9 || state == 22) return false;
-  //   Vector2 ospeed = p.Speed;
-  //   Vector2 step = ospeed*Engine.DeltaTime;
-  //   FloatRect r = new FloatRect(p);
-  //   Anti0fZone hits = null;
-  //   foreach(Anti0fZone a in p.Scene.Tracker.GetEntities<Anti0fZone>()){
-  //     if(a.bounds.CollideRectSweep(r,step)){
-  //       hits=a;
-  //       break;
-  //     }
-  //   }
-  //   if(hits==null){
-  //     return false;
-  //   }
-  //   if(hits.maxstep>0 || PortalGateH.intersections.ContainsKey(p)){
-  //     //We use L1 distance
-  //     float length = Math.Max(Math.Abs(step.X),Math.Abs(step.Y));
-  //     int steps = (int)Math.Ceiling(length/MathF.Max(hits.maxstep,1));
-  //     DebugConsole.Write("Inside 0f "+length.ToString()+" "+steps.ToString());
-  //     Vector2 substep = step/(float)steps;
-  //     for(int i=0; i<steps; i++){
-  //       if(p.StateMachine.state != state || p.Speed.Y!=ospeed.Y || p.Speed.X!=ospeed.X || p.Dead) return true;
-  //       if(i!=0){
-  //         if(hits.cthrowables&&(state == 0 || state == 2 || state == 7)){
-  //           foreach(Holdable c in p.Scene.Tracker.GetComponents<Holdable>()){
-  //             if(c.Check(p) && c.Pickup(p)){
-  //               p.StateMachine.state = 8;
-  //               return true;
-  //             }
-  //           }
-  //         }
-
-  //         if(state != 18 && hits.ctriggers){
-  //           foreach(Trigger t in p.Scene.Tracker.GetEntities<Trigger>()){
-  //             if(p.CollideCheck(t)){
-  //               if(!t.Triggered){
-  //                 t.Triggered = true;
-  //                 p.triggersInside.Add(t);
-  //                 t.OnEnter(p);
-  //               }
-  //             } else if(t.Triggered) {
-  //               p.triggersInside.Remove(t);
-  //               t.Triggered=false;
-  //               t.OnLeave(p);
-  //             }
-  //           }
-  //         }
-          
-  //         Collider g = p.Collider;
-  //         p.Collider=p.hurtbox;
-  //         if(!p.Dead && state!=21 && hits.cplayercolliders){
-  //           foreach(PlayerCollider c in p.Scene.Tracker.GetComponents<PlayerCollider>()){
-  //             if(c.Check(p) && p.Dead){
-  //               p.Collider=g;
-  //               return true;
-  //             }
-  //           }
-  //         }
-  //         p.Collider=g;
-          
-  //       }
-  //       p.MoveH(substep.X,p.onCollideH,null);
-  //       p.MoveV(substep.Y,p.onCollideV,null);
-  //     }
-  //   } else {
-  //     foreach(Holdable h in p.Scene.Tracker.GetComponents<Holdable>()){
-        
-  //     }
-  //   }
-  //   return true;
-    
-  // }
   abstract class LinearRaster<T>{
     public LinkedList<ACol<T>> active = new();
-    List<ACol<T>> mayHit = new();
-    int addIdx = 0;
-    public void Fill(List<ACol<T>> l, float maxt){
-      for(int idx=0; idx<l.Count; idx++){
-        var col = l[idx];
+    public List<ACol<T>> mayHit = new();
+    public int addIdx = 0;
+    public void Fill(IEnumerable<ACol<T>> l, float maxt){
+      var idx = 0;
+      var enu = l.GetEnumerator();
+      while(enu.MoveNext()){
+        var col = enu.Current;
         if(col.f.collides && col.f.enter<maxt){
-          col.order=idx;
+          col.order=idx++;
           mayHit.Add(col);
         }
       }
@@ -154,8 +85,6 @@ public class Anti0fZone:Entity{
       mayHit.Clear();
       addIdx=0;
     }
-    public abstract void Fill(Player p, Vector2 step, float maxt);
-    public abstract bool prog(Player p, float step);
     public bool prog(float step){
       var cn = active.First;
       if((cn==null) && (addIdx>=mayHit.Count || mayHit[addIdx].f.enter>step)) return false;
@@ -173,13 +102,13 @@ public class Anti0fZone:Entity{
 
   }
   class HoldableRaster:LinearRaster<Holdable>{
-    public override void Fill(Player p, Vector2 step, float maxt){
+    public void Fill(Player p, Vector2 step, float maxt){
       FloatRect f = new FloatRect(p);
       Fill(p.Scene.Tracker.GetComponents<Holdable>().Select(
         h=>new ACol<Holdable>(f.ISweep(h.Entity.Collider,-step),(Holdable)h)
-      ).ToList(),maxt);
+      ),maxt);
     }
-    public override bool prog(Player p, float step){
+    public bool prog(Player p, float step){
       if(!Input.GrabCheck || p.IsTired || p.Holding!=null) return false;
       switch(p.StateMachine.state){
         case 0: case 7:
@@ -191,7 +120,7 @@ public class Anti0fZone:Entity{
       prog(step);
       foreach(var h in active){
         if(h.o.Check(p) && h.o.Pickup(p)){
-          p.StateMachine.state = 8; 
+          p.StateMachine.State = 8; 
           return true;
         }
       }
@@ -199,13 +128,13 @@ public class Anti0fZone:Entity{
     }
   }
   class ColliderRaster:LinearRaster<PlayerCollider>{
-    public override void Fill(Player p, Vector2 step, float maxt){
+    public void Fill(Player p, Vector2 step, float maxt){
       FloatRect f = new FloatRect(p)._expand(1,1);
       Fill(p.Scene.Tracker.GetComponents<PlayerCollider>().Where(h=>h.Entity.Collidable).Select(
         h=>new ACol<PlayerCollider>(f.ISweep(h.Entity.Collider,-step),(PlayerCollider)h)
-      ).ToList(),maxt);
+      ),maxt);
     }
-    public override bool prog(Player p, float step){
+    public bool prog(Player p, float step){
       if(p.StateMachine.state == 21) return false;
       prog(step);
       Collider old = p.Collider;
@@ -226,13 +155,13 @@ public class Anti0fZone:Entity{
     }
   }
   class TriggerRaster:LinearRaster<Trigger>{
-    public override void Fill(Player p, Vector2 step, float maxt){
+    public void Fill(Player p, Vector2 step, float maxt){
       FloatRect f = new FloatRect(p)._expand(4,4);
       Fill(p.Scene.Tracker.GetEntities<Trigger>().Select(
         h=>new ACol<Trigger>(f.ISweep(h.Collider,-step),(Trigger)h)
-      ).ToList(),maxt);
+      ),maxt);
     }
-    public override bool prog(Player p, float step){
+    public bool prog(Player p, float step){
       if (p.StateMachine.State == 18) return false;
       prog(step);
       var cn = active.First;
@@ -253,24 +182,29 @@ public class Anti0fZone:Entity{
     }
   }
   class SolidRaster:LinearRaster<Solid>{
-    public override void Fill(Player p, Vector2 step, float maxt){
+    public void Fill(Player p, Vector2 step, float maxt){
       FloatRect f = new FloatRect(p)._expand(8,8);
       Fill(p.Scene.Tracker.GetEntities<Solid>().Select(
         h=>new ACol<Solid>(f.ISweep(h.Collider,-step),(Solid)h)
-      ).ToList(),maxt);
-      
+      ),maxt);
     }
-    public override bool prog(Player p, float step){
+    public bool prog(Player p, float step, bool doPlayerstuff=true, bool alwayswjc = false){
       
       if(prog(step)) p.Scene.Tracker.Entities[typeof(Solid)] = active.Select(s=>s.o).ToList<Entity>();
       //DebugConsole.Write($"solid reinterpolation {p.StateMachine.state}");
+      bool wjcp,wjcn;
+      if(!doPlayerstuff) return false;
       switch(p.StateMachine.state){
         case Player.StNormal:
-          //DebugConsole.Write("normal reinterpolation");
-          if (!Input.Jump.Pressed || !(TalkComponent.PlayerOver != null && Input.Talk.Pressed)) return false;
+          
+          if (!Input.Jump.Pressed || (TalkComponent.PlayerOver != null && Input.Talk.Pressed)) return false;
           //if(p.jumpGraceTimer>0f) p.Jump(); //always happens before we reach here
-          else if(p.CanUnDuck){
-            if(p.WallJumpCheck(1)){
+          //DebugConsole.Write($"normal reinterpolation {p.Position} {Input.Jump.Pressed } {p.CanUnDuck}");
+          if(p.CanUnDuck){
+            wjcp = (alwayswjc||p.CollideCheck<Solid>(p.Position+Vector2.UnitX*5)) && p.WallJumpCheck(1);
+            wjcn = (alwayswjc||p.CollideCheck<Solid>(p.Position-Vector2.UnitX*5)) && p.WallJumpCheck(-1);
+            //DebugConsole.Write($"from anti0f: {alwayswjc} {wjcp} {wjcn}");
+            if(wjcp){
               //DebugConsole.Write("anti0fwj happened");
               if (p.Facing==Facings.Right && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && p.Stamina>0f && 
                 p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position + Vector2.UnitX * 3f)
@@ -278,7 +212,7 @@ public class Anti0fZone:Entity{
               else if (p.DashAttacking && p.SuperWallJumpAngleCheck) p.SuperWallJump(-1);
               else p.WallJump(-1);
               return true;
-            } else if(p.WallJumpCheck(-1)){
+            } else if(wjcn){
               //DebugConsole.Write("anti0fwj happened");
               if(p.Facing==Facings.Left && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && p.Stamina>0f && 
                 p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position + Vector2.UnitX * -3f)
@@ -292,34 +226,133 @@ public class Anti0fZone:Entity{
         case Player.StDash: case Player.StRedDash:
           //DebugConsole.Write($"dash reinterpolation {p.Speed}");
           if(!Input.Jump.Pressed || !p.CanUnDuck) return false;
-          bool wjcp = p.WallJumpCheck(1);
-          bool wjcn = p.WallJumpCheck(-1);
-          //DebugConsole.Write($"from anti0f: {wjcp} {wjcn}");
+          wjcp = (alwayswjc||p.CollideCheck<Solid>(p.Position+Vector2.UnitX*5)) && p.WallJumpCheck(1);
+          wjcn = (alwayswjc||p.CollideCheck<Solid>(p.Position-Vector2.UnitX*5)) && p.WallJumpCheck(-1);
+          //DebugConsole.Write($"from anti0f: {alwayswjc} {wjcp} {wjcn}");
           if(!(wjcp || wjcn)) return false;
           if(p.SuperWallJumpAngleCheck) p.SuperWallJump(wjcp?-1:1);
           else if(wjcp){
             if(p.Facing==Facings.Right && Input.GrabCheck && p.Stamina>0f && p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position+Vector2.UnitX*3f)){
               var old = p.Speed;
-              p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed}");
+              p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed} {p.LiftSpeed} {p.liftSpeedTimer}");
             } else p.WallJump(-1);
           } else {
             if(p.Facing==Facings.Left && Input.GrabCheck && p.Stamina>0f && p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position-Vector2.UnitX*3f)){
-              p.ClimbJump(); DebugConsole.Write($"0f'd cb {p.Speed}");
+              var old = p.Speed;
+              p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed} {p.LiftSpeed} {p.liftSpeedTimer}");
             } else p.WallJump(1);
           }
-          p.StateMachine.state = 0;
+          p.StateMachine.State = 0;
           return true;
       }
       return false;
     }
+  }
+  class ZoneRaster:LinearRaster<Anti0fZone>{
+    int zpc; public bool doplayercolliders=>zpc>0; public bool hpc;
+    int zt; public bool dotriggers=>zt>0; public bool ht;
+    int zh; public bool doholdables=>zh>0; public bool hh;
+    int zs; public bool dosolids=>zs>0; public bool hs;
+    int zwj; public bool dowalljumps=>zwj>0;
+    bool wholeroom;
+
+    void inire(Anti0fZone z, int adj){
+      zpc+=z.cplayercolliders?adj:0;
+      zt+=z.ctriggers?adj:0;
+      zh+=z.cthrowables?adj:0;
+      zs+=z.csolids?adj:0;
+      zwj+=z.alwayswjc?adj:0;
+    }
+    Anti0fZone iniw(Anti0fZone z){
+      if(z.wholeroom){
+        wholeroom = true;
+        hpc|=z.cplayercolliders;
+        ht|=z.ctriggers;
+        hh|=z.cthrowables;
+        hs|=z.csolids;
+        inire(z,1);
+      }
+      return z;
+    }
+    public bool Fill(Player p, Vector2 step, float maxt, bool first){
+      FloatRect f = new FloatRect(p)._expand(1,1);
+      wholeroom = false; zpc=0; zt=0; zh=0; zs=0; zwj=0;
+      hpc = false; ht = false; hh = false; hs = false;
+      Fill(p.Scene.Tracker.GetEntities<Anti0fZone>().Select(
+        h=>new ACol<Anti0fZone>(f.ISweep(h.Collider,-step),iniw((Anti0fZone)h))
+      ),maxt);
+      if(first && !useSteps) return false;
+      foreach(var z_ in mayHit){
+        var z = z_.o;
+        hpc|=z.cplayercolliders;
+        ht|=z.ctriggers;
+        hh|=z.cthrowables;
+        hs|=z.csolids;
+      }
+      if(hpc) crast.Fill(p,step,maxt);
+      if(ht) trast.Fill(p,step,maxt);
+      if(hh) hrast.Fill(p,step,maxt);
+      if(hs){
+        srast.Fill(p,step,maxt);
+        p.Scene.Tracker.Entities[typeof(Solid)] = srast.active.Select(s=>s.o).ToList<Entity>();
+      }
+      return true;
+    }
+    public bool prog(Player p, float step){
+      var cn = active.First;
+      while(cn!=null){
+        if(cn.Value.f.exit<step){
+          inire(cn.Value.o,-1);
+          active.Remove(cn);
+        }
+        cn=cn.Next;
+      }
+      while(addIdx<mayHit.Count && mayHit[addIdx].f.enter<=step){
+        if(mayHit[addIdx].f.exit>=step){
+          inire(mayHit[addIdx].o,1);
+          active.AddLast(mayHit[addIdx]);
+        }
+        addIdx++;
+      }
+
+      bool flag = false;
+      if(doholdables) flag |= hrast.prog(p,step);
+      if(doplayercolliders) flag |= crast.prog(p,step);
+      if(dotriggers) flag |= trast.prog(p,step);
+      if(hs) flag |= srast.prog(p,step,dosolids,dowalljumps);
+      return flag;
+    }
+    //This function is what someone deeply scared of floating point misrepresentation writes.
+    public float stepMagn(ref float current, float max){
+      float dif = max-current;
+      if(max-current<=1){
+        current = max;
+        return dif;
+      }
+      if(wholeroom || active.Count != 0){
+        current=current+1;
+        return 1;
+      }
+      if(addIdx>=mayHit.Count){
+        current = max;
+        return dif;
+      }
+      max = MathF.Max(1,MathF.Min(mayHit[addIdx].f.enter,max));
+      dif = max-current;
+      current = max;
+      return dif;
+    }
+    public bool useSteps=>wholeroom||mayHit.Count>0;
   }
   
   static HoldableRaster hrast = new();
   static ColliderRaster crast = new();
   static TriggerRaster trast = new();
   static SolidRaster srast = new();
+  static ZoneRaster rast = new();
+  static List<Entity> oldSolids;
   static void ClearRasters(){
-    hrast.Clear(); crast.Clear(); trast.Clear(); srast.Clear();
+    hrast.Clear(); crast.Clear(); trast.Clear(); srast.Clear(); rast.Clear();
   }
   static float MinStepSize = 1;
   static bool PlayerUpdateDetour2(Player p){
@@ -331,7 +364,7 @@ public class Anti0fZone:Entity{
 
     var dist = _ispeed*Engine.DeltaTime;
     if(Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y))<=MathF.Max(z.maxstep,MinStepSize)) return false;
-    DebugConsole.Write("Anti0f stuff begin");
+    //DebugConsole.Write("Anti0f stuff begin");
     bool exit()=>
       p.StateMachine.state!=_st || p.Dashes!=_idashes || 
       p.Speed!=_ispeed || p.Dead;
@@ -345,6 +378,7 @@ public class Anti0fZone:Entity{
       return flag | exit();
     }
     start:  
+      float frac = 0;
       float length = Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y));
       int steps = (int)Math.Ceiling(length/MathF.Max(z.maxstep,MinStepSize));
       Vector2 step = dist/(float)steps;
@@ -354,28 +388,107 @@ public class Anti0fZone:Entity{
       if(z.ctriggers) trast.Fill(p,step,steps);
       if(z.csolids) srast.Fill(p,step,steps);
 
-      List<Entity> oldSolids=null;
+      oldSolids=null;
       if(z.csolids) oldSolids = p.Scene.Tracker.Entities[typeof(Solid)];
 
       for(int i=0; i<steps; i++){
+        frac = ((float)i+1)/(float)steps;
         if(i!=0 && proc(i)){
           DebugConsole.Write("exiting due to proc");
           goto exit;
         }
-        var lpos = p.Position;
-        if(p.MoveH(step.X,p.onCollideH) || p.MoveV(step.Y,p.onCollideV)) goto exit;
-        if((lpos+step - p.Position).LengthSquared()>MinStepSize*MinStepSize){
+        var lpos = p.ExactPosition;
+        bool flag = false;
+        if(p.MoveH(step.X,p.onCollideH)){
+          _ispeed.X=p.Speed.X;
+          flag = true;
+        }
+        if(p.MoveV(step.Y,p.onCollideV)){
+          _ispeed.Y=p.Speed.Y;
+          flag = true;
+        }
+        if(flag) goto reconsile;
+        if((lpos+step - p.ExactPosition).LengthSquared()>0.25){
           if(z.cposexit) goto exit;
           DebugConsole.Write("Position sharply changed while in anti0f! Attempting to reconsile");
-          dist = dist-step*i;
-          if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
-          goto start;
+          goto reconsile;
         }
       }
 
     exit:
       if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
       return true;
+    reconsile:
+      DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
+      if(exit() || frac>=1) goto exit;
+      dist = _ispeed*Engine.DeltaTime*(1-frac);
+      if(_ispeed.X == 0) dist.X=0;
+      if(_ispeed.Y == 0) dist.Y=0;
+      if(dist == Vector2.Zero) goto exit;
+      if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
+      goto start;
+  }
+  static bool PlayerUpdateDetour3(Player p){
+    bool first = true;
+    int _st = p.StateMachine.state;
+    Vector2 _ispeed = p.Speed;
+    int _idashes = p.Dashes;
+    if(_st==9 || _st == 22) return false;
+
+    var dist = _ispeed*Engine.DeltaTime;
+    if(Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y))<=1) return false;
+    bool exit()=>
+      p.StateMachine.state!=_st || p.Dashes!=_idashes || 
+      p.Speed!=_ispeed || p.Dead;
+    float frac;
+
+    oldSolids = p.Scene.Tracker.Entities[typeof(Solid)];
+    start:
+      ClearRasters();
+      float length = Math.Max(Math.Abs(dist.X), Math.Abs(dist.Y)); //L1 distance obviously
+      Vector2 step = dist/length;
+      if(!rast.Fill(p,step,length,first)) return false;
+      //DebugConsole.Write($"Anti0f stuff start {_st}");
+      first = false;
+      float current = 0;
+      //DebugConsole.Write($"currrent:{current} max:{length}");
+      while(current<length){
+        float magn = rast.stepMagn(ref current, length);
+        //DebugConsole.Write($"magnitude:{magn} currrent:{current} max:{length}");
+        frac = current/length;
+        bool rp = rast.prog(p,current);
+        if(rp||exit()){
+          DebugConsole.Write($"Explicit exit: {rp} {p.StateMachine.state} {_st}");
+          goto exit;
+        }
+
+        var lpos = p.ExactPosition;
+        bool flag = false;
+        if(p.MoveH(step.X*magn,p.onCollideH)){
+          _ispeed.X=p.Speed.X;
+          flag = true;
+        }
+        if(p.MoveV(step.Y*magn,p.onCollideV)){
+          _ispeed.Y=p.Speed.Y;
+          flag = true;
+        }
+        if(flag) goto reconsile;
+        if((lpos+step*magn - p.ExactPosition).LengthSquared()>0.25){
+          DebugConsole.Write("Position sharply changed while in anti0f! Attempting to reconsile");
+          goto reconsile;
+        }
+      }
+
+    exit:
+      p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
+      return true;
+    reconsile:
+      DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
+      if(exit() || frac>=1) goto exit;
+      dist = _ispeed*Engine.DeltaTime*(1-frac);
+      if(dist == Vector2.Zero) goto exit;
+      p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
+      goto start;
   }
 
   static ILHook updateHook;
@@ -389,7 +502,7 @@ public class Anti0fZone:Entity{
       goto bad;
     }
     Instruction jumpTarget = d.Next;
-    c.EmitDelegate(PlayerUpdateDetour2);
+    c.EmitDelegate(PlayerUpdateDetour3);
     c.Emit(OpCodes.Brtrue,jumpTarget);
     c.Emit(OpCodes.Ldarg_0);
     // for(int i=-10; i<30; i++){
