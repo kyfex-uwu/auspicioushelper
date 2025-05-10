@@ -16,6 +16,7 @@ namespace Celeste.Mod.auspicioushelper;
 class FadeMaterialLayer:BasicMaterialLayer{
   public float _alpha = 1;
   public override float alpha => _alpha;
+  public override bool matsToDraw=>todraw.Count>0;
   List<Entity> todraw;
   public FadeMaterialLayer(List<Entity> things, int depth):base(depth,null,true,true,false){
     todraw = things;
@@ -27,7 +28,7 @@ class FadeMaterialLayer:BasicMaterialLayer{
     Draw.SpriteBatch = origsb;
   }
   public override bool checkdo(){
-    return todraw.Count>1;
+    return todraw.Count>0;
   }
 }
 
@@ -48,7 +49,7 @@ public class TemplateFakewall:TemplateDisappearer{
     fadespeed = d.Float("fade_speed",1);
   }
   public override void addTo(Scene scene){
-    if(auspicioushelperModule.Session.brokenTempaltes.Contains(fullpath)){
+    if(auspicioushelperModule.Session.brokenTempaltes.Contains(fullpath) && false){
       RemoveSelf();
     } else {
       base.addTo(scene);
@@ -85,7 +86,7 @@ public class TemplateFakewall:TemplateDisappearer{
     FadeMaterialLayer f = new FadeMaterialLayer(c,ddepth);
     MaterialPipe.addLayer(f);
     yield return null;
-    while((f._alpha = f._alpha-Engine.DeltaTime*fadespeed)>0){
+    while((f._alpha = f._alpha-Engine.DeltaTime*fadespeed*1)>0){
       yield return null;
     }
     MaterialPipe.removeLayer(f);

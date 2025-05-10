@@ -46,7 +46,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     pastLiftspeed[0]=Vector2.Zero;
   }
   List<Entity> todraw;
-  StaticMover sm;
+  internal StaticMover sm;
   HashSet<Platform> doNot = new();
   public override void addTo(Scene scene){
     base.addTo(scene);

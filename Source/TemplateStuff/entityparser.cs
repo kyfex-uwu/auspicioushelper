@@ -92,8 +92,9 @@ public static class EntityParser{
       case Types.platformbasic: case Types.platformdisobedient:
         if(e is Platform p){
           if(d.t == Types.platformdisobedient)
-            return new Wrappers.BasicPlatformDisobedient(p,t,simoffset+d.d.Position-t.virtLoc);
-          return new Wrappers.BasicPlatform(p,t,simoffset+d.d.Position-t.virtLoc);
+            t.addEnt(new Wrappers.BasicPlatformDisobedient(p,t,simoffset+d.d.Position-t.virtLoc));
+          t.addEnt(new Wrappers.BasicPlatform(p,t,simoffset+d.d.Position-t.virtLoc));
+          return null;
         }else{
           DebugConsole.Write("Wrongly classified!!! "+d.d.Name);
           return null;

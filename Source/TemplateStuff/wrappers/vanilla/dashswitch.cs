@@ -2,6 +2,7 @@
 
 
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Core.Platforms;
@@ -65,7 +66,7 @@ public class DashSwitchW:DashSwitch, ISimpleEnt{
   }
   public void parentChangeStat(int vis, int col,int act){
     if(vis!=0)Visible = vis>0;
-    if(col!=0)Collidable = col>0;
+    if(col!=0)Collidable = col>0&&!pressed;
     if(act!=0)Active = act>0;
     if(col>0) EnableStaticMovers();
     else if(col<0) DisableStaticMovers();
