@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Monocle;
 
@@ -89,5 +90,8 @@ public class FoundEntity:Component{
       return 0;
     }
     return reflectGet(f.Entity, path, args);
+  }
+  public static FoundEntity find(string ident){
+    return found.TryGetValue(ident, out var f)?f:null;
   }
 }

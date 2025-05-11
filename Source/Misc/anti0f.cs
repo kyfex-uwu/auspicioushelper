@@ -41,14 +41,6 @@ public class Anti0fZone:Entity{
     wholeroom = d.Bool("cover_whole_room",false);
     Collider = ci?new Hitbox(d.Width-12,d.Height-12,6,6):new Hitbox(d.Width,d.Height);
   }
-  public struct ACol<T>{
-    public FloatRect.FRCollision f;
-    public T o;
-    public int order;
-    public ACol(FloatRect.FRCollision info, T col){
-      f=info; o=col;
-    }
-  }
 
   public static Anti0fZone getHit(Player p){
     FloatRect r = new FloatRect(p);
@@ -60,47 +52,6 @@ public class Anti0fZone:Entity{
     return null;
   }
 
-  abstract class LinearRaster<T>{
-    public LinkedList<ACol<T>> active = new();
-    public List<ACol<T>> mayHit = new();
-    public int addIdx = 0;
-    public void Fill(IEnumerable<ACol<T>> l, float maxt){
-      var idx = 0;
-      var enu = l.GetEnumerator();
-      while(enu.MoveNext()){
-        var col = enu.Current;
-        if(col.f.collides && col.f.enter<maxt){
-          col.order=idx++;
-          mayHit.Add(col);
-        }
-      }
-      mayHit.Sort((a,b)=>{
-        var c1 = MathF.Max(a.f.enter,0)- MathF.Max(b.f.enter,0);
-        if(c1 != 0) return MathF.Sign(c1);
-        return a.order-b.order;
-      });
-    }
-    public void Clear(){
-      active.Clear();
-      mayHit.Clear();
-      addIdx=0;
-    }
-    public bool prog(float step){
-      var cn = active.First;
-      if((cn==null) && (addIdx>=mayHit.Count || mayHit[addIdx].f.enter>step)) return false;
-      while(cn!=null){
-        if(cn.Value.f.exit<step) active.Remove(cn);
-        cn=cn.Next;
-      }
-      while(addIdx<mayHit.Count && mayHit[addIdx].f.enter<=step){
-        if(mayHit[addIdx].f.exit>=step) active.AddLast(mayHit[addIdx]);
-        addIdx++;
-      }
-      //DebugConsole.Write($"{this.GetType().ToString()} {active.Count} {step}");
-      return true;
-    }
-
-  }
   class HoldableRaster:LinearRaster<Holdable>{
     public void Fill(Player p, Vector2 step, float maxt){
       FloatRect f = new FloatRect(p);

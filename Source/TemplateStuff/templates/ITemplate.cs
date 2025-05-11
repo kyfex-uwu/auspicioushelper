@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Mono.Cecil.Cil;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -164,6 +165,13 @@ public class Template:Entity, ITemplateChild{
       c.AddAllChildren(l);
     }
     if(!(this is TemplateDisappearer)) l.Add(this);
+  }
+  public List<T> GetChildren<T>() where T:Entity{
+    List<Entity> list = new();
+    AddAllChildren(list);
+    List<T> nlist = new();
+    foreach(var li in list) if(li is T le) nlist.Add(le);
+    return nlist;
   }
   public virtual void parentChangeStat(int vis, int col, int act){
     foreach(ITemplateChild c in children){

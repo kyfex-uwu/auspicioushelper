@@ -48,10 +48,10 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   List<Entity> todraw;
   internal StaticMover sm;
   HashSet<Platform> doNot = new();
+  CassetteMaterialLayer layer = null;
   public override void addTo(Scene scene){
     base.addTo(scene);
     setVisCol(false,false);
-    CassetteMaterialLayer layer = null;
     if(channel != "")CassetteMaterialLayer.layers.TryGetValue(channel,out layer);
     List<Entity> allChildren = new();
     AddAllChildren(allChildren);
@@ -67,7 +67,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
       OnDisable=()=>{
         setVisCol(false,false);
         cachedCol =false;
-        if(layer !=null) layer.removeTrying(this);
+        if(layer !=null) layer.addTrying(this);
       },
       OnAttach=(Platform p)=>{
         setVisCol(true,true);
@@ -109,7 +109,9 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   public void renderMaterial(IMaterialLayer l, SpriteBatch s, Camera c){
     SpriteBatch origsb = Draw.SpriteBatch;
     Draw.SpriteBatch = s;
-    foreach(Entity e in todraw) if(e.Scene != null && e.Depth<=l.depth)e.Render();
+    foreach(Entity e in todraw){
+      if(e.Scene != null && e.Depth<=l.depth)e.Render();
+    } 
     Draw.SpriteBatch = origsb;
   }
   bool cachedCol;
@@ -147,6 +149,11 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
       } 
     }
     return res;
+  }
+  public override void destroy(bool particles)
+  {
+    base.destroy(particles);
+    if(layer!=null) layer.removeTrying(this);
   }
   static HookManager hooks = new HookManager(()=>{
     On.Celeste.Platform.MoveHExactCollideSolids += MoveHPlatHook;

@@ -154,6 +154,7 @@ public struct FloatRect{
 
   //this function is NOT TIGHT for grids; The returned collision will always be a superset of actual collision
   public FRCollision ISweep(Collider c, Vector2 s){
+    if(c is null) return new FRCollision();
     if(c is Hitbox h || c is Grid g){
       return ICollideRectSweep(new FloatRect(c.AbsoluteLeft,c.AbsoluteTop,c.Width,c.Height),s);
     }
@@ -167,7 +168,8 @@ public struct FloatRect{
       }
       return f;
     }
-    throw new NotImplementedException();
+    DebugConsole.Write($"Unimplemented collider type {c} on {c?.Entity}");
+    return new FRCollision();
   }
   public bool CollideCollider(Collider c){
     if(c is Hitbox h){
