@@ -34,11 +34,13 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 public class BasicMultient:ITemplateChild{
   public Template parent{get;set;}
   public Template.Propagation prop {get;} = Template.Propagation.Shake;
-  public struct EntEnt{ //entity entry, say it faster
+  public class EntEnt{ //entity entry, say it faster
     public Vector2 offset;
+    public Vector2 lpos;
     public Entity e;
     public EntEnt(Entity e, Vector2 o){
       offset=o; this.e=e;
+      lpos = e.Position;
     }
   }
   List<EntEnt> ents = new List<EntEnt>();
@@ -54,8 +56,17 @@ public class BasicMultient:ITemplateChild{
     if(e.Scene == null && this.Scene != null) Scene.Add(e);
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
-    foreach(var en in ents){
-      en.e.Position=(en.e is Decal)?(loc+en.offset).Round():loc+en.offset;
+    for(var i=0; i<ents.Count; i++){
+      var en = ents[i];
+      if(en.e is Decal){
+        en.e.Position=(loc+en.offset).Round();
+      }else {
+        if(en.e.Position != en.lpos){
+          en.offset += en.e.Position-en.lpos;
+        }
+        en.e.Position = loc+en.offset;
+        en.lpos = en.e.Position;
+      }
     }
   }
   public void sceneadd(Scene scene){
