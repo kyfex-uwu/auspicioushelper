@@ -32,7 +32,10 @@ entity.placements = {
       friction =350,
       die_to_barrier = false,
       respawning = false,
-      respawnDelay = 2
+      respawnDelay = 2,
+      die_to_barrier = false,
+      respawning = false,
+      respawnDelay = 1.5
     }
   }
 }

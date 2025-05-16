@@ -60,6 +60,7 @@ public class Anti0fZone:Entity{
       ),maxt);
     }
     public bool prog(Player p, float step){
+      DebugConsole.Write("here");
       if(!Input.GrabCheck || p.IsTired || p.Holding!=null) return false;
       switch(p.StateMachine.state){
         case 0: case 7:
@@ -148,15 +149,18 @@ public class Anti0fZone:Entity{
       switch(p.StateMachine.state){
         case Player.StNormal:
           
-          if (!Input.Jump.Pressed || (TalkComponent.PlayerOver != null && Input.Talk.Pressed)) return false;
-          //if(p.jumpGraceTimer>0f) p.Jump(); //always happens before we reach here
+          if (!Input.Jump.Pressed || (TalkComponent.PlayerOver != null && Input.Talk.Pressed) || Input.Jump.bufferCounter==0) return false;
+          // if((p.jumpGraceTimer>0f || p.onGround) && p.Speed.Y>=0){
+          //   p.Jump(); //always happens before we reach here
+          //   return true;
+          // }
           //DebugConsole.Write($"normal reinterpolation {p.Position} {Input.Jump.Pressed } {p.CanUnDuck}");
           if(p.CanUnDuck){
             wjcp = (alwayswjc||p.CollideCheck<Solid>(p.Position+Vector2.UnitX*5)) && p.WallJumpCheck(1);
             wjcn = (alwayswjc||p.CollideCheck<Solid>(p.Position-Vector2.UnitX*5)) && p.WallJumpCheck(-1);
             //DebugConsole.Write($"from anti0f: {alwayswjc} {wjcp} {wjcn}");
             if(wjcp){
-              //DebugConsole.Write("anti0fwj happened");
+              DebugConsole.Write($"anti0fwj happened {p.onGround} {p.Speed} {Input.Jump.bufferCounter}");
               if (p.Facing==Facings.Right && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && p.Stamina>0f && 
                 p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position + Vector2.UnitX * 3f)
               ) p.ClimbJump();
@@ -164,7 +168,7 @@ public class Anti0fZone:Entity{
               else p.WallJump(-1);
               return true;
             } else if(wjcn){
-              //DebugConsole.Write("anti0fwj happened");
+              //DebugConsole.Write($"anti0fwj happened {p.onGround} {p.OnGround()}");
               if(p.Facing==Facings.Left && Input.GrabCheck && !SaveData.Instance.Assists.NoGrabbing && p.Stamina>0f && 
                 p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position + Vector2.UnitX * -3f)
               ) p.ClimbJump();
@@ -176,7 +180,11 @@ public class Anti0fZone:Entity{
           return false;
         case Player.StDash: case Player.StRedDash:
           //DebugConsole.Write($"dash reinterpolation {p.Speed}");
-          if(!Input.Jump.Pressed || !p.CanUnDuck) return false;
+          if(!Input.Jump.Pressed || !p.CanUnDuck || Input.Jump.bufferCounter==0) return false;
+          // if((p.jumpGraceTimer>0f || p.onGround) && p.Speed.Y>=0){
+          //   p.Jump(); //always happens before we reach here
+          //   return true;
+          // }
           wjcp = (alwayswjc||p.CollideCheck<Solid>(p.Position+Vector2.UnitX*5)) && p.WallJumpCheck(1);
           wjcn = (alwayswjc||p.CollideCheck<Solid>(p.Position-Vector2.UnitX*5)) && p.WallJumpCheck(-1);
           //DebugConsole.Write($"from anti0f: {alwayswjc} {wjcp} {wjcn}");
@@ -186,12 +194,14 @@ public class Anti0fZone:Entity{
             if(p.Facing==Facings.Right && Input.GrabCheck && p.Stamina>0f && p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position+Vector2.UnitX*3f)){
               var old = p.Speed;
               p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed} {p.LiftSpeed} {p.liftSpeedTimer}");
-            } else p.WallJump(-1);
+            } else if(p.SuperWallJumpAngleCheck)p.SuperWallJump(-1);
+            else p.WallJump(-1);
           } else {
             if(p.Facing==Facings.Left && Input.GrabCheck && p.Stamina>0f && p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position-Vector2.UnitX*3f)){
               var old = p.Speed;
               p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed} {p.LiftSpeed} {p.liftSpeedTimer}");
-            } else p.WallJump(1);
+            } else if(p.SuperWallJumpAngleCheck)p.SuperWallJump(-1);
+            else p.WallJump(-1);
           }
           p.StateMachine.State = 0;
           return true;
@@ -370,7 +380,7 @@ public class Anti0fZone:Entity{
       if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
       return true;
     reconsile:
-      DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
+      //DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
       if(exit() || frac>=1) goto exit;
       dist = _ispeed*Engine.DeltaTime*(1-frac);
       if(_ispeed.X == 0) dist.X=0;

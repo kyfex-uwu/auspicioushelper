@@ -58,7 +58,7 @@ public static class EntityParser{
           DebugConsole.Write(e.Name +" registered as unwrapped");
           bad=false;
         }else{
-          etype = parseMap[e.Name] = Types.basic;
+          etype = parseMap[e.Name] = Types.removeSMbasic;
           DebugConsole.Write(e.Name +" registered as basic");
           bad=false;
         }

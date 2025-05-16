@@ -8,16 +8,19 @@ using Microsoft.Xna.Framework;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
-public interface ISimpleChild:ITemplateChild{
+
+public interface ISimpleEnt:ITemplateChild{
   void ITemplateChild.AddAllChildren(List<Entity> l){
     l.Add((Entity)this);
   }
   void ITemplateChild.addTo(Scene s){
-    s.Add((Entity) this);
+    if(this is Entity e){
+      s.Add(e);
+      e.Scene = s;
+    } else {
+      DebugConsole.Write($"{this} implements simpleent wihtout being entity");
+    }
   }
-}
-
-public interface ISimpleEnt:ISimpleChild{
   void ITemplateChild.destroy(bool particles){
     ((Entity) this).RemoveSelf();
   }
