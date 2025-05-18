@@ -21,7 +21,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   bool ridingTrigger;
   
   public TemplateStaticmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
-  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d.Attr("template",""),d.Position+offset,depthoffset,getOwnID(d)){
+  public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d,d.Position+offset,depthoffset){
     smearamount = d.Int("liftspeed_smear",4);
     averageSmear = d.Bool("smear_average",false);
     channel = d.Attr("channel","");
@@ -29,6 +29,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     ridingTrigger = d.Bool("ridingTrigger",true);
     hooks.enable();
   }
+  public override Vector2 gatheredLiftspeed => ownLiftspeed;
   void evalLiftspeed(bool precess = true){
     float mX=0;
     float mY=0;
@@ -90,7 +91,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
           flag = true;
           setCollidability(cachedCol);
         }
-        childRelposTo(virtLoc,gatheredLiftspeed);
+        childRelposTo(virtLoc,ownLiftspeed);
         if(flag)setCollidability(!cachedCol);
       }
     });

@@ -18,7 +18,7 @@ class TemplateBlock:TemplateDisappearer{
   bool persistent;
   string breaksfx;
   public TemplateBlock(EntityData d, Vector2 offset, int depthoffset)
-  :base(d.Attr("template",""),d.Position+offset,depthoffset,getOwnID(d)){
+  :base(d,d.Position+offset,depthoffset){
     uvis = d.Bool("visible",true);
     ucol = d.Bool("collidable",true);
     uact = d.Bool("active",true);

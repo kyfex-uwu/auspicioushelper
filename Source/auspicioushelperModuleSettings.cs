@@ -35,7 +35,7 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       if(value){
         if(hideRulesList.Count>0) MapHider.hideListed();
       }
-      else MapHider.revealListed();
+      else if(MapHider.isHiding) MapHider.revealListed();
     }
   }
   public List<string> hideRulesList {get; set;} = new(["/t$"]);

@@ -42,7 +42,7 @@ public class TemplateFakewall:TemplateDisappearer{
   float fadespeed;
   public TemplateFakewall(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateFakewall(EntityData d, Vector2 offset, int depthoffset)
-  :base(d.Attr("template",""),d.Position+offset,depthoffset,getOwnID(d)){
+  :base(d,d.Position+offset,depthoffset){
     freeze = d.Bool("freeze",false);
     dontOnTransitionInto = d.Bool("dontOnTransitionInto");
     ddepth = d.Int("disappear_depth",-13000);

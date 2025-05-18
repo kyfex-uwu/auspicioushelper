@@ -51,6 +51,9 @@ public static class DebugConsole {
 
     }
   }
+  public static void Write(string message, object o){
+    Write(message+" "+(o==null?"NULL":o.ToString()));
+  }
   public static void Write(char[,] arr){
     string res = "";
     for(int i=0; i<arr.GetLength(0); i++){

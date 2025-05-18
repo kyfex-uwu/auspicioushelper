@@ -88,9 +88,9 @@ public class auspicioushelperModule : EverestModule {
         }
     }
     static void OnReload(bool silent){
-        DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.HideHelperMaps}");
+        //DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.HideHelperMaps}");
         //foreach (ModAsset item in Everest.Content.Map.Values.Where((ModAsset asset) => asset.Type == typeof(AssetTypeMap)))
-        if(Settings.HideHelperMaps)MapHider.hideListed();
+        if(Settings.HideHelperMaps && !MapHider.isHiding)MapHider.hideListed();
         //DebugConsole.Write(Engine.Instance.scene.ToString());
         ChannelState.unwatchAll();
         if(Engine.Instance.scene is LevelLoader l){
@@ -106,11 +106,13 @@ public class auspicioushelperModule : EverestModule {
         }
     }
 
-    public override void LoadContent(bool firstLoad){
+    public override void LoadContent(bool firstLoad)
+    {
         base.LoadContent(firstLoad);
         SpeedrunToolIop.hooks.enable();
         auspicioushelperGFX.loadContent();
         MaterialPipe.setup();
+        DebugConsole.Write("Loading content");
     }
     public static void GiveUp(On.Celeste.Level.orig_GiveUp orig, Level l,int returnIndex, bool restartArea, bool minimal, bool showHint){
         ChannelState.clearChannels();

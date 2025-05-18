@@ -9,10 +9,12 @@ using Celeste.Mod.Entities;
 using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.auspicioushelper;
 
-[CustomEntity("auspicioushelper/TemplateCassetteManager")]
+[CustomEntity("auspicioushelper/TemplateCassetteManager","auspicioushelper/TemplateCassetteManagerSimple")]
+[Tracked]
 public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   Dictionary<string, string> material = null;
   static Dictionary<string,string> nameTrans = new Dictionary<string, string>{
@@ -51,36 +53,57 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   bool useChannel;
   bool active = true;
   bool correct;
+  bool subordinate = false;
+  List<string> channels = new List<string>{"","","",""};
   public TemplateCassetteManager(EntityData d, Vector2 offset):base(d.Position+offset){
-    material = Util.kvparseflat(d.Attr("materials",""));
-    var timingDict = Util.kvparseflat(d.Attr("timings",""));
-    beatsPerMeasure = d.Float("beatsPerMeasure",4);
-    beatsPerSecond = d.Float("beatsPerMinute",90)/60;
-    channel = d.Attr("channel","");
-    useChannel = d.Bool("useChannel",false);
-    correct = d.Bool("correct",true);
-    lastBeatLoc = (d.Float("offset",0)*beatsPerSecond)%beatsPerMeasure;
-    Dictionary<float, timingDesc> added = new Dictionary<float, timingDesc>();
-    if(timingDict != null && timingDict.Count>0)foreach(var pair in timingDict){
-      float timing = float.Parse(pair.Key);
-      if(timing>beatsPerMeasure) continue;
-      timingDesc desc = null;
-      if(!added.TryGetValue(timing, out desc)){
-        desc = new timingDesc();
-        timings.Add(new Tuple<float, timingDesc>(timing,desc));
-        added.Add(timing,desc);
+    if(d.Name == "auspicioushelper/TemplateCassetteManager"){
+      material = Util.kvparseflat(d.Attr("materials",""));
+      var timingDict = Util.kvparseflat(d.Attr("timings",""));
+      beatsPerMeasure = d.Float("beatsPerMeasure",4);
+      beatsPerSecond = d.Float("beatsPerMinute",90)/60;
+      channel = d.Attr("channel","");
+      useChannel = d.Bool("useChannel",false);
+      correct = d.Bool("correct",true);
+      lastBeatLoc = (d.Float("offset",0)*beatsPerSecond)%beatsPerMeasure;
+      Dictionary<float, timingDesc> added = new Dictionary<float, timingDesc>();
+      if(timingDict != null && timingDict.Count>0)foreach(var pair in timingDict){
+        float timing = float.Parse(pair.Key);
+        if(timing>beatsPerMeasure) continue;
+        timingDesc desc = null;
+        if(!added.TryGetValue(timing, out desc)){
+          desc = new timingDesc();
+          timings.Add(new Tuple<float, timingDesc>(timing,desc));
+          added.Add(timing,desc);
+        }
+        desc.fromDict(Util.kvparseflat(Util.stripEnclosure(pair.Value)));
       }
-      desc.fromDict(Util.kvparseflat(Util.stripEnclosure(pair.Value)));
-    }
-    timings.Sort((a, b) => a.Item1.CompareTo(b.Item1));
-    for(int i=0; i<timings.Count; i++){
-      if(timings[i].Item1>lastBeatLoc){
-        curIndex = i; break;
+      timings.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+      for(int i=0; i<timings.Count; i++){
+        if(timings[i].Item1>lastBeatLoc){
+          curIndex = i; break;
+        }
+      }
+      ini = new timingDesc().fromDict(Util.kvparseflat(d.Attr("onactivate","")));
+      deini = new timingDesc().fromDict(Util.kvparseflat(d.Attr("ondeactivate")));
+      hooks.enable();
+    } else {
+      subordinate = true;
+      material = new();
+      bool usevanilla = !d.Bool("simple_style",false);
+      for(int i=0; i<4; i++){
+        string ch = d.Attr("channel_"+(i+1).ToString());
+        if(string.IsNullOrWhiteSpace(ch)) continue;
+        material[ch] = i switch {
+          0=>$"{{color:#42559a, x:1.57079632, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}}}",
+          1=>$"{{color:#5a1254, x:1.57079632, y:-1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}}}",
+          2=>$"{{color:#666a24, x:1.57079632, y:0, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}}}",
+          3=>$"{{color:#037231, x:0, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}}}",
+          _=>"{color:#fff, x:0.3,y:1.2}"
+        };
+        channels[i] = ch;
       }
     }
     inimaterials();
-    ini = new timingDesc().fromDict(Util.kvparseflat(d.Attr("onactivate","")));
-    deini = new timingDesc().fromDict(Util.kvparseflat(d.Attr("ondeactivate")));
   }
   public void inimaterials(){
     if(material != null) foreach(var pair in material){
@@ -132,6 +155,9 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   }
   public override void Added(Scene scene){
     base.Added(scene);
+    if(subordinate){
+      return;
+    }
     if(useChannel){
       setChVal(ChannelState.readChannel(channel));
       ChannelState.watch(this);
@@ -166,10 +192,9 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
       ChannelState.SetChannel(pair.Key,pair.Value);
     }
   }
-  public override void Update(){
-    base.Update();
-
-    float cbeatloc = lastBeatLoc+Engine.DeltaTime*beatsPerSecond;
+  void Advance(float time){
+    if(subordinate) return;
+    float cbeatloc = lastBeatLoc+time*beatsPerSecond;
     if(timings.Count>0 && active)while(timings[curIndex].Item1<=cbeatloc){
       Run(timings[curIndex].Item2);
       curIndex++;
@@ -180,4 +205,34 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
     }
     lastBeatLoc = cbeatloc;
   }
+  public override void Update(){
+    base.Update();
+    if(subordinate){
+      CassetteBlockManager cbm = Scene.Tracker.GetEntity<CassetteBlockManager>();
+      int cbeatloc = cbm.currentIndex;
+      if(cbeatloc != lastBeatLoc){
+        for(int i=0; i<4; i++){
+          if(!string.IsNullOrWhiteSpace(channels[i])){
+            ChannelState.SetChannel(channels[i],i==cbeatloc?1:0);
+          }
+        }
+      }
+      lastBeatLoc = cbeatloc;
+      return;  
+    }
+    Advance(Engine.DeltaTime);
+  }
+  static void onFreeze(On.Celeste.Celeste.orig_Freeze orig, float amount){
+    if(Engine.FreezeTimer<amount){
+      foreach(TemplateCassetteManager m in Engine.Instance.scene.Tracker.GetEntities<TemplateCassetteManager>()){
+        m.Advance(amount);
+      }
+    }
+    orig(amount);
+  }
+  static HookManager hooks = new(()=>{
+    On.Celeste.Celeste.Freeze += onFreeze;
+  }, ()=>{
+    On.Celeste.Celeste.Freeze -= onFreeze;
+  }, auspicioushelperModule.OnEnterMap);
 }

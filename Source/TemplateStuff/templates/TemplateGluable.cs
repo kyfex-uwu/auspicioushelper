@@ -13,6 +13,7 @@ public class TemplateGluable:Template{
   int smearamount;
   Vector2[] pastLiftspeed;
   bool averageSmear;
+  public override Vector2 gatheredLiftspeed => ownLiftspeed;
   void evalLiftspeed(bool precess = true){
     float mX=0;
     float mY=0;
@@ -31,7 +32,7 @@ public class TemplateGluable:Template{
   }
   public TemplateGluable(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateGluable(EntityData d, Vector2 offset, int depthoffset)
-  :base(d.Attr("template",""),d.Position+offset,depthoffset,getOwnID(d)){
+  :base(d,d.Position+offset,depthoffset){
     lookingFor = d.Attr("glue_to");
     smearamount = d.Int("liftspeed_smear",4);
     pastLiftspeed = new Vector2[smearamount];
@@ -62,7 +63,7 @@ public class TemplateGluable:Template{
       var move = gluedto.Position-lpos;
       pastLiftspeed[0]+=move/Math.Max(Engine.DeltaTime,0.005f);
       evalLiftspeed();
-      relposTo(Position,gatheredLiftspeed);
+      relposTo(Position,ownLiftspeed);
       lpos = gluedto.Position;
     }
     evalLiftspeed(true);

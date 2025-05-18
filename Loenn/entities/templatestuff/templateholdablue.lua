@@ -35,6 +35,7 @@ entity.placements = {
       respawnDelay = 2,
       die_to_barrier = false,
       respawning = false,
+      dontFlingOff = false,
       respawnDelay = 1.5
     }
   }

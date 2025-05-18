@@ -18,6 +18,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
   public bool enabled {get;set;}
   public RenderTarget2D outtex {get; private set;}
   RenderTarget2D mattex;
+  RenderTarget2D pretex;
   public float depth {get;set;}
   public CassetteMaterialFormat format;
   string channel;
@@ -29,6 +30,9 @@ public class CassetteMaterialLayer:IMaterialLayer{
     public float alphacutoff = 0.1f;
     public float stripecutoff = 0f;
     public float depth = 9000;
+    public string shader = "__default__";
+    public string preshader = "";
+    public bool usepreshader = false;
     public CassetteMaterialFormat(){}
 
     public static CassetteMaterialFormat fromDict(Dictionary<string,string> dict){
@@ -51,17 +55,36 @@ public class CassetteMaterialLayer:IMaterialLayer{
           case "depth":c.depth = float.Parse(pair.Value); break;
           case "alphacutoff":c.alphacutoff = float.Parse(pair.Value); break;
           case "stripecutoff":c.stripecutoff = float.Parse(pair.Value); break;
+          case "shader": c.shader = pair.Value; break;
+          case "preshader": c.preshader = pair.Value; break;
+          case "style":
+            switch(pair.Value){
+              case "vanilla": 
+                c.shader = "vanilla";
+                c.preshader = "prevanilla";
+              break;
+              case "simple": default:
+                c.shader = "simple";
+                c.preshader = "";
+              break;
+            }
+          break;
         }
       }
+      if(c.shader == "__default__"){
+        c.shader = "vanilla";
+        c.preshader = "prevanilla";
+      }
+      if(!string.IsNullOrWhiteSpace(c.preshader)) c.usepreshader = true;
       return c;
     }
     public int gethash(){
       return HashCode.Combine(border, innerlow, innerhigh, patternvec, alphacutoff, stripecutoff, depth);
     }
   }
-  static Effect shader;
   public static Dictionary<string, CassetteMaterialLayer> layers = new Dictionary<string,CassetteMaterialLayer>();
-  
+  Effect shader;
+  Effect preshader;
   public CassetteMaterialLayer(CassetteMaterialFormat format, string channel){
     this.channel = channel;
     this.depth = format.depth;
@@ -69,6 +92,18 @@ public class CassetteMaterialLayer:IMaterialLayer{
     outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     mattex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     resources.enable();
+    switch(format.shader){
+      case"simple": shader = simpleShader; break;
+      case "vanilla": shader = vanillaShader; break;
+      default: shader = auspicioushelperGFX.LoadEffect("cassette/"+format.shader)??simpleShader; break;
+    }
+    if(format.usepreshader){
+      pretex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
+      switch(format.preshader){
+        case "prevanilla": preshader = vanillaPreshader; break;
+        default: preshader = auspicioushelperGFX.LoadEffect("cassette/"+format.preshader);break;
+      }
+    }
   }
   List<Entity> items = new List<Entity>();
   bool dirty;
@@ -96,6 +131,14 @@ public class CassetteMaterialLayer:IMaterialLayer{
     }
     sb.End();
     MaterialPipe.gd.Textures[1] = mattex;
+    if(format.usepreshader && preshader!=null){
+      MaterialPipe.gd.SetRenderTarget(pretex);
+      MaterialPipe.gd.Clear(Color.Transparent);
+      sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, preshader, Matrix.Identity);
+      sb.Draw(mattex,Vector2.Zero,Color.White);
+      sb.End();
+      MaterialPipe.gd.Textures[2] = pretex;
+    }
     MaterialPipe.gd.SetRenderTarget(outtex);
     MaterialPipe.gd.Clear(Color.Transparent);
     sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, shader, Matrix.Identity);
@@ -127,9 +170,15 @@ public class CassetteMaterialLayer:IMaterialLayer{
   public void removeTrying(IMaterialObject o){
     trying.Remove(o);
   }
+  
+  static Effect simpleShader;
+  static Effect vanillaShader;
+  static Effect vanillaPreshader;
   static HookManager resources = new HookManager(()=>{
     //totally a hook (this is a good api)
-    shader = auspicioushelperGFX.LoadEffect("cassetteshader");
+    simpleShader = auspicioushelperGFX.LoadEffect("cassette/simple");
+    vanillaShader = auspicioushelperGFX.LoadEffect("cassette/vanilla");
+    vanillaPreshader = auspicioushelperGFX.LoadEffect("cassette/prevanilla");
   },bool ()=>{
     foreach(var pair in layers){
       List<Entity> keep = new List<Entity>();

@@ -22,6 +22,7 @@ public static class MapHider{
   //   On.Celeste.AreaData.Load-=ADLoadHook;
   // }).enable();
   static Dictionary<string,ModAsset> hidden = new Dictionary<string, ModAsset>();
+  public static bool isHiding = false;
   static HashSet<string> whitelisted = new HashSet<string>();
   static List<Tuple<string,Regex>> rules=null;
   static bool check(string assetstr){
@@ -64,14 +65,18 @@ public static class MapHider{
       //DebugConsole.Write($"hiding {x}");
       Everest.Content.Map.Remove(x);
     }
-    if(toremove.Count != 0) AssetReloadHelper.ReloadAllMaps();
+    if (toremove.Count != 0) {
+      AssetReloadHelper.ReloadAllMaps();
+      isHiding = true;
+    }
   }
   public static void revealListed(){
-    if(hidden == null || hidden.Count==0)return;
+    if(!isHiding || hidden == null || hidden.Count==0)return;
     foreach(var pair in hidden){
       Everest.Content.Map[pair.Key] = pair.Value;
     }
     hidden.Clear();
+    isHiding = false;
     AssetReloadHelper.ReloadAllMaps();
   }
   public static void uncache(){

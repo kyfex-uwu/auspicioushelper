@@ -34,15 +34,33 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
                  valAt(pos, 0,1).a<alphacutoff || valAt(pos, 0,-1).a<alphacutoff;
   bool diags = valAt(pos, 1,1).a<alphacutoff || valAt(pos, 1,-1).a<alphacutoff ||
                valAt(pos,-1,-1).a<alphacutoff || valAt(pos, -1,1).a<alphacutoff;
-  bool farcenters = valAt(pos,2,0).a<alphacutoff || valAt(pos,-2,0).a<alphacutoff ||
-                    valAt(pos, 0,2).a<alphacutoff || valAt(pos, 0,-2).a<alphacutoff;
   
-  float4 v = float4(wpos, time, 1);
-  float sv = cos(dot(v,pattern));
-  if(sv>stripecutoff || centers || diags || farcenters){
+  
+  float4 darkcol = matval*highcol+(1-matval)*lowcol;
+  if(centers || diags){
     return edgecol;
   }
-  return matval*highcol+(1-matval)*lowcol;
+  float4 v = float4(wpos+float2(0.5f,0.5f), time, 1);
+  float sv = cos(dot(v,pattern));
+  bool farcenters = valAt(pos,2,0).a<alphacutoff || valAt(pos,-2,0).a<alphacutoff ||
+                    valAt(pos, 0,2).a<alphacutoff || valAt(pos, 0,-2).a<alphacutoff;
+  if(farcenters || sv>stripecutoff){
+    return edgecol;
+  }
+  // if(farcenters){
+  //   return darkcol;
+  // }
+  // bool farfarcenters = valAt(pos,3,0).a<alphacutoff || valAt(pos,-3,0).a<alphacutoff ||
+  //                      valAt(pos, 0,3).a<alphacutoff || valAt(pos, 0,-3).a<alphacutoff ||
+  //                      valAt(pos, 1,2).a<alphacutoff || valAt(pos, 2,1).a<alphacutoff ||
+  //                      valAt(pos, -1,2).a<alphacutoff || valAt(pos, -2,1).a<alphacutoff ||
+  //                      valAt(pos, 1,-2).a<alphacutoff || valAt(pos, 2,-1).a<alphacutoff ||
+  //                      valAt(pos, -1,-2).a<alphacutoff || valAt(pos, -2,-1).a<alphacutoff;
+
+  // if(farfarcenters || sv>stripecutoff){
+  //   return edgecol;
+  // }
+  return darkcol;
 }
 
 technique BasicTech {

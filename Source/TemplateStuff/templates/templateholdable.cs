@@ -33,6 +33,7 @@ public class TemplateHoldable:Actor{
   bool respawning;
   float respawndelay;
   EntityData d;
+  bool dontFlingOff=false;
   public TemplateHoldable(EntityData d, Vector2 offset):base(d.Position+offset){
     Position+=new Vector2(d.Width/2, d.Height);
     hoffset = d.Nodes.Length>0?d.Nodes[0]-new Vector2(d.Width/2, d.Height):new Vector2(0,-d.Height/2);
@@ -65,11 +66,12 @@ public class TemplateHoldable:Actor{
     dietobarrier = d.Bool("die_to_barrier",false);
     respawning = d.Bool("respawning",false);
     respawndelay = d.Float("respawnDelay",2f);
+    dontFlingOff = d.Bool("dontFlingOff",false);
     SquishCallback = OnSquish2;
   }
   HashSet<Platform> Mysolids;
   void make(Scene s){
-    te = new TemplateDisappearer(d.Attr("template"),Position+hoffset,d.Int("depthoffset",0),Template.getOwnID(d));
+    te = new TemplateDisappearer(d,Position+hoffset,d.Int("depthoffset",0));
     te.addTo(s);
     Mysolids = new (te.GetChildren<Solid>());
   }
@@ -114,16 +116,20 @@ public class TemplateHoldable:Actor{
     }
     return false;
   }
-  void OnPickup(){
-    if(lastPickup!=null){
-      lastPickup.Speed = lastPickup.Speed*playerfrac+Speed*theofrac;
+  void OnPickup()
+  {
+    if (lastPickup != null)
+    {
+      lastPickup.Speed = lastPickup.Speed * playerfrac + Speed * theofrac;
     }
     Speed = Vector2.Zero;
-    if(!keepCollidableAlways) te.setCollidability(false);
+    if (!keepCollidableAlways) te.setCollidability(false);
     AddTag(Tags.Persistent);
+    foreach (Entity e in te.GetChildren<Entity>()) e.AddTag(Tags.Persistent);
   }
   void OnRelease(Vector2 force){
     RemoveTag(Tags.Persistent);
+    foreach (Entity e in te.GetChildren<Entity>()) e.RemoveTag(Tags.Persistent);
     if (force.X != 0f && force.Y == 0f){
       force.Y = -0.4f;
     }
@@ -195,11 +201,12 @@ public class TemplateHoldable:Actor{
     if (Hold.IsHeld){
       prevLiftspeed = Vector2.Zero;
     } else {
+      te.setCollidability(false);
       //DebugConsole.Write($"out update: {Position}");
       if(OnGround()){
         float target = (!OnGround(Position + Vector2.UnitX * 3f))? 20f: (!OnGround(Position - Vector2.UnitX * 3f) ? -20f:0);
         Speed.X = Calc.Approach(Speed.X, target, 800f * Engine.DeltaTime);
-        if (LiftSpeed == Vector2.Zero && prevLiftspeed != Vector2.Zero){
+        if (LiftSpeed == Vector2.Zero && prevLiftspeed != Vector2.Zero &&!dontFlingOff){
           Speed = prevLiftspeed;
           prevLiftspeed = Vector2.Zero;
           Speed.Y = Math.Min(Speed.Y * 0.6f, 0f);
@@ -207,7 +214,7 @@ public class TemplateHoldable:Actor{
           if (Speed.Y < 0f) noGravityTimer = 0.15f;
         } else {
           prevLiftspeed = LiftSpeed;
-          if (LiftSpeed.Y < 0f && Speed.Y < 0f) Speed.Y=0;
+          if (LiftSpeed.Y < 0f && Speed.Y < 0f &&!dontFlingOff) Speed.Y=0;
         }
       } else if(Hold.ShouldHaveGravity) {
         float num = gravity;
@@ -219,7 +226,6 @@ public class TemplateHoldable:Actor{
         if (noGravityTimer > 0f)noGravityTimer-=Engine.DeltaTime;
         else Speed.Y = Calc.Approach(Speed.Y, terminalvel, num * Engine.DeltaTime);
       }
-      te.setCollidability(false);
       MoveH(Speed.X * Engine.DeltaTime, OnCollideH);
       MoveV(Speed.Y * Engine.DeltaTime, OnCollideV);
       te.setCollidability(true);
@@ -235,28 +241,39 @@ public class TemplateHoldable:Actor{
           Speed = speed2 * 0.333f;
           Input.Rumble(RumbleStrength.Medium, RumbleLength.Medium);
         }
-        Audio.Play("event:/new_content/game/10_farewell/glider_engage", Position);
+        Audio.Play("event:/new_content/game/10_farewell/glider_emancipate", Position);
         Add(new Coroutine(resetRoutine()));
         break;
       }
     }
 
+    jumpthruMoving = 0;
     var move = ExactPosition - exlpos;
     pastLiftspeed[0]+=move/Math.Max(Engine.DeltaTime,0.005f);
     exlpos = ExactPosition;
     if(lpos!=Position){
       lpos = Position;
       inRelpos = true; AllowPushing = false;
+      bool origpushing = false;
+      bool orignaiiveinv = false;
+      if(keepCollidableAlways && Hold.Holder!=null){
+        inmovestep = origpushing = Hold.Holder.AllowPushing;
+        orignaiiveinv = !Hold.Holder.TreatNaive;
+        Hold.Holder.TreatNaive = true;
+        Hold.Holder.AllowPushing = false;
+      }
       te.relposTo(Position+hoffset,te.ownLiftspeed);
-      inRelpos = false; AllowPushing = true;
+      if(origpushing && Hold.Holder!=null) Hold.Holder.AllowPushing = true;
+      if(orignaiiveinv && Hold.Holder!=null) Hold.Holder.TreatNaive = false;
+      inRelpos = false; AllowPushing = true; inmovestep = false;
       Position = lpos;
     }
     lpos = Position;
-
   }
   bool inRelpos;
   const int smearamount = 3;
   Vector2[] pastLiftspeed = new Vector2[smearamount];
+
   void evalLiftspeed(bool precess = true){
     float mX=0;
     float mY=0;
@@ -278,7 +295,7 @@ public class TemplateHoldable:Actor{
     return orig(self, player);
   }
   public static bool MoveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor self, int amount, Collision cb, Solid pusher){
-    if(pusher != null && self is TemplateHoldable s && s.te!=null){
+    if((pusher != null || jumpthruMoving>0) && self is TemplateHoldable s && s.te!=null){
       s.te.setCollidability(false);
       bool res = orig(self,amount,cb,pusher);
       s.te.setCollidability(true);
@@ -288,7 +305,7 @@ public class TemplateHoldable:Actor{
     }
   }
   public static bool MoveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor self, int amount, Collision cb, Solid pusher){
-    if(pusher != null && self is TemplateHoldable s && s.te!=null){
+    if((pusher != null || jumpthruMoving>0) && self is TemplateHoldable s && s.te!=null){
       s.te.setCollidability(false);
       bool res = orig(self,amount,cb,pusher);
       s.te.setCollidability(true);
@@ -297,13 +314,49 @@ public class TemplateHoldable:Actor{
       return orig(self, amount, cb, pusher);
     }
   }
+  public static void PlayerUpdateHook(On.Celeste.Player.orig_Update orig, Player p){
+    jumpthruMoving = 0;
+    TemplateHoldable flag = null;
+    if(p.Holding != null && p.Holding.Entity is TemplateHoldable th && th.keepCollidableAlways){
+      th.te?.setCollidability(false);
+      flag = th;
+    }
+    orig(p);
+    if(flag!=null){
+      flag.te?.setCollidability(true);
+    }
+  }
+  static bool inmovestep = false;
+  static int jumpthruMoving = 0;
+  static bool RidingJumpthruHook(On.Celeste.Player.orig_IsRiding_JumpThru orig, Player p, JumpThru j){
+    if(inmovestep && p.AllowPushing == false) return false;
+    return orig(p,j);
+  }
+  static void JumpthruMoveHHook(On.Celeste.JumpThru.orig_MoveHExact orig, JumpThru j, int amount){
+    jumpthruMoving++;
+    orig(j,amount);
+    jumpthruMoving--;
+  }
+  static void JumpThruMoveVHook(On.Celeste.JumpThru.orig_MoveVExact orig, JumpThru j, int amount){
+    jumpthruMoving++;
+    orig(j,amount);
+    jumpthruMoving--;
+  }
   static HookManager hooks = new HookManager(()=>{
     On.Celeste.Holdable.Pickup += PickupHook;
     On.Celeste.Actor.MoveHExact+=MoveHHook;
     On.Celeste.Actor.MoveVExact+=MoveVHook;
+    On.Celeste.Player.Update+=PlayerUpdateHook;
+    On.Celeste.Player.IsRiding_JumpThru+=RidingJumpthruHook;
+    On.Celeste.JumpThru.MoveHExact+=JumpthruMoveHHook;
+    On.Celeste.JumpThru.MoveVExact+=JumpThruMoveVHook;
   },()=>{
     On.Celeste.Holdable.Pickup -= PickupHook;
     On.Celeste.Actor.MoveHExact-=MoveHHook;
     On.Celeste.Actor.MoveVExact-=MoveVHook;
+    On.Celeste.Player.Update-=PlayerUpdateHook;
+    On.Celeste.Player.IsRiding_JumpThru-=RidingJumpthruHook;
+    On.Celeste.JumpThru.MoveHExact-=JumpthruMoveHHook;
+    On.Celeste.JumpThru.MoveVExact-=JumpThruMoveVHook;
   },auspicioushelperModule.OnEnterMap);
 }

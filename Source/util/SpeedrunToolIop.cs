@@ -14,7 +14,6 @@ internal static class SpeedrunToolIop{
   static Type interoptype = null;
   internal static List<object> toDeregister = new List<object>();
   static void loadState(Dictionary<Type, Dictionary<string, object>> values, Level level){
-    DebugConsole.Write($"Loading auspicioushelper savestate stuff");
     int? lastUsed = ChannelBooster.lastUsed?.id;
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
@@ -51,7 +50,6 @@ internal static class SpeedrunToolIop{
     }
     TemplateCassetteManager.unfrickMats(level);
     FoundEntity.clear(Engine.Instance.scene);
-    DebugConsole.Write($"Finished successfully");
   }
 
   static List<object[]> staticTypes = new List<object[]>{
@@ -134,6 +132,7 @@ internal static class SpeedrunToolIop{
     } catch(Exception ex){
       DebugConsole.Write($"Deregistration failed with {ex}");
     }
+    toDeregister.Clear();
   });
 }
 

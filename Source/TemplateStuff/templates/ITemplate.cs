@@ -63,20 +63,21 @@ public class Template:Entity, ITemplateChild{
   }
   public virtual Vector2 virtLoc=>Position;
   public Vector2 ownLiftspeed;
-  public Vector2 gatheredLiftspeed=>parent==null?ownLiftspeed:ownLiftspeed+parent.gatheredLiftspeed;
+  public virtual Vector2 gatheredLiftspeed=>parent==null?ownLiftspeed:ownLiftspeed+parent.gatheredLiftspeed;
   public Vector2 parentLiftspeed=>parent==null?Vector2.Zero:parent.gatheredLiftspeed;
   public Propagation prop{get;set;} = Propagation.All; 
   public Vector2 toffset = Vector2.Zero;
   public Wrappers.BasicMultient basicents = null;
   public DashCollision OnDashCollide = null;
-  public Template(string templateStr, Vector2 pos, int depthoffset, string ownidpath="NULL"):base(pos){
+  public Template(EntityData data, Vector2 pos, int depthoffset):base(pos){
+    string templateStr = data.Attr("template","");
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
       DebugConsole.Write("No template found with identifier "+templateStr);
     }
     this.depthoffset = depthoffset;
     this.Visible = false;
     Depth = 10000+depthoffset;
-    this.ownidpath=ownidpath;
+    this.ownidpath=getOwnID(data);
   }
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;

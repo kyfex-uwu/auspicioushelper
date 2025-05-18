@@ -159,6 +159,7 @@ public static class EntityParser{
       if(lr!=null) lr.StartAmbience();
       return new Lightning(e,o);
     });
+    clarify("bigSpinner", Types.unwrapped, static (Level l, LevelData ld, Vector2 o, EntityData e)=>new Wrappers.Bumperw(e,o));
 
     parseMap["refill"] = Types.unwrapped;
     loaders["refill"] = (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Wrappers.RefillW(e,offset);

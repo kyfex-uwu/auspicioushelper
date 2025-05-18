@@ -230,7 +230,6 @@ public static class ChannelState{
   }
   public static void load(Dictionary<string,int> s){
     clearChannels();
-    DebugConsole.Write($"Loading channels: {s.Count}");
     unwatchAll();
     foreach(var pair in s) channelStates[pair.Key] = pair.Value;
   }
