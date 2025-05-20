@@ -137,7 +137,7 @@ public static class Util{
   public static float[] toArray(Vector3 x)=>new float[]{x.X,x.Y,x.Z};
   public static float[] toArray(Vector4 x)=>new float[]{x.X,x.Y,x.Z,x.W};
 
-  public static string sideBySide(List<string> strs){
+  public static string sideBySide(List<string> strs, string seperator = " "){
     List<string[]> sp = strs.Select(s=>s.Split('\n')).ToList();
     List<int> widths = sp.Select(l=>l.Max(s=>s.Length)).ToList();
     int lines = sp.Max(l=>l.Length);
@@ -145,9 +145,9 @@ public static class Util{
     for(int i=0; i<lines; i++){
       for(int j=0; j<sp.Count; j++){
         if(i<sp[j].Length){
-          res+=sp[j][i]+new string(' ', widths[j]-sp[j][i].Length);
+          res+=sp[j][i]+new string(' ', widths[j]-sp[j][i].Length)+seperator;
         } else {
-          res+=new string(' ',widths[j]);
+          res+=new string(' ',widths[j])+seperator;
         }
       }
       res+= '\n';

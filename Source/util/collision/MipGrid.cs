@@ -56,10 +56,11 @@ public class MipGrid{
       ulong rightmask = FULL^leftmask;
       ulong res=0;
       int yfi = blockh-yf;
+      int xfi = blockw-xf;
       res|=(tl&leftmask)>>(yf*8+xf);
-      res|=(tr&rightmask)>>(yf*8)<<xf;
+      res|=(tr&rightmask)>>(yf*8)<<xfi;
       res|=(bl&leftmask)<<(yfi*8)>>xf;
-      res|=(br&rightmask)<<(yfi*8+xf);
+      res|=(br&rightmask)<<(yfi*8+xfi);
       return res;
     }
     public ulong getAreaSmeared(int x, int y, int smearH, int smearV){
@@ -72,12 +73,12 @@ public class MipGrid{
       return getBlock(x/blockw,y/blockh);
     }
   }
-  List<Layer> layers;
-  int width;
-  int height;
-  int highestlevel;
+  internal List<Layer> layers;
+  internal int width;
+  internal int height;
+  internal int highestlevel;
   Vector2 cellshape;
-  Vector2 tlc => g.AbsolutePosition.Round()+cellshape*cellRectCorner;
+  internal Vector2 tlc => g.AbsolutePosition.Round()+cellshape*cellRectCorner;
   FloatRect bounds=>new FloatRect(tlc.X,tlc.Y,cellshape.X*width,cellshape.Y*height);
   Grid g;
   Vector2 cellRectCorner = Vector2.Zero;
@@ -156,7 +157,7 @@ public class MipGrid{
     highestlevel = layers.Count-1;
   }
   //takes in corners of rect in the frame of the grid's bottom layer
-  static ulong makeRectMask(int blockx, int blocky, Vector2 otlc, Vector2 obrc, int level){
+  internal static ulong makeRectMask(int blockx, int blocky, Vector2 otlc, Vector2 obrc, int level){
     int levelDiv = 1<<(level*3);
     Vector2 coordoffset = new Vector2(blockx*blockw,blocky*blockh);
     Vector2 rtlc = (otlc/levelDiv-coordoffset).Floor();
@@ -193,13 +194,14 @@ public class MipGrid{
     int level = 0;
     while(level<highestlevel && (1<<(3*(level+1)))<mld)level++;
     int levelDiv = 1<<(3*level);
-    Vector2 rtlc = Vector2.Max(((f.tlc-tlc)/cellshape).Floor(), new Vector2(0,0));
-    Vector2 rbrc = Vector2.Min(((f.brc-tlc)/cellshape).Ceiling(), new Vector2(width,height));
+    Vector2 rtlc = Vector2.Max(((f.tlc.Round()-tlc)/cellshape).Floor(), new Vector2(0,0));
+    Vector2 rbrc = Vector2.Min(((f.brc.Round()-tlc)/cellshape).Ceiling(), new Vector2(width,height));
     if(rbrc.X<0 || rbrc.Y<0 || rtlc.X>=width || rtlc.Y>=height) return false;
+
     int xstop = Math.Min((int)Math.Ceiling(rbrc.X/levelDiv/blockw),layers[level].width);
     int ystop = Math.Min((int)Math.Ceiling(rbrc.Y/levelDiv/blockh),layers[level].height);
-    for(int x=(int)Math.Floor(rtlc.X/levelDiv/blockw); x<xstop; x++){
-      for(int y=(int)Math.Floor(rtlc.Y/levelDiv/blockh); y<ystop; y++){
+    for(int x=Math.Max(0,(int)Math.Floor(rtlc.X/levelDiv/blockw)); x<xstop; x++){
+      for(int y=Math.Max(0,(int)Math.Floor(rtlc.Y/levelDiv/blockh)); y<ystop; y++){
         if(collideFrLevel(x,y,rtlc,rbrc,level)) return true;
       }
     }
@@ -209,11 +211,11 @@ public class MipGrid{
   bool collideMipGridLevel(MipGrid o, Vector2 oloc, int x, int y, int level){
     int levelDiv = 1<<(level*3);
     //offset in level's blockspace
-    Vector2 soffset = oloc/levelDiv - new Vector2(x*blockw, y*blockh);
+    Vector2 soffset = new Vector2(x*blockw, y*blockh) - oloc/levelDiv;
     Vector2 owhole = soffset.Floor();
     Vector2 ofrac = soffset-owhole;
     ulong self = layers[level].getBlock(x,y);
-    ulong other = o.layers[level].getAreaSmeared((int)owhole.X, (int)owhole.Y, ofrac.X!=0? -1:0, ofrac.Y!=0? -1:0);
+    ulong other = o.layers[level].getAreaSmeared((int)owhole.X, (int)owhole.Y, ofrac.X!=0? 1:0, ofrac.Y!=0? 1:0);
     ulong hit = self&other;
     if(level == 0)return hit!=0;
     while(hit!=0){
@@ -223,7 +225,7 @@ public class MipGrid{
     }
     return false;
   }
-  bool collideMipGrid(MipGrid o, Vector2? optionalAtparam=null){
+  public bool collideMipGrid(MipGrid o, Vector2? optionalAtparam=null){
     Vector2 owpos = optionalAtparam??o.tlc;
     if(o.cellshape!=cellshape) throw new Exception("cannot collide grids with different cell shapes yet");
     //into level 0 area space
@@ -232,16 +234,23 @@ public class MipGrid{
     int levelDiv = 1<<(3*level);
     Vector2 low = (oloc/levelDiv).Floor();
     Vector2 high = ((oloc+new Vector2(o.width+1,o.height+1))/levelDiv).Ceiling();
+
     int xstop = Math.Min((int)Math.Ceiling(high.X/blockw),layers[level].width);
     int ystop = Math.Min((int)Math.Ceiling(high.Y/blockh),layers[level].height);
-    for(int x=(int)Math.Floor(low.X/blockw); x<xstop; x++){
-      for(int y=(int)Math.Floor(low.Y/blockh); y<ystop; y++){
+    for(int x=Math.Max(0,(int)Math.Floor(low.X/blockw)); x<xstop; x++){
+      for(int y=Math.Max(0,(int)Math.Floor(low.Y/blockh)); y<ystop; y++){
         if(collideMipGridLevel(o,oloc,x,y,level)) return true;
       }
     }
     return false;
   }
-  static string getBlockstr(ulong data){
+  public bool collideMipGridOffset(MipGrid o, Vector2 offset){
+    return collideMipGridOffset(o, o.tlc+offset);
+  }
+  public bool collideFrOffset(FloatRect f, Vector2 offset){
+    return collideFr(new FloatRect(f.x+offset.X,f.y+offset.Y,f.w,f.h));
+  }
+  public static string getBlockstr(ulong data){
     string s = "";
     for(int y=0; y<blockh; y++){
       if(y!=0) s+="\n";
