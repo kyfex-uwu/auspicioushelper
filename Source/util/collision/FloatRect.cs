@@ -116,6 +116,9 @@ public struct FloatRect{
   public bool CollideExRect(float ox, float oy, float ow, float oh){
     return x+w>ox && y+h>oy && x<ox+ow && y<oy+oh;
   }
+  public bool CollideFr(FloatRect other){
+    return CollideExRect(other.x,other.y,other.w,other.h);
+  }
   public bool CollideRectSweep(FloatRect o, Vector2 sweep){
     FloatRect expanded = new FloatRect(x-o.w,y-o.h,w+o.w,h+o.h);
     return expanded.CollideRay(o.tlc,sweep);

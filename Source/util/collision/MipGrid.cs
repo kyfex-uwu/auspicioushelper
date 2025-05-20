@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -77,7 +78,7 @@ public class MipGrid{
   internal int width;
   internal int height;
   internal int highestlevel;
-  Vector2 cellshape;
+  public Vector2 cellshape;
   internal Vector2 tlc => g.AbsolutePosition.Round()+cellshape*cellRectCorner;
   FloatRect bounds=>new FloatRect(tlc.X,tlc.Y,cellshape.X*width,cellshape.Y*height);
   Grid g;
@@ -259,5 +260,26 @@ public class MipGrid{
       }
     }
     return s;
+  }
+}
+
+
+class MipGridCollisionCacher{
+  struct CacheKey: IEquatable<CacheKey>{
+    MipGrid a;
+    MipGrid b;
+    Vector2 l;
+    Vector2 h;
+    public CacheKey(MipGrid a, MipGrid b, Vector2 boffset){
+      Vector2 dif = (a.tlc-boffset)/a.cellshape;
+      this.a=a; this.b=b; l=dif.Floor(); h=dif.Ceiling();
+    }
+    public bool Equals(CacheKey o){
+      return ReferenceEquals(a, o.a) && ReferenceEquals(b, o.b) && l==o.l && h==o.h;
+    }
+    public override bool Equals(object obj)=>obj is CacheKey k && Equals(k);
+    public override int GetHashCode() {
+      return HashCode.Combine(RuntimeHelpers.GetHashCode(a), RuntimeHelpers.GetHashCode(b), l, h);
+    }
   }
 }

@@ -67,9 +67,4 @@ public class TemplateSwapblock:Template{
     Add(new DashListener((Vector2 dir)=>activate()));
     base.addTo(scene);
   }
-  // public override void relposTo(Vector2 loc, Vector2 liftspeed){
-  //   Position = loc+toffset;
-  //   virtLoc = Position+spos.pos;
-  //   childRelposTo(virtLoc,ownLiftspeed+liftspeed);
-  // }
 }

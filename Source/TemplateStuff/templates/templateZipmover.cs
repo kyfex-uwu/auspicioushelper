@@ -157,11 +157,6 @@ public class TemplateZipmover:Template{
       yield return 0.5f;
       goto waiting;
   }
-  // public override void relposTo(Vector2 loc,Vector2 liftspeed){
-  //   Position = loc+toffset;
-  //   virtLoc = Position+spos.pos;
-  //   childRelposTo(virtLoc,liftspeed+ownLiftspeed);
-  // }
   public override void Removed(Scene scene){
     base.Removed(scene);
     sfx.Stop();
