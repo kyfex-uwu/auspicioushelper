@@ -37,10 +37,10 @@ public class FoundEntity:Component{
     base.Removed(entity);
     found.Remove(ident);
   }
-  public static int reflectGet(Entity e, List<string> path, List<int> args){
+  public static int reflectGet(Entity e, List<string> path, List<int> args, int startidx = 2){
     object o = e;
     int j=0;
-    for(int i=2; i<path.Count; i++){
+    for(int i=startidx; i<path.Count; i++){
       if(o == null) return 0;
       Type type = o.GetType();
       if(path[i] == "__index__"){
@@ -62,6 +62,7 @@ public class FoundEntity:Component{
       }
       PropertyInfo prop = type.GetProperty(path[i], BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
       if(prop != null){
+        //DebugConsole.Write($"Getting prop {path[i]} {o.ToString()}")
         o = prop.GetValue(o); continue;
       }
       DebugConsole.Write($"The reflection process on entity {e?.ToString()} failed at index {i} looking for {path[i]} on {o?.ToString()}");

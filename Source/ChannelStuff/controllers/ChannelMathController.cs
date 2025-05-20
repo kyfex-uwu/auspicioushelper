@@ -295,7 +295,7 @@ public class ChannelMathController:Entity{
         case "speedy": return (int)p.Speed.Y;
         case "posx": return (int)p.Position.X;
         case "posy": return (int)p.Position.Y;
-        default: return FoundEntity.reflectGet(p,strs,ints);
+        default: return FoundEntity.reflectGet(p,strs,ints,1);
       }
     });
     registerInterop("killPlayer",(List<string> strs, List<int> ints)=>{

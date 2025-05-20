@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Celeste.Editor;
 using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -136,4 +137,21 @@ public static class Util{
   public static float[] toArray(Vector3 x)=>new float[]{x.X,x.Y,x.Z};
   public static float[] toArray(Vector4 x)=>new float[]{x.X,x.Y,x.Z,x.W};
 
+  public static string sideBySide(List<string> strs){
+    List<string[]> sp = strs.Select(s=>s.Split('\n')).ToList();
+    List<int> widths = sp.Select(l=>l.Max(s=>s.Length)).ToList();
+    int lines = sp.Max(l=>l.Length);
+    string res = "";
+    for(int i=0; i<lines; i++){
+      for(int j=0; j<sp.Count; j++){
+        if(i<sp[j].Length){
+          res+=sp[j][i]+new string(' ', widths[j]-sp[j][i].Length);
+        } else {
+          res+=new string(' ',widths[j]);
+        }
+      }
+      res+= '\n';
+    }
+    return res;
+  }
 }
