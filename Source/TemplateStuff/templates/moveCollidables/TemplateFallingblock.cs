@@ -19,6 +19,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
   string rch;
   bool triggered;
   string ImpactSfx = "event:/game/general/fallblock_impact";
+  string ShakeSfx = "event:/game/general/fallblock_shake";
   float maxspeed;
   float gravity;
   public TemplateFallingblock(EntityData d, Vector2 offset, int depthoffset)
@@ -38,30 +39,36 @@ public class TemplateFallingblock:TemplateMoveCollidable{
   }
   IEnumerator Sequence(){
     float speed = 0;
+    bool first = true;
     while(!hasRiders<Player>() || triggered){
       yield return null;
     }
     DebugConsole.Write("Triggered fallingblock");
     triggered = true;
-    tryingWait:
-      yield return 0.25f;
+    Audio.Play(ShakeSfx,Position);
+    yield return 0.25f;
     trying:
       yield return null;
       Query qs = getq(falldir);
       if(TestMove(qs, 1, falldir)){
         speed = 0;
+        if(!first){
+          Audio.Play(ShakeSfx,Position);
+          yield return 0.2;
+        }
       } else goto trying;
     falling:
+      first = false;
       yield return null;
       speed = Calc.Approach(speed,130,500*Engine.DeltaTime);
       qs = getq(falldir*speed*Engine.DeltaTime);
-      if(!qs.s.bounds.CollideFr(Util.levelBounds(Scene))) goto removing;
+      if(!qs.s.bounds.CollideFr(Util.levelBounds(Scene)) && !Util.levelBounds(Scene).CollidePoint(Position)) goto removing;
       bool res = falldir.X==0?
         MoveVCollide(qs,speed*Engine.DeltaTime*falldir.Y,0,speed*falldir):
         MoveHCollide(qs,speed*Engine.DeltaTime*falldir.X,0,speed*falldir);
       if(res){
         Audio.Play(ImpactSfx,Position);
-        goto tryingWait;
+        goto trying;
       }
       else goto falling;
     removing:
