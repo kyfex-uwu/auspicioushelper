@@ -1,0 +1,94 @@
+
+
+
+using System;
+using System.Collections;
+using Celeste.Mod.Entities;
+using Microsoft.Xna.Framework;
+using Monocle;
+
+namespace Celeste.Mod.auspicioushelper;
+
+[CustomEntity("auspicioushelper/TemplateFallingblock")]
+public class TemplateFallingblock:TemplateMoveCollidable{
+  public TemplateFallingblock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
+
+  Vector2 falldir = Vector2.UnitY;
+  Vector2 basefalldir = Vector2.UnitY;
+  string tch;
+  string rch;
+  bool triggered;
+  string ImpactSfx = "event:/game/general/fallblock_impact";
+  float maxspeed;
+  float gravity;
+  public TemplateFallingblock(EntityData d, Vector2 offset, int depthoffset)
+  :base(d,offset+d.Position,depthoffset){
+    basefalldir = d.Attr("direction") switch{
+      "down"=> Vector2.UnitY,
+      "up"=>-Vector2.UnitY,
+      "left"=>-Vector2.UnitX,
+      "right"=>Vector2.UnitX,
+      _=>Vector2.UnitX
+    };
+    rch = d.Attr("reverseChannel");
+    tch = d.Attr("triggerChannel");
+    ImpactSfx = d.Attr("impact_sfx","event:/game/general/fallblock_impact");
+    maxspeed = d.Float("max_speed",130f);
+    gravity = d.Float("gravity", 500);
+  }
+  IEnumerator Sequence(){
+    float speed = 0;
+    while(!hasRiders<Player>() || triggered){
+      yield return null;
+    }
+    DebugConsole.Write("Triggered fallingblock");
+    triggered = true;
+    tryingWait:
+      yield return 0.25f;
+    trying:
+      yield return null;
+      Query qs = getq(falldir);
+      if(TestMove(qs, 1, falldir)){
+        speed = 0;
+      } else goto trying;
+    falling:
+      yield return null;
+      speed = Calc.Approach(speed,130,500*Engine.DeltaTime);
+      qs = getq(falldir*speed*Engine.DeltaTime);
+      if(!qs.s.bounds.CollideFr(Util.levelBounds(Scene))) goto removing;
+      bool res = falldir.X==0?
+        MoveVCollide(qs,speed*Engine.DeltaTime*falldir.Y,0,speed*falldir):
+        MoveHCollide(qs,speed*Engine.DeltaTime*falldir.X,0,speed*falldir);
+      if(res){
+        Audio.Play(ImpactSfx,Position);
+        goto tryingWait;
+      }
+      else goto falling;
+    removing:
+      yield return null;
+      Vector2 fds = falldir;
+      for(int i=0; i<20; i++){
+        speed = Calc.Approach(speed,160,500*Engine.DeltaTime);
+        Position+=fds*speed*Engine.DeltaTime;
+        childRelposTo(virtLoc,falldir*speed);
+        yield return null;
+      }
+      destroy(false);
+  }
+  public override void Awake(Scene scene) {
+    base.Awake(scene);
+    if(!string.IsNullOrWhiteSpace(tch)){
+      if(ChannelState.readChannel(tch)!=0) triggered = true;
+      else Add(new ChannelTracker(tch,(int val)=>{
+        if(val!=0) triggered=true;
+      }));
+    }
+    if(!string.IsNullOrWhiteSpace(rch)){
+      if(ChannelState.readChannel(rch)!=0) falldir=-basefalldir;
+      Add(new ChannelTracker(rch, (int val)=>{
+        falldir = val==0?basefalldir:-basefalldir;
+      }));
+    }
+    Add(new Coroutine(Sequence()));
+  }
+}

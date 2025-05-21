@@ -11,7 +11,6 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateBlock")]
-[Tracked]
 class TemplateBlock:TemplateDisappearer{
   public TemplateBlock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   bool uvis;

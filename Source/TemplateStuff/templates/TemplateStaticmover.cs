@@ -75,7 +75,14 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
       },
       SolidChecker=(Solid s)=>{
         //DebugConsole.Write(s.ToString());
-        return s.Collidable && !doNot.Contains(s) && s.CollidePoint(Position);
+        bool check = !doNot.Contains(s) && s.CollidePoint(Position);
+        if(!check) return false;
+        if(!s.Collidable){
+          setVisCol(false,false);
+          cachedCol =false;
+          if(layer !=null) layer.addTrying(this);
+        }
+        return true;
       },
       OnDestroy=()=>{
         setCollidability(false);

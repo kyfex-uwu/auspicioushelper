@@ -14,15 +14,15 @@ namespace Celeste.Mod.auspicioushelper;
 public class TemplateMoveCollidable:TemplateDisappearer{ 
   public override Vector2 gatheredLiftspeed => ownLiftspeed;
   Vector2 movementCounter;
-  Vector2 exactPosition=>Position+movementCounter;
+  public Vector2 exactPosition=>Position+movementCounter;
   public override Vector2 virtLoc => dislocated?Position.Round():Position;
-  bool useOwnUncollidable;
-  public TemplateMoveCollidable(EntityData data, Vector2 pos, int depthoffset, string idp):base(data,pos,depthoffset){
+  bool useOwnUncollidable = false;
+  public TemplateMoveCollidable(EntityData data, Vector2 pos, int depthoffset):base(data,pos,depthoffset){
+    DebugConsole.Write(Position.ToString());
     Position = Position.Round();
     movementCounter = Vector2.Zero;
     prop &= ~Propagation.Riding; 
   }
-  List<Solid> solids;
   bool dislocated = false;
   
   MipGridCollisionCacher mgcc = new();
@@ -115,6 +115,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     }
     return dirvec*amount;
   }
+  public bool TestMove(Query qs, int amount, Vector2 dirvec)=>amount==0||TestMove(qs.q,qs.s,amount,dirvec)!=Vector2.Zero;
   public Vector2 TestLeniency(QueryBounds q, QueryIn s, Vector2 ioffset, int maxLeniency, Vector2 leniencyVec){
     for(int i=1; i<=maxLeniency; i++){
       for(int j=-1; j<=1; j+=2){
@@ -161,7 +162,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
   //   }
   //   return true;
   // }
-  public bool MoveHCollide(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
+  public bool MoveHCollideExact(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
     Vector2 v = leniency==0? TestMove(q,s,amount,new Vector2(1,0)) : TestMoveLeniency(q,s,amount,new Vector2(1,0),leniency,new Vector2(0,1));
     if(v!=Vector2.Zero){
       Position+=v;
@@ -170,7 +171,8 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     }
     return true;
   }
-  public bool MoveVCollide(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
+  public bool MoveHCollideExact(Query qs, int amount, int leniency, Vector2 liftspeed)=>MoveHCollideExact(qs.q,qs.s,amount,leniency,liftspeed);
+  public bool MoveVCollideExact(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
     Vector2 v = leniency==0? TestMove(q,s,amount,new Vector2(0,1)) : TestMoveLeniency(q,s,amount,new Vector2(0,1),leniency,new Vector2(1,0));
     if(v!=Vector2.Zero){
       Position+=v;
@@ -178,5 +180,37 @@ public class TemplateMoveCollidable:TemplateDisappearer{
       return false;
     }
     return true;
+  }
+  public bool MoveVCollideExact(Query qs, int amount, int leniency, Vector2 liftspeed)=>MoveVCollideExact(qs.q,qs.s,amount,leniency,liftspeed);
+  public bool MoveHCollide(QueryBounds q, QueryIn s, float amount, int leniency, Vector2 liftspeed){
+    movementCounter.X+=amount;
+    int dif = (int)Math.Round(movementCounter.X);
+    bool fail = dif!=0 && MoveHCollideExact(q,s,dif,leniency,liftspeed);
+    if(!fail) movementCounter.X-=dif;
+    else movementCounter.X = (float)Math.Clamp(movementCounter.X, -0.501,0.501);
+    return fail;
+  }
+  public bool MoveHCollide(Query qs, float amount, int leniency, Vector2 liftspeed)=>MoveHCollide(qs.q,qs.s,amount,leniency,liftspeed);
+  public bool MoveVCollide(QueryBounds q, QueryIn s, float amount, int leniency, Vector2 liftspeed){
+    movementCounter.Y+=amount;
+    int dif = (int)Math.Round(movementCounter.Y);
+    bool fail = dif!=0 && MoveVCollideExact(q,s,dif,leniency,liftspeed);
+    if(!fail) movementCounter.Y-=dif;
+    else movementCounter.Y = (float)Math.Clamp(movementCounter.Y, -0.501,0.501);
+    return fail;
+  }
+  public bool MoveVCollide(Query qs, float amount, int leniency, Vector2 liftspeed)=>MoveVCollide(qs.q,qs.s,amount,leniency,liftspeed);
+  public class Query{
+    public QueryBounds q;
+    public QueryIn s;
+    public Query(QueryBounds q, QueryIn s){
+      this.q=q; this.s=s;
+    }
+  }
+  public Query getq(Vector2 maxpotentialmovemagn){
+    QueryIn s = getQself();
+    Vector2 v = maxpotentialmovemagn.Abs().Ceiling();
+    QueryBounds q = getQinfo(s.bounds._expand(v.X,v.Y),s.gotten);
+    return new(q,s);
   }
 }

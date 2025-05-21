@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Celeste.Editor;
+using Monocle;
 using Microsoft.Xna.Framework;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -153,5 +154,11 @@ public static class Util{
       res+= '\n';
     }
     return res;
+  }
+  public static FloatRect levelBounds(Scene s){
+    if(s is Level l){
+      return new FloatRect(l.Bounds.Left,l.Bounds.Top,l.Bounds.Right-l.Bounds.Left,l.Bounds.Bottom-l.Bounds.Top);
+    }
+    return FloatRect.empty;
   }
 }
