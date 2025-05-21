@@ -16,3 +16,6 @@ Todo:
  - shake for templates
  - [done - they don't] Ensure hookmanagers work as expected lmao
 
+ Potential performance/cleanup things:
+  - MipGrid cache cleanup?
+
