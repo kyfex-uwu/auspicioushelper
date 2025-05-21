@@ -40,6 +40,7 @@ public class MipGrid{
       if(y<0 && (y&(blockh-1))!=0) yb--;
       int xf = x-xb*blockw;
       int yf = y-yb*blockw;
+      //DebugConsole.Write($"{x},{y}, {xb},{yb}  {xf},{yf}");
       ulong tl, tr, bl, br;
       if(xb>=0 && yb>=0 && xb<width-1 && yb<height-1){
         tl = getBlockFast(xb,yb);
@@ -61,8 +62,11 @@ public class MipGrid{
       int xfi = blockw-xf;
       res|=(tl&leftmask)>>(yf*8+xf);
       res|=(tr&rightmask)>>(yf*8)<<xfi;
-      res|=(bl&leftmask)<<(yfi*8)>>xf;
-      res|=(br&rightmask)<<(yfi*8+xfi);
+      if(yf!=0){
+        res|=(bl&leftmask)<<(yfi*8)>>xf;
+        res|=(br&rightmask)<<(yfi*8+xfi);
+      }
+      //DebugConsole.Write(getBlockstr(res));
       return res;
     }
     public ulong getAreaSmeared(int x, int y, int smearH, int smearV){
@@ -219,6 +223,11 @@ public class MipGrid{
     ulong self = layers[level].getBlock(x,y);
     ulong other = o.layers[level].getAreaSmeared((int)owhole.X, (int)owhole.Y, ofrac.X!=0? 1:0, ofrac.Y!=0? 1:0);
     ulong hit = self&other;
+    // DebugConsole.Write($"{oloc} {soffset} {owhole} {ofrac}");
+    // DebugConsole.Write($"{x} {y} {level}");
+    // DebugConsole.Write(Util.sideBySide([
+    //   MipGrid.getBlockstr(self), getBlockstr(other)
+    // ]));
     if(level == 0)return hit!=0;
     while(hit!=0){
       int index = System.Numerics.BitOperations.TrailingZeroCount(hit);
@@ -232,6 +241,7 @@ public class MipGrid{
     if(o.cellshape!=cellshape) throw new Exception("cannot collide grids with different cell shapes yet");
     //into level 0 area space
     Vector2 oloc = (owpos.Round()-tlc.Round())/cellshape;
+    //DebugConsole.Write($"===============starting {oloc}");
     int level = Math.Min(o.highestlevel, highestlevel);
     int levelDiv = 1<<(3*level);
     Vector2 low = (oloc/levelDiv).Floor();
