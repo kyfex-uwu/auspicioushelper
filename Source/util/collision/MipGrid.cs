@@ -246,7 +246,7 @@ public class MipGrid{
     return false;
   }
   public bool collideMipGridOffset(MipGrid o, Vector2 offset){
-    return collideMipGridOffset(o, o.tlc+offset);
+    return collideMipGrid(o, o.tlc+offset);
   }
   public bool collideFrOffset(FloatRect f, Vector2 offset){
     return collideFr(new FloatRect(f.x+offset.X,f.y+offset.Y,f.w,f.h));
@@ -265,13 +265,14 @@ public class MipGrid{
 
 
 class MipGridCollisionCacher{
+  Dictionary<CacheKey, bool> results = new();
   struct CacheKey: IEquatable<CacheKey>{
     MipGrid a;
     MipGrid b;
     Vector2 l;
     Vector2 h;
     public CacheKey(MipGrid a, MipGrid b, Vector2 boffset){
-      Vector2 dif = (a.tlc-boffset)/a.cellshape;
+      Vector2 dif = (a.tlc-(b.tlc+boffset))/a.cellshape;
       this.a=a; this.b=b; l=dif.Floor(); h=dif.Ceiling();
     }
     public bool Equals(CacheKey o){
@@ -281,5 +282,12 @@ class MipGridCollisionCacher{
     public override int GetHashCode() {
       return HashCode.Combine(RuntimeHelpers.GetHashCode(a), RuntimeHelpers.GetHashCode(b), l, h);
     }
+  }
+  public bool CollideCheck(MipGrid a, MipGrid b, Vector2 boffset){
+    CacheKey col = new CacheKey(a,b,boffset);
+    if(!results.TryGetValue(col,out var res)){
+      results.Add(col,res = a.collideMipGridOffset(b,boffset));
+    }
+    return res;
   }
 }
