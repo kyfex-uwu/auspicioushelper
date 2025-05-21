@@ -54,6 +54,7 @@ public class TemplateZipmover:Template{
       "dashAutomatic"=>ActivationType.dashAutomatic,
       _=>ActivationType.ride,
     };
+    prop &= ~Propagation.Riding;
   }
   public override void addTo(Scene scene){
     Spline spline=null;
@@ -81,6 +82,7 @@ public class TemplateZipmover:Template{
       };
     }
     base.addTo(scene);
+
   }
   IEnumerator dashAudioSeq(){
     var audio = Audio.Play("event:/new_content/game/10_farewell/fusebox_hit_1");

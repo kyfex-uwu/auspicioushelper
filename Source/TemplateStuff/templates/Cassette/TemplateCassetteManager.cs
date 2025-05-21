@@ -209,7 +209,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
     base.Update();
     if(subordinate){
       CassetteBlockManager cbm = Scene.Tracker.GetEntity<CassetteBlockManager>();
-      int cbeatloc = cbm.currentIndex;
+      int cbeatloc = cbm?.currentIndex??-1;
       if(cbeatloc != lastBeatLoc){
         for(int i=0; i<4; i++){
           if(!string.IsNullOrWhiteSpace(channels[i])){

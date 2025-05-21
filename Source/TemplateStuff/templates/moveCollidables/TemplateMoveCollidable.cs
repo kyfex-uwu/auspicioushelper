@@ -12,13 +12,12 @@ using MonoMod.Utils;
 namespace Celeste.Mod.auspicioushelper;
 
 public class TemplateMoveCollidable:TemplateDisappearer{ 
-  public override Vector2 gatheredLiftspeed => ownLiftspeed;
+  public override Vector2 gatheredLiftspeed => dislocated?ownLiftspeed:base.gatheredLiftspeed;
   Vector2 movementCounter;
   public Vector2 exactPosition=>Position+movementCounter;
   public override Vector2 virtLoc => dislocated?Position.Round():Position;
   bool useOwnUncollidable = false;
   public TemplateMoveCollidable(EntityData data, Vector2 pos, int depthoffset):base(data,pos,depthoffset){
-    DebugConsole.Write(Position.ToString());
     Position = Position.Round();
     movementCounter = Vector2.Zero;
     prop &= ~Propagation.Riding; 
@@ -110,7 +109,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     int dir = Math.Sign(amount);
     int i = 0;
     while(i!=amount){
-      if(q.Collide(s,dirvec*(i+1))) return dirvec*i;
+      if(q.Collide(s,dirvec*(i+dir))) return dirvec*i;
       i+=dir;
     }
     return dirvec*amount;
@@ -183,6 +182,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
   }
   public bool MoveVCollideExact(Query qs, int amount, int leniency, Vector2 liftspeed)=>MoveVCollideExact(qs.q,qs.s,amount,leniency,liftspeed);
   public bool MoveHCollide(QueryBounds q, QueryIn s, float amount, int leniency, Vector2 liftspeed){
+    if(Math.Sign(movementCounter.X)!=Math.Sign(amount)) movementCounter.X = (float)Math.Clamp(movementCounter.X,-0.49,0.49);
     movementCounter.X+=amount;
     int dif = (int)Math.Round(movementCounter.X);
     bool fail = dif!=0 && MoveHCollideExact(q,s,dif,leniency,liftspeed);
@@ -192,6 +192,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
   }
   public bool MoveHCollide(Query qs, float amount, int leniency, Vector2 liftspeed)=>MoveHCollide(qs.q,qs.s,amount,leniency,liftspeed);
   public bool MoveVCollide(QueryBounds q, QueryIn s, float amount, int leniency, Vector2 liftspeed){
+    if(Math.Sign(movementCounter.Y)!=Math.Sign(amount)) movementCounter.Y = (float)Math.Clamp(movementCounter.Y,-0.49,0.49);
     movementCounter.Y+=amount;
     int dif = (int)Math.Round(movementCounter.Y);
     bool fail = dif!=0 && MoveVCollideExact(q,s,dif,leniency,liftspeed);

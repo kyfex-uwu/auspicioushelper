@@ -19,7 +19,8 @@ entity.placements = {
       triggerChannel="",
       gravity = 500,
       max_speed = 130,
-      impact_sfx = "event:/game/general/fallblock_impact"
+      impact_sfx = "event:/game/general/fallblock_impact",
+      shake_sfx = "event:/game/general/fallblock_shake"
     }
   }
 }

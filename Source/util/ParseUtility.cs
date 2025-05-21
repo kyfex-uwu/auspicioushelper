@@ -7,6 +7,7 @@ using System.Linq;
 using Celeste.Editor;
 using Monocle;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace Celeste.Mod.auspicioushelper;
 public static class Util{
@@ -160,5 +161,12 @@ public static class Util{
       return new FloatRect(l.Bounds.Left,l.Bounds.Top,l.Bounds.Right-l.Bounds.Left,l.Bounds.Bottom-l.Bounds.Top);
     }
     return FloatRect.empty;
+  }
+  public static void RemovePred<T>(HashSet<T> set, Func<T,bool> pred){
+    List<T> tr = new();
+    foreach(T a in set){
+      if(pred(a)) tr.Add(a);
+    }
+    foreach(T a in tr) set.Remove(a);
   }
 }

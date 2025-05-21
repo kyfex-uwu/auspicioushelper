@@ -172,6 +172,19 @@ public static class EntityParser{
       if(l.Session.DoNotLoad.Contains(id)) return null;
       return (Entity) new Strawberry(e,offset,new EntityID(ld.Name,e.ID));
     };
+
+    defaultModdedSetup();
+  }
+  public static Level.EntityLoader getLoader(string name){
+    loaders.TryGetValue(name, out var loader);
+    if(loader !=null || Level.EntityLoaders.TryGetValue(name, out loader)) return loader;
+    EntityData e = new EntityData();
+    e.Name = name;
+    if(skitzoGuess(e)){
+      loader = loaders[e.Name];
+      return loader;
+    }
+    return null;
   }
 
   static bool skitzoGuess(EntityData d){
@@ -296,5 +309,8 @@ public static class EntityParser{
       case "templeGate": loaders["templeGate"]=static (Level l, LevelData d, Vector2 o, EntityData e)=>new TempleGate(e,o, d.Name); return true;
     }
     return false;
+  }
+  public static void defaultModdedSetup(){
+    Wrappers.FrostHelperStuff.Staticbumperwrapper.clarify.enable();
   }
 }

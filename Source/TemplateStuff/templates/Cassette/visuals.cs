@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -149,7 +150,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
   bool lastdn = false;
   public bool checkdo(){
     bool drawnormal = ChannelState.readChannel(channel) == 0;
-    if(drawnormal && !lastdn) trying.Clear();
+    if(drawnormal && !lastdn) Util.RemovePred(trying, a=>a is TemplateCassetteBlock);
     lastdn = drawnormal;
     return drawnormal || trying.Count>0;
   }

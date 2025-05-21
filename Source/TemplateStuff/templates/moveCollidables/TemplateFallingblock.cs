@@ -34,6 +34,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     rch = d.Attr("reverseChannel");
     tch = d.Attr("triggerChannel");
     ImpactSfx = d.Attr("impact_sfx","event:/game/general/fallblock_impact");
+    ShakeSfx = d.Attr("shake_sfx","event:/game/general/fallblock_shake");
     maxspeed = d.Float("max_speed",130f);
     gravity = d.Float("gravity", 500);
   }
@@ -43,7 +44,6 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     while(!hasRiders<Player>() || triggered){
       yield return null;
     }
-    DebugConsole.Write("Triggered fallingblock");
     triggered = true;
     Audio.Play(ShakeSfx,Position);
     yield return 0.25f;
@@ -54,7 +54,8 @@ public class TemplateFallingblock:TemplateMoveCollidable{
         speed = 0;
         if(!first){
           Audio.Play(ShakeSfx,Position);
-          yield return 0.2;
+          yield return 0.25f;
+          goto falling;
         }
       } else goto trying;
     falling:
@@ -63,10 +64,12 @@ public class TemplateFallingblock:TemplateMoveCollidable{
       speed = Calc.Approach(speed,130,500*Engine.DeltaTime);
       qs = getq(falldir*speed*Engine.DeltaTime);
       if(!qs.s.bounds.CollideFr(Util.levelBounds(Scene)) && !Util.levelBounds(Scene).CollidePoint(Position)) goto removing;
+      ownLiftspeed = speed*falldir;
       bool res = falldir.X==0?
         MoveVCollide(qs,speed*Engine.DeltaTime*falldir.Y,0,speed*falldir):
         MoveHCollide(qs,speed*Engine.DeltaTime*falldir.X,0,speed*falldir);
       if(res){
+        ownLiftspeed = Vector2.Zero;
         Audio.Play(ImpactSfx,Position);
         goto trying;
       }
@@ -74,10 +77,10 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     removing:
       yield return null;
       Vector2 fds = falldir;
-      for(int i=0; i<20; i++){
+      for(int i=0; i<40; i++){
         speed = Calc.Approach(speed,160,500*Engine.DeltaTime);
         Position+=fds*speed*Engine.DeltaTime;
-        childRelposTo(virtLoc,falldir*speed);
+        childRelposTo(virtLoc,fds*speed);
         yield return null;
       }
       destroy(false);
