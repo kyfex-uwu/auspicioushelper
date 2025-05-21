@@ -165,11 +165,21 @@ public class Template:Entity, ITemplateChild{
     foreach(ITemplateChild c in children){
       c.AddAllChildren(l);
     }
-    if(!(this is TemplateDisappearer)) l.Add(this);
+    l.Add(this);
   }
-  public List<T> GetChildren<T>() where T:Entity{
+  public void AddAllChildrenProp(List<Entity> l, Propagation p){
+    foreach(ITemplateChild c in children){
+      if(c is Template t){
+        if((c.prop&p) == p) t.AddAllChildrenProp(l,p);
+      } else {
+        if((c.prop & p) == p) c.AddAllChildren(l);
+      }
+    }
+  }
+  public List<T> GetChildren<T>(Propagation p = Propagation.None) where T:Entity{
     List<Entity> list = new();
-    AddAllChildren(list);
+    if(p == Propagation.None) AddAllChildren(list);
+    else AddAllChildrenProp(list,p);
     List<T> nlist = new();
     foreach(var li in list) if(li is T le) nlist.Add(le);
     return nlist;

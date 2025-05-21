@@ -77,6 +77,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     public List<FloatRect> rects=new();
     public List<MipGrid> grids=new();
     public FloatRect bounds = FloatRect.empty;
+    public HashSet<Solid> gotten;
   }
   QueryBounds getQinfo(FloatRect f, HashSet<Solid> exclude){
     QueryBounds res  =new();
@@ -91,7 +92,9 @@ public class TemplateMoveCollidable:TemplateDisappearer{
   QueryIn getQself(){
     QueryIn res = new();
     FloatRect bounds = FloatRect.empty;
-    foreach(Solid s in GetChildren<Solid>(Propagation.Shake)){
+    var all = GetChildren<Solid>(Propagation.Shake);
+    res.gotten = new(all);
+    foreach(Solid s in all){
       if(useOwnUncollidable || s.Collidable){
         FloatRect coarseBounds = new FloatRect(s);
         if(s.Collider is Grid g) res.grids.Add(MipGrid.fromGrid(g));
@@ -137,5 +140,43 @@ public class TemplateMoveCollidable:TemplateDisappearer{
       loc = TestLeniency(q,s,dirvec*Math.Sign(amount),maxLeniency,leniencyVec);
       return loc==Vector2.Zero;
     }
+  }
+  public Vector2 TestMoveLeniency(QueryBounds q, QueryIn s, int amount, Vector2 dirvec, int maxLeniency, Vector2 leniencyVec){
+    bool res = TestMoveLeniency(q,s,amount,dirvec,maxLeniency,leniencyVec, out var v);
+    return v;
+  }
+  // public bool MoveBy(Vector2 amount, Vector2 liftspeed, Vector2? leniencyVec, int? maxLeniency){
+  //   Vector2 leni = leniencyVec??Vector2.Zero;
+  //   movementCounter+=amount;
+  //   if(exactPosition.Round()!=Position){
+  //     Vector2 delta = exactPosition.Round()-Position;
+  //     var ml = maxLeniency??0;
+  //     bool res;
+  //     QueryIn s = getQself();
+  //     Vector2 ex = amount.Abs()+leni.Abs()*ml;
+  //     QueryBounds q = getQinfo(s.bounds._expand(ex.X+1,ex.Y+1),s.gotten);
+  //     if(ml == 0){
+  //       Vector2 npos = 
+  //     }
+  //   }
+  //   return true;
+  // }
+  public bool MoveHCollide(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
+    Vector2 v = leniency==0? TestMove(q,s,amount,new Vector2(1,0)) : TestMoveLeniency(q,s,amount,new Vector2(1,0),leniency,new Vector2(0,1));
+    if(v!=Vector2.Zero){
+      Position+=v;
+      childRelposTo(virtLoc,liftspeed);
+      return false;
+    }
+    return true;
+  }
+  public bool MoveVCollide(QueryBounds q, QueryIn s, int amount, int leniency, Vector2 liftspeed){
+    Vector2 v = leniency==0? TestMove(q,s,amount,new Vector2(0,1)) : TestMoveLeniency(q,s,amount,new Vector2(0,1),leniency,new Vector2(1,0));
+    if(v!=Vector2.Zero){
+      Position+=v;
+      childRelposTo(virtLoc,liftspeed);
+      return false;
+    }
+    return true;
   }
 }

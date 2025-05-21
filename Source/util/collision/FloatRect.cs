@@ -224,4 +224,11 @@ public struct FloatRect{
   public FloatRect _expand(float xe, float ye){
     return new FloatRect(x-xe,y-ye,w+xe*2,h+ye*2);
   }
+  public static FloatRect full=> new FloatRect(-1000000000,-1000000000,2000000000,2000000000);
+  public static FloatRect empty=> new FloatRect(1000000000,1000000000,-2000000000,-2000000000);
+  public FloatRect _union(FloatRect f){
+    var c1 = Vector2.Min(tlc,f.tlc);
+    var c2 = Vector2.Max(brc,f.brc);
+    return fromCorners(c1,c2);
+  }
 }

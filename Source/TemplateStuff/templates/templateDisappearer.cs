@@ -87,6 +87,7 @@ public class TemplateDisappearer:Template{
     List<Entity> cents=new();
     AddAllChildren(cents);
     foreach(var c in cents){
+      if(c is TemplateDisappearer) continue;
       if(!selfVis) c.Visible=false;
       if(!selfCol) c.Collidable=false;
       if(!selfAct) c.Active=false;

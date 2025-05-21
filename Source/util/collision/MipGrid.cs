@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.auspicioushelper;
 public class MipGrid{
@@ -260,6 +261,15 @@ public class MipGrid{
       }
     }
     return s;
+  }
+  public static MipGrid fromGrid(Grid g){
+    DynamicData d = new DynamicData(g);
+    if(d.TryGet("__mipgrid", out var obj) && obj is MipGrid m){
+    } else {
+      m = new MipGrid(g);
+      d.Set("__mipgrid",m);
+    }
+    return m;
   }
 }
 
