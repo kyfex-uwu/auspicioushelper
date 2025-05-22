@@ -90,6 +90,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       childRelposTo(virtLoc,gatheredLiftspeed);
       yield return null;
     }
+    ownLiftspeed=Vector2.Zero;
     yield return 0.2f;
     while(at<0){
       at=Calc.Approach(at,0,Engine.DeltaTime*30);
@@ -98,6 +99,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       childRelposTo(virtLoc,gatheredLiftspeed);
       yield return null;
     }
+    ownLiftspeed=Vector2.Zero;
   }
   public void setChVal(int val){
     if(val==0){

@@ -194,7 +194,21 @@ public class Template:Entity, ITemplateChild{
     foreach(ITemplateChild c in children){
       c.destroy(particles);
     }
+    children.Clear();
+    fgt=null;
     RemoveSelf();
+  }
+  public void destroyChildren(bool particles = true){
+    foreach(ITemplateChild c in children){
+      c.destroy(particles);
+    }
+    children.Clear();
+    fgt = null;
+  }
+  public virtual void remake(){
+    Scene old = Scene;
+    Scene=null;
+    addTo(old);
   }
   public string fullpath=>parent==null?ownidpath.ToString():parent.fullpath+$"/{ownidpath}";
   public static string getOwnID(EntityData e){

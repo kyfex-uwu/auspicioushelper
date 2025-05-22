@@ -33,7 +33,7 @@ internal static class TileHooks{
 }
 
 public interface IBoundsHaver{
-  FloatRect bounds {get;}
+  FloatRect bounds {get; set;}
   public Rectangle GetTilebounds(Vector2 loc, Rectangle isect){
     Vector2 tlc = ((bounds.tlc-loc)/8).Floor();
     Vector2 brc = ((bounds.brc-loc)/8).Ceiling();

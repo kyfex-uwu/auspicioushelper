@@ -42,13 +42,6 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
     origpos = Position;
     prop &= ~Propagation.Riding;
   }
-  void destroyChildren(){
-    foreach(ITemplateChild c in children){
-      c.destroy(true);
-    }
-    children.Clear();
-    fgt = null;
-  }
   public override void Awake(Scene scene) {
     base.Awake(scene);
     Add(movesfx = new SoundSource());

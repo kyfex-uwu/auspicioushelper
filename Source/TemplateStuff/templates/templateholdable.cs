@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Celeste.Mod.auspicioushelper.Wrappers;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Monocle;
@@ -125,11 +126,18 @@ public class TemplateHoldable:Actor{
     Speed = Vector2.Zero;
     if (!keepCollidableAlways) te.setCollidability(false);
     AddTag(Tags.Persistent);
-    foreach (Entity e in te.GetChildren<Entity>()) e.AddTag(Tags.Persistent);
+    foreach (Entity e in te.GetChildren<Entity>()){
+      e.AddTag(Tags.Persistent);
+      if(e is IBoundsHaver h) h.bounds = new FloatRect(-0x0fffffff,-0x0fffffff,0x1fffffff,0x1fffffff);
+    }
   }
   void OnRelease(Vector2 force){
     RemoveTag(Tags.Persistent);
-    foreach (Entity e in te.GetChildren<Entity>()) e.RemoveTag(Tags.Persistent);
+    if(te==null) return;
+    foreach (Entity e in te.GetChildren<Entity>()){
+      e.RemoveTag(Tags.Persistent);
+      if(e is IBoundsHaver h) h.bounds = new FloatRect(SceneAs<Level>().Bounds);
+    }
     if (force.X != 0f && force.Y == 0f){
       force.Y = -0.4f;
     }
