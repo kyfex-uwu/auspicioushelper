@@ -39,12 +39,13 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     gravity = d.Float("gravity", 500);
   }
   IEnumerator Sequence(){
-    float speed = 0;
+    float speed;
     bool first = true;
     while(!hasRiders<Player>() || triggered){
       yield return null;
     }
     triggered = true;
+    disconnect();
     Audio.Play(ShakeSfx,Position);
     yield return 0.25f;
     trying:
@@ -61,7 +62,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     falling:
       first = false;
       yield return null;
-      speed = Calc.Approach(speed,130,500*Engine.DeltaTime);
+      speed = Calc.Approach(speed,maxspeed,gravity*Engine.DeltaTime);
       qs = getq(falldir*speed*Engine.DeltaTime);
       if(!qs.s.bounds.CollideFr(Util.levelBounds(Scene)) && !Util.levelBounds(Scene).CollidePoint(Position)) goto removing;
       ownLiftspeed = speed*falldir;

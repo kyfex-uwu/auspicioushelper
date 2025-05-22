@@ -4,7 +4,7 @@ local utils = require("utils")
 local entity = {}
 
 entity.name = "auspicioushelper/TemplateFakewall"
-entity.depth = 2000
+entity.depth = -13000
 
 entity.placements = {
   {

@@ -4,7 +4,7 @@ local utils = require("utils")
 local entity = {}
 
 entity.name = "auspicioushelper/TemplateBlock"
-entity.depth = 2000
+entity.depth = -13000
 
 local sfxs = {
   "event:/game/general/wall_break_dirt",

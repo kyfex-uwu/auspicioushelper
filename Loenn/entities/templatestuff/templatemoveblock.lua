@@ -3,24 +3,26 @@ local utils = require("utils")
 
 local entity = {}
 
-entity.name = "auspicioushelper/TemplateFallingblock"
+entity.name = "auspicioushelper/TemplateMoveblock"
 entity.depth = -13000
 
 local directions = {"down","up","left","right"}
 
 entity.placements = {
   {
-    name = "Template Falling Block",
+    name = "Template M*veblock",
     data = {
       template = "",
       depthoffset=5,
-      direction="down",
-      reverseChannel="",
-      triggerChannel="",
-      gravity = 500,
-      max_speed = 130,
-      impact_sfx = "event:/game/general/fallblock_impact",
-      shake_sfx = "event:/game/general/fallblock_shake"
+      direction="right",
+      uncollidable_blocks=false,
+      speed=75,
+      acceleration=300,
+      respawning=true,
+      respawn_timer=2,
+      Max_stuck=0.15,
+      cansteer=false,
+      max_leniency=4
     }
   }
 }
@@ -30,7 +32,7 @@ entity.fieldInformation = {
   }
 }
 
-entity.texture = "loenn/auspicioushelper/template/tfall"
+entity.texture = "loenn/auspicioushelper/template/tmovr"
 
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x-6, entity.y-6, 12, 12)

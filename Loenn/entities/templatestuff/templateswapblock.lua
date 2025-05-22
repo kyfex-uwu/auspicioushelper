@@ -4,7 +4,7 @@ local utils = require("utils")
 local entity = {}
 
 entity.name = "auspicioushelper/TemplateSwapblock"
-entity.depth = 2000
+entity.depth = -13000
 entity.nodeLimits = {1,100}
 entity.nodeLineRenderType = "line"
 

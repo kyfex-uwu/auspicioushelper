@@ -16,7 +16,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
   Vector2 movementCounter;
   public Vector2 exactPosition=>Position+movementCounter;
   public override Vector2 virtLoc => dislocated?Position.Round():Position;
-  bool useOwnUncollidable = false;
+  public bool useOwnUncollidable = false;
   public TemplateMoveCollidable(EntityData data, Vector2 pos, int depthoffset):base(data,pos,depthoffset){
     Position = Position.Round();
     movementCounter = Vector2.Zero;
@@ -34,12 +34,12 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     Position = Position.Round();
     childRelposTo(virtLoc,gatheredLiftspeed);
   }
-  public virtual void reconnect(){
+  public virtual void reconnect(Vector2? fallback=null){
     dislocated = false;
     prop |= Propagation.Shake;
     bool old = getSelfCol();
     setCollidability(false);
-    relposTo(parent.virtLoc, Vector2.Zero);
+    relposTo(parent?.virtLoc??fallback??Position, Vector2.Zero);
     setCollidability(old);
   }
   public class QueryBounds {
