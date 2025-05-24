@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -58,8 +59,10 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
       steerdelay = 0.2f;
       while(!triggered && !hasRiders<Player>()) yield return null;
       disconnect();
+      triggered=true;
       speed = 0;
       Audio.Play("event:/game/04_cliffside/arrowblock_activate", Position);
+      shake(0.2f);
       yield return 0.2f;
       movesfx.Play("event:/game/04_cliffside/arrowblock_move");
       movesfx.Param("arrow_stop", 0f);
@@ -112,12 +115,15 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
       goto moving;
     blocked:
       movesfx.Stop();
+      shake(0.2f);
       Audio.Play("event:/game/04_cliffside/arrowblock_break", Position);
+      yield return 0.2f;
       if(!respawning){
         destroy(true);
         yield break;
       } 
       destroyChildren();
+      triggered=false;
       fgt = null;
       yield return maxrespawntimer;
       Scene old = Scene;

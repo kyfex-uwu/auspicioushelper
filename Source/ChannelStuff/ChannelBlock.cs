@@ -57,7 +57,7 @@ public class ChannelBlock:ChannelBaseEntity, IMaterialObject {
   }
 
   public void registerMaterials(){
-    layerA.planDraw(this);
+    layerA?.planDraw(this);
   }
   public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     if(curstate == SolidState.there){

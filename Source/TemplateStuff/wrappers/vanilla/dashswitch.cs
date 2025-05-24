@@ -42,7 +42,7 @@ public class DashSwitchW:DashSwitch, ISimpleEnt{
     base.Update();
   }
   Vector2 lpos {get;set;}
-  Vector2 toffset {get;set;}
+  public Vector2 toffset {get;set;}
   
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     if(Scene==null)return;

@@ -46,7 +46,7 @@ public interface IBoundsHaver{
 internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.None;
   public Template parent {get;set;}
-  public Vector2 toffset;
+  public Vector2 toffset {get;set;}
   public FloatRect bounds {get;set;}
   public BgTiles(templateFiller t, Vector2 posoffset, int depthoffset):base(posoffset+t.offset, t.bgt){
     toffset = t.offset;
@@ -70,11 +70,13 @@ internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
 internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
   public Template.Propagation prop{get;} = Template.Propagation.All;
   public Template parent {get;set;}
-  public Vector2 toffset;
+  public Vector2 toffset {get;set;}
   public FloatRect bounds {get;set;}
+  VirtualMap<char> data;
   public FgTiles(templateFiller t, Vector2 posoffset, int depthoffset):base(posoffset+t.offset, t.fgt){
     toffset = t.offset;
     Depth+=depthoffset;
+    data = t.fgt;
     TileHooks.hooks.enable();
     OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
   }
@@ -93,6 +95,21 @@ internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     MoveTo(loc+toffset, liftspeed);
+  }
+  public void destroy(bool particles){
+    if(particles){
+      Rectangle bounds = (this as IBoundsHaver).GetTilebounds(Position,AnimatedTiles.GetClippedRenderTiles(5));
+      Vector2 ppos = parent?.virtLoc??Center;
+      for(int i=bounds.X; i<bounds.X+bounds.Width; i++){
+        for(int j=bounds.Y; j<bounds.Height; j++){
+          char tile = data[i,j];
+          if(tile == '0' || tile == '\0') continue;
+          Vector2 offset = new Vector2(i*8+4,j*8+4);
+          Scene.Add(Engine.Pooler.Create<Debris>().Init(Position+offset,tile).BlastFrom(ppos));
+        }
+      }
+    }
+    RemoveSelf();
   }
 
   public override void MoveHExact(int move){

@@ -3,7 +3,9 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Mono.Cecil.Cil;
 using Monocle;
@@ -40,8 +42,10 @@ public interface ITemplateChild{
   }
   void AddAllChildren(List<Entity> list);
   void setOffset(Vector2 ppos){}
-  void shake(Vector2 amount){}
   void destroy(bool particles);
+}
+public interface IChildShaker{
+  public void onShake(Vector2 amount);
 }
 
 public class Template:Entity, ITemplateChild{
@@ -214,4 +218,47 @@ public class Template:Entity, ITemplateChild{
   public static string getOwnID(EntityData e){
     return e.ID.ToString();
   }
+  
+  public Vector2 ownShakeVec;
+  public float shakeTimer;
+  public static Dictionary<Entity, Vector2> prevpos = new();
+  static void restorePos(){
+    foreach(var pair in prevpos){
+      pair.Key.Position=pair.Value;
+    }
+    prevpos.Clear();
+  }
+  public void shake(float time){
+    if(time <= 0) return;
+    if(shakeTimer<=0) Add(new Coroutine(shakeRoutine()));
+    shakeTimer = MathF.Max(time,shakeTimer);
+  }
+  BeforeAfterRender bar;
+  IEnumerator shakeRoutine(){
+    Add(bar = new(()=>{
+      foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
+        prevpos.TryAdd(e,e.Position);
+        e.Position+=ownShakeVec;
+        if(e is IChildShaker s) s.onShake(ownShakeVec);
+      }
+    }));
+    shakeHooks.enable();
+    while(shakeTimer>0){
+      shakeTimer-=Engine.DeltaTime;
+      if(Scene.OnInterval(0.04f)) ownShakeVec = Calc.Random.ShakeVector();
+      yield return null;
+    }
+    ownShakeVec = Vector2.Zero;
+    Remove(bar);
+    bar=null;
+    foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
+        if(e is IChildShaker s) s.onShake(ownShakeVec);
+    }
+    yield break;
+  }
+  public static HookManager shakeHooks = new HookManager(()=>{
+    BeforeAfterRender.postafter.Add(restorePos);
+  },()=>{
+    BeforeAfterRender.postafter.Remove(restorePos);
+  });
 }

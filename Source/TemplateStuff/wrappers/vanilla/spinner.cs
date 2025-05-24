@@ -38,7 +38,7 @@ public class Spinner:CrystalStaticSpinner, ISimpleEnt{
     if(col!=0) Collidable = col>0;
     if(act!=0) Active = act>0;
   }
-  Vector2 toffset;
+  public Vector2 toffset {get;set;}
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     Position=loc+toffset;
   }

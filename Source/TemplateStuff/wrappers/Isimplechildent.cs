@@ -23,6 +23,19 @@ public interface ISimpleEnt:ITemplateChild{
   void ITemplateChild.destroy(bool particles){
     ((Entity) this).RemoveSelf();
   }
+  public Vector2 toffset {get;set;}
+  void ITemplateChild.parentChangeStat(int vis, int col, int act){
+    Entity s = (Entity)this;
+    if(vis!=0) s.Visible=vis>0;
+    if(col!=0) s.Collidable = col>0;
+    if(act!=0) s.Active = act>0;
+  }
+  void ITemplateChild.setOffset(Vector2 ppos){
+    toffset = ((Entity) this).Position-ppos;
+  }
+  void ITemplateChild.relposTo(Vector2 vector, Vector2 liftspeed){
+    ((Entity) this).Position = vector+toffset;
+  }
 }
 
 public interface ISimpleWrapper:ITemplateChild{
