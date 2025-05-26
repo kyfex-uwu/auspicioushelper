@@ -45,7 +45,6 @@ public interface ISimpleWrapper:ITemplateChild{
     list.Add(wrapped);
   }
   void ITemplateChild.addTo(Scene s) {
-    DebugConsole.Write($"adding from wrapper: {wrapped}");
     s.Add(wrapped);
   }
   void ITemplateChild.destroy(bool particles) {

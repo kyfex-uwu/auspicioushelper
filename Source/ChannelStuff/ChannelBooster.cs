@@ -31,7 +31,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
   public void relposTo(Vector2 pos, Vector2 liftspeed){
     Vector2 npos = pos+toffset;
     if(outline!=null) outline.Position = npos;
-    if(!BoostingPlayer && sprite.CurrentAnimationID != "pop") Position = npos;
+    if(!BoostingPlayer && sprite!=null && sprite.CurrentAnimationID != "pop") Position = npos;
     if(insideplayer!=null){
       insideplayer.MoveTowardsX(npos.X,100);
       insideplayer.MoveTowardsY(npos.Y,100);

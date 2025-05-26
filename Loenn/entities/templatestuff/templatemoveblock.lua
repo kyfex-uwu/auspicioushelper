@@ -22,6 +22,7 @@ entity.placements = {
       respawn_timer=2,
       Max_stuck=0.15,
       cansteer=false,
+      movesfx = "event:/game/04_cliffside/arrowblock_move",
       max_leniency=4
     }
   }

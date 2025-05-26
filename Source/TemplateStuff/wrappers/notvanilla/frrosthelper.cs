@@ -33,11 +33,12 @@ public static class FrostHelperStuff{
       d.Set("anchor",loc+toffset+twoffset);
     }
     public static HookManager clarify = new(()=>{
-      Level.EntityLoader orig = EntityParser.getLoader("FrostHelper/StaticBumper");
       EntityParser.clarify("FrostHelper/StaticBumper", EntityParser.Types.unwrapped, (Level l, LevelData d, Vector2 o, EntityData e)=>{
-        Entity s = orig(l,d,o,e);
-        DebugConsole.Write($"Adding wrapped bumper! {s}");
-        return new Staticbumperwrapper(s,e);
+        if(Level.EntityLoaders.TryGetValue("FrostHelper/StaticBumper",out var orig)){
+          Entity s = orig(l,d,o,e);
+          return new Staticbumperwrapper(s,e);
+        }
+        return null;
       });
     },()=>{});
   }

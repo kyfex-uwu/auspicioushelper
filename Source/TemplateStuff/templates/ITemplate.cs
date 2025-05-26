@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Celeste.Mod.auspicioushelper.Wrappers;
 using Microsoft.Xna.Framework;
 using Mono.Cecil.Cil;
 using Monocle;
@@ -208,6 +209,7 @@ public class Template:Entity, ITemplateChild{
     }
     children.Clear();
     fgt = null;
+    basicents = null;
   }
   public virtual void remake(){
     Scene old = Scene;
@@ -252,7 +254,7 @@ public class Template:Entity, ITemplateChild{
     Remove(bar);
     bar=null;
     foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
-        if(e is IChildShaker s) s.onShake(ownShakeVec);
+      if(e is IChildShaker s) s.onShake(ownShakeVec);
     }
     yield break;
   }

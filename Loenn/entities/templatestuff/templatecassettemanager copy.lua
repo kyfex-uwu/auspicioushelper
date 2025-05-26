@@ -15,6 +15,7 @@ entity.placements = {
       channel_3="",
       channel_4="",
       simple_style = false,
+      visual_only = false,
     }
   }
 }
