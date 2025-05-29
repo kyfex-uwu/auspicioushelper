@@ -7,15 +7,45 @@ using Celeste.Mod.auspicioushelper;
 using Monocle;
 using System.Collections;
 using Microsoft.Xna.Framework.Graphics;
+using Celeste.Mod.auspicioushelper.Wrappers;
+using System.Runtime.CompilerServices;
 
 namespace Celeste.Mod.auspicioushelper;
 
 
 [Tracked]
 [CustomEntity("auspicioushelper/ChannelBooster")]
-public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
+public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
+  bool pact;
+  public void parentChangeStat(int vis, int col, int act){
+    if(vis!=0) Visible=vis>0;
+    if(col!=0) Collidable=col>0;
+    if(act!=0) Active=act>0;
+    //Active = Collidable && pact;
+  }
+  public Vector2 toffset {get;set;}
+  public Template parent {get;set;}
+  public void setOffset(Vector2 offset){
+    toffset = Position-offset;
+  }
+  public void relposTo(Vector2 pos, Vector2 liftspeed){
+    Vector2 npos = pos+toffset;
+    if(outline!=null) outline.Position = npos;
+    if(!BoostingPlayer && sprite!=null && sprite.CurrentAnimationID != "pop") Position = npos;
+    if(insideplayer!=null){
+      insideplayer.MoveTowardsX(npos.X,100);
+      insideplayer.MoveTowardsY(npos.Y,100);
+      insideplayer.boostTarget = npos;
+      insideplayer.LiftSpeed = liftspeed;
+    }
+  }
+  public void destroy(bool particles){
+    RemoveSelf();
+    outline.RemoveSelf();
+  }
   private const float RespawnTime = 1f;
-  public static Booster boosterOfSins = new Booster(new Vector2(0,-999999), false) {Depth = 9+10};
+  //public static Booster boosterOfSins = new Booster(new Vector2(0,-999999), false) {Depth = 9+10};
+  public static Booster boosterOfSins = (Booster)RuntimeHelpers.GetUninitializedObject(typeof(Booster));
   public static ChannelBooster lastUsed = null;
   public static ParticleType P_Burst = new ParticleType{
     Source = GFX.Game["particles/blob"],
@@ -135,9 +165,11 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     
     setChVal(ChannelState.readChannel(channel));
   }
+  Player insideplayer;
   private void OnPlayer(Player player){
     if (respawnTimer <= 0f && cannotUseTimer <= 0f && !BoostingPlayer)
     {
+      insideplayer=player;
       cannotUseTimer = 0.45f;
       boosterOfSins.Center = Center;
       player.Boost(boosterOfSins);
@@ -162,6 +194,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     if(selfswitching){
       ChannelState.SetChannel(channel, 1-currentState);
     }
+    insideplayer=null;
   }
   public static void PlayerboostHandler(On.Celeste.Booster.orig_PlayerBoosted orig, Booster self, Player player, Vector2 direction){
     if (self==boosterOfSins || self.Depth == 9+10){
@@ -200,6 +233,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     cannotUseTimer = 0f;
     respawnTimer = 1f;
     BoostingPlayer = false;
+    insideplayer = null;
   }
   public static void PlayerreleaseHandler(On.Celeste.Booster.orig_PlayerReleased orig, Booster self){
     if (self==boosterOfSins || self.Depth == 9+10){
@@ -294,7 +328,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject{
     sprite.Position = position;
   }
   public void registerMaterials(){
-    layerA.planDraw(this);
+    layerA?.planDraw(this);
   }
   public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     if(respawnTimer<=0 && sprite.Visible){

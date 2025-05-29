@@ -94,5 +94,6 @@ public class BasicMultient:ITemplateChild{
     foreach(EntEnt ent in ents){
       ent.e.RemoveSelf();
     }
+    ents.Clear();
   }
 }

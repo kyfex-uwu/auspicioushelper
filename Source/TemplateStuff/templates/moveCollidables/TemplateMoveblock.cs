@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
@@ -21,6 +22,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
   bool cansteer;
   int maxleniency;
   Vector2 origpos;
+  string moveevent = "event:/game/04_cliffside/arrowblock_move";
   public TemplateMoveBlock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateMoveBlock(EntityData d, Vector2 offset, int depthoffset)
   :base(d,offset+d.Position,depthoffset){
@@ -39,6 +41,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
     maxStuckTime = d.Float("Max_stuck",0.15f);
     cansteer = d.Bool("cansteer", false);
     maxleniency = d.Int("max_leniency",4);
+    moveevent = d.Attr("movesfx","event:/game/04_cliffside/arrowblock_move");
     origpos = Position;
     prop &= ~Propagation.Riding;
   }
@@ -58,16 +61,18 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
       steerdelay = 0.2f;
       while(!triggered && !hasRiders<Player>()) yield return null;
       disconnect();
+      triggered=true;
       speed = 0;
       Audio.Play("event:/game/04_cliffside/arrowblock_activate", Position);
+      shake(0.2f);
       yield return 0.2f;
-      movesfx.Play("event:/game/04_cliffside/arrowblock_move");
+      movesfx.Play(moveevent);
       movesfx.Param("arrow_stop", 0f);
     moving:
       yield return null;
       speed = Calc.Approach(speed,maxspeed,acceleration*Engine.DeltaTime);
       Query qs = getq(new Vector2(speed+maxleniency,speed+maxleniency).Ceiling());
-      bool collideflag = false;
+      bool collideflag;
       Vector2 movevec = movedir;
       Player p = Scene.Tracker.GetEntity<Player>();
       if(movedir.Y==0){
@@ -109,21 +114,28 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
         movesfx.Param("arrow_stop", 0f);
         stuckTimer = maxStuckTime;
       }
+      float tau = MathF.PI * 2f;
+      int num = (int)Math.Floor((0f - (movevec * new Vector2(-1f, 1f)).Angle() + tau) % tau / tau * 8f + 0.5f);
+      movesfx.Param("arrow_influence", num + 1);
       goto moving;
     blocked:
       movesfx.Stop();
+      shake(0.2f);
       Audio.Play("event:/game/04_cliffside/arrowblock_break", Position);
+      yield return 0.2f;
       if(!respawning){
         destroy(true);
         yield break;
       } 
       destroyChildren();
+      triggered=false;
       fgt = null;
       yield return maxrespawntimer;
       Scene old = Scene;
       Scene = null;
       reconnect(origpos);
       addTo(old);
+      yield return null;
       Audio.Play("event:/game/04_cliffside/arrowblock_reappear", Position);
       goto waiting;
   }

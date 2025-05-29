@@ -16,7 +16,7 @@ public class Bumperw : Bumper, ISimpleEnt {
   }
   
   Vector2 rpp;
-  Vector2 toffset;
+  public Vector2 toffset {get;set;}
   Vector2 twoffset = Vector2.Zero;
   public Bumperw(EntityData e, Vector2 o):base(e,o){
     Tween tw = Get<Tween>();

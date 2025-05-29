@@ -28,6 +28,15 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     pastLiftspeed = new Vector2[smearamount];
     ridingTrigger = d.Bool("ridingTrigger",true);
     hooks.enable();
+    Add(new BeforeAfterRender(()=>{
+      if(this.ownShakeVec == Vector2.Zero) return;
+      foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
+        prevpos.TryAdd(e,e.Position);
+        e.Position+=ownShakeVec;
+        if(e is IChildShaker s) s.onShake(ownShakeVec);
+      }
+    }));
+    shakeHooks.enable();
   }
   public override Vector2 gatheredLiftspeed => ownLiftspeed;
   void evalLiftspeed(bool precess = true){
@@ -63,12 +72,15 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
       OnEnable=()=>{
         childRelposTo(virtLoc,Vector2.Zero);
         setVisCol(true,true);
-        if(layer != null) layer.removeTrying(this);
+        if(string.IsNullOrWhiteSpace(channel)) remake();
+        else if(layer != null) layer.removeTrying(this);
+        this.ownShakeVec = Vector2.Zero;
       },
       OnDisable=()=>{
         setVisCol(false,false);
         cachedCol =false;
-        if(layer !=null) layer.addTrying(this);
+        if(string.IsNullOrWhiteSpace(channel)) destroyChildren(true);
+        else if(layer !=null) layer.addTrying(this);
       },
       OnAttach=(Platform p)=>{
         setVisCol(true,true);
@@ -100,6 +112,9 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
         }
         childRelposTo(virtLoc,ownLiftspeed);
         if(flag)setCollidability(!cachedCol);
+      },
+      OnShake = (Vector2 shakevec)=>{
+        this.ownShakeVec += shakevec;
       }
     });
     if(layer!=null){
@@ -122,7 +137,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     } 
     Draw.SpriteBatch = origsb;
   }
-  bool cachedCol;
+  bool cachedCol = true;
 
   static bool MoveHPlatHook(On.Celeste.Platform.orig_MoveHExactCollideSolids orig, Platform p, 
     int moveH, bool thruDashBlocks, Action<Vector2, Vector2, Platform> onCollide

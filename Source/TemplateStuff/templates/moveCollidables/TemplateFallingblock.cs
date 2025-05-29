@@ -47,6 +47,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
     }
     triggered = true;
     disconnect();
+    shake(0.2f);
     Audio.Play(ShakeSfx,Position);
     yield return 0.25f;
     trying:
@@ -55,8 +56,9 @@ public class TemplateFallingblock:TemplateMoveCollidable{
       if(TestMove(qs, 1, falldir)){
         speed = 0;
         if(!first){
+          shake(0.2f);
           Audio.Play(ShakeSfx,Position);
-          yield return 0.25f;
+          yield return 0.1f;
           goto falling;
         }
       } else goto trying;

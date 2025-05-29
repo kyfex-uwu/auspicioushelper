@@ -11,7 +11,7 @@ public class RefillW:Refill,ISimpleEnt {
   public RefillW(EntityData d, Vector2 offset):base(d,offset){
     hooks.enable();
   }
-  Vector2 toffset;
+  public Vector2 toffset {get;set;}
   public void setOffset(Vector2 ppos){
     toffset = Position-ppos;
   }

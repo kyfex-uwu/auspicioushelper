@@ -93,7 +93,7 @@ public class TemplateZipmover:Template{
   public override void Update(){
     base.Update();
   }
-
+  
   private IEnumerator FancySequence(){
     bool done; float at;
     waiting:
@@ -105,7 +105,6 @@ public class TemplateZipmover:Template{
         if(dashed!=0) goto going;
       }
       goto waiting;
-
     going:
       sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
       yield return 0.1f;
@@ -125,6 +124,7 @@ public class TemplateZipmover:Template{
       
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       SceneAs<Level>().Shake();
+      shake(0.1f);
       yield return 0.25f;
 
       if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
@@ -155,6 +155,7 @@ public class TemplateZipmover:Template{
         childRelposTo(virtLoc, gatheredLiftspeed);
       }
       ownLiftspeed = Vector2.Zero;
+      shake(0.1f);
       if(spos.t>0) goto returning;
       yield return 0.5f;
       goto waiting;

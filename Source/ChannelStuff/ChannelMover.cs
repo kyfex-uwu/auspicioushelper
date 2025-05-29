@@ -50,7 +50,7 @@ public class ChannelMover:Solid, IChannelUser, IMaterialObject{
     Draw.Rect(Position, width, height, Color.AliceBlue);
   }
   public void registerMaterials(){
-    ChannelBaseEntity.layerA.planDraw(this);
+    ChannelBaseEntity.layerA?.planDraw(this);
   }
   public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c){
     sb.Draw(Draw.Pixel.Texture.Texture_Safe,new Rectangle((int) Position.X, (int) Position.Y,(int) width, (int) height), Draw.Pixel.ClipRect, new Color(1,0,0,255));

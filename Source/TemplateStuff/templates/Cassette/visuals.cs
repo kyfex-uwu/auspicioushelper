@@ -126,6 +126,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
     if(ChannelState.readChannel(channel) == 0)foreach(Entity e in items){
       if(e.Scene != null && e.Depth<=depth) e.Render();
+      //DebugConsole.Write($"{e.Position} {e}");
     }
     foreach(IMaterialObject e in trying){
       e.renderMaterial(this, sb, c);

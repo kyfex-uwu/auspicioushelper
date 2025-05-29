@@ -54,6 +54,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   bool active = true;
   bool correct;
   bool subordinate = false;
+  bool visualOnly = false;
   List<string> channels = new List<string>{"","","",""};
   public TemplateCassetteManager(EntityData d, Vector2 offset):base(d.Position+offset){
     if(d.Name == "auspicioushelper/TemplateCassetteManager"){
@@ -102,6 +103,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
         };
         channels[i] = ch;
       }
+      visualOnly = d.Bool("visual_only",false);
     }
     inimaterials();
   }
@@ -208,6 +210,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   public override void Update(){
     base.Update();
     if(subordinate){
+      if(visualOnly) return;
       CassetteBlockManager cbm = Scene.Tracker.GetEntity<CassetteBlockManager>();
       int cbeatloc = cbm?.currentIndex??-1;
       if(cbeatloc != lastBeatLoc){
