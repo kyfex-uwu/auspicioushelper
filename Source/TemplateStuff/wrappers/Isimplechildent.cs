@@ -9,6 +9,7 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 
 public interface ISimpleEnt:ITemplateChild{
+  Template.Propagation ITemplateChild.prop => Template.Propagation.Shake;
   void ITemplateChild.AddAllChildren(List<Entity> l){
     l.Add((Entity)this);
   }

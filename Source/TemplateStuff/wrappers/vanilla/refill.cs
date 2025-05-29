@@ -7,7 +7,7 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 
 public class RefillW:Refill,ISimpleEnt {
   public Template parent {get;set;}
-  public Template.Propagation prop {get;}
+  public Template.Propagation prop=>Template.Propagation.None;
   public RefillW(EntityData d, Vector2 offset):base(d,offset){
     hooks.enable();
   }

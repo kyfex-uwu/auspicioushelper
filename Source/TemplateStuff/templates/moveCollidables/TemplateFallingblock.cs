@@ -31,6 +31,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
       "right"=>Vector2.UnitX,
       _=>Vector2.UnitX
     };
+    falldir = basefalldir;
     rch = d.Attr("reverseChannel");
     tch = d.Attr("triggerChannel");
     ImpactSfx = d.Attr("impact_sfx","event:/game/general/fallblock_impact");

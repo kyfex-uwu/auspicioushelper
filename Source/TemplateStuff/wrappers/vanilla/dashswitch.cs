@@ -11,7 +11,7 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 
 public class DashSwitchW:DashSwitch, ISimpleEnt{
   public Template parent {get;set;}
-  public Template.Propagation prop {get;set;} = Template.Propagation.All;
+  public Template.Propagation prop => Template.Propagation.All;
   Vector2 origtoffset;
 
   public DashSwitchW(EntityData e, Vector2 offset, EntityID id):base(

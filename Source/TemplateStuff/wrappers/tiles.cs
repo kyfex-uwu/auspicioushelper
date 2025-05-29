@@ -44,7 +44,7 @@ public interface IBoundsHaver{
 }
 
 internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
-  public Template.Propagation prop{get;} = Template.Propagation.None;
+  public Template.Propagation prop => Template.Propagation.None;
   public Template parent {get;set;}
   public Vector2 toffset;
   public FloatRect bounds {get;set;}
@@ -68,7 +68,7 @@ internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
 }
 
 internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
-  public Template.Propagation prop{get;} = Template.Propagation.All;
+  public Template.Propagation prop=> Template.Propagation.All;
   public Template parent {get;set;}
   public Vector2 toffset;
   public FloatRect bounds {get;set;}
