@@ -15,7 +15,7 @@ namespace Celeste.Mod.auspicioushelper;
 
 [Tracked]
 [CustomEntity("auspicioushelper/ChannelBooster")]
-public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
+public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IBooster{
   bool pact;
   public void parentChangeStat(int vis, int col, int act){
     if(vis!=0) Visible=vis>0;
@@ -45,7 +45,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
   }
   private const float RespawnTime = 1f;
   //public static Booster boosterOfSins = new Booster(new Vector2(0,-999999), false) {Depth = 9+10};
-  public static Booster boosterOfSins = (Booster)RuntimeHelpers.GetUninitializedObject(typeof(Booster));
+  //public static Booster boosterOfSins = (Booster)RuntimeHelpers.GetUninitializedObject(typeof(Booster));
   public static ChannelBooster lastUsed = null;
   public static ParticleType P_Burst = new ParticleType{
     Source = GFX.Game["particles/blob"],
@@ -148,7 +148,6 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
     channel = data.Attr("channel","");
     selfswitching = data.Bool("self_activating", false);
     id=idctr++;
-    hooks.enable();
   }
   public override void Added(Scene scene)
   {
@@ -171,9 +170,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
     {
       insideplayer=player;
       cannotUseTimer = 0.45f;
-      boosterOfSins.Center = Center;
-      player.Boost(boosterOfSins);
-      lastUsed = this;
+      IBooster.startBoostPlayer(player, this);
       Audio.Play("event:/game/04_cliffside/greenbooster_enter", Position);
       sprite.Play("inside");
       //sprite.FlipX = player.Facing == Facings.Left;
@@ -195,13 +192,6 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
       ChannelState.SetChannel(channel, 1-currentState);
     }
     insideplayer=null;
-  }
-  public static void PlayerboostHandler(On.Celeste.Booster.orig_PlayerBoosted orig, Booster self, Player player, Vector2 direction){
-    if (self==boosterOfSins || self.Depth == 9+10){
-      lastUsed.PlayerBoosted(player, direction);
-    } else {
-      orig(self, player, direction);
-    }
   }
 
   private IEnumerator BoostRoutine(Player player, Vector2 dir){
@@ -235,30 +225,11 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
     BoostingPlayer = false;
     insideplayer = null;
   }
-  public static void PlayerreleaseHandler(On.Celeste.Booster.orig_PlayerReleased orig, Booster self){
-    if (self==boosterOfSins || self.Depth == 9+10){
-      lastUsed.PlayerReleased();
-    } else {
-      orig(self);
-    }
-  }
   public void PlayerDied(){
     if (BoostingPlayer){
       PlayerReleased();
       dashRoutine.Active = false;
       base.Tag = 0;
-    }
-  }
-  public static void PlayerdieHandler(On.Celeste.Booster.orig_PlayerDied orig, Booster self){
-    if (self==boosterOfSins || self.Depth == 9+10){
-      try{
-        lastUsed.PlayerDied();
-      }catch(Exception ex){
-        DebugConsole.Write($"thing happened {ex}"); 
-        //this happens very rarely when dying on a new map with weird state from an old one. No consequence.
-      }
-    } else {
-      orig(self);
     }
   }
   public void Respawn(bool remanifest, bool change){
@@ -342,14 +313,5 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt{
     //   (int)pos.X,(int)pos.Y, 4,4
     // ),Draw.Pixel.ClipRect,iinnerColor);
   }
-  static HookManager hooks = new HookManager(()=>{
-    On.Celeste.Booster.PlayerBoosted += PlayerboostHandler;
-    On.Celeste.Booster.PlayerDied += PlayerdieHandler;
-    On.Celeste.Booster.PlayerReleased += PlayerreleaseHandler;
-  }, void ()=>{
-    On.Celeste.Booster.PlayerBoosted -= PlayerboostHandler;
-    On.Celeste.Booster.PlayerDied -= PlayerdieHandler;
-    On.Celeste.Booster.PlayerReleased -= PlayerreleaseHandler;
-  }, auspicioushelperModule.OnEnterMap);
 }
 
