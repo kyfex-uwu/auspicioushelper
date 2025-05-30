@@ -40,12 +40,14 @@ public class BasicMultient:ITemplateChild{
     public Entity e;
     public EntEnt(Entity e, Vector2 o){
       offset=o; this.e=e;
+      if(e is Decal) offset = o.Round();
       lpos = e.Position;
     }
   }
   List<EntEnt> ents = new List<EntEnt>();
   int depthoffset;
   Scene Scene = null;
+  Vector2 lloc;
   public BasicMultient(Template t){
     parent = t;
     depthoffset = t.depthoffset;
@@ -56,18 +58,21 @@ public class BasicMultient:ITemplateChild{
     if(e.Scene == null && this.Scene != null) Scene.Add(e);
   }
   public void relposTo(Vector2 loc, Vector2 liftspeed){
+    Vector2 nloc = loc.Round();
+    if(nloc == lloc) return;
     for(var i=0; i<ents.Count; i++){
       var en = ents[i];
       if(en.e is Decal){
-        en.e.Position=(loc+en.offset).Round();
+        en.e.Position=nloc+en.offset;
       }else {
         if(en.e.Position != en.lpos){
-          en.offset += en.e.Position-en.lpos;
+          en.offset = en.e.Position-lloc;
         }
-        en.e.Position = loc+en.offset;
+        en.e.Position = nloc+en.offset;
         en.lpos = en.e.Position;
       }
     }
+    lloc = nloc;
   }
   public void sceneadd(Scene scene){
     this.Scene = scene;
