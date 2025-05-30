@@ -95,28 +95,18 @@ public class Template:Entity, ITemplateChild{
   }
   internal Wrappers.FgTiles fgt = null;
   public void addEnt(ITemplateChild c){
-    children.Add(c);
-    c.addTo(Scene);
-    c.setOffset(virtLoc);
     c.parent = this;
+    children.Add(c);
     if(c is Template ct){
       ct.depthoffset+=depthoffset;
     }
+    c.addTo(Scene);
+    c.setOffset(virtLoc);
   }
   public void setOffset(Vector2 ppos){
     this.toffset = Position-ppos;
   }
-  public virtual void addTo(Scene scene){
-    if(Scene != null){
-      DebugConsole.Write("Something has gone terribly wrong in recursive adding process");
-    }
-    Scene = scene;
-    if(basicents != null){
-      DebugConsole.Write("Weird if this happens but nothing is actually wrong");
-      basicents.sceneadd(scene);
-    }
-    scene.Add(this);
-
+  void makeChildren(Scene scene){
     if(t==null) return;
     if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset));
     if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset));
@@ -136,6 +126,18 @@ public class Template:Entity, ITemplateChild{
       };
       AddBasicEnt(e, simoffset+d.Position-virtLoc);
     }
+  }
+  public virtual void addTo(Scene scene){
+    if(Scene != null){
+      DebugConsole.Write("Something has gone terribly wrong in recursive adding process");
+    }
+    Scene = scene;
+    if(basicents != null){
+      DebugConsole.Write("Weird if this happens but nothing is actually wrong");
+      basicents.sceneadd(scene);
+    }
+    scene.Add(this);
+    makeChildren(scene);
   }
   public override void Added(Scene scene){
     if(Scene == null){
@@ -212,9 +214,7 @@ public class Template:Entity, ITemplateChild{
     basicents = null;
   }
   public virtual void remake(){
-    Scene old = Scene;
-    Scene=null;
-    addTo(old);
+    makeChildren(Scene);
   }
   public string fullpath=>parent==null?ownidpath.ToString():parent.fullpath+$"/{ownidpath}";
   public static string getOwnID(EntityData e){

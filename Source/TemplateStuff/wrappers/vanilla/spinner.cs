@@ -44,6 +44,7 @@ public class Spinner:CrystalStaticSpinner, ISimpleEnt{
   }
   public void setOffset(Vector2 ppos){
     toffset = Position-ppos;
+    Depth+=parent.depthoffset;
   }
   static bool CheckSolidHook(On.Celeste.CrystalStaticSpinner.orig_SolidCheck orig, CrystalStaticSpinner self, Vector2 pos){
     if(self is Spinner s){

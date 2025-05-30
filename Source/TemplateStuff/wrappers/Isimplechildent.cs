@@ -33,6 +33,7 @@ public interface ISimpleEnt:ITemplateChild{
   }
   void ITemplateChild.setOffset(Vector2 ppos){
     toffset = ((Entity) this).Position-ppos;
+    ((Entity)this).Depth+=parent.depthoffset;
   }
   void ITemplateChild.relposTo(Vector2 vector, Vector2 liftspeed){
     ((Entity) this).Position = vector+toffset;

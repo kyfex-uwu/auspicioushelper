@@ -53,6 +53,7 @@ internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
     Depth+=depthoffset;
     TileHooks.hooks.enable();
   }
+  public void setOffset(Vector2 ppos){}
   public void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
   }
@@ -80,6 +81,7 @@ internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
     TileHooks.hooks.enable();
     OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
   }
+  public void setOffset(Vector2 ppos){}
   public override void Added(Scene scene){
     base.Added(scene);
     bounds = new FloatRect(SceneAs<Level>().Bounds);

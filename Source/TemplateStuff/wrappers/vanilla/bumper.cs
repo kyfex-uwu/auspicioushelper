@@ -38,6 +38,7 @@ public class Bumperw : Bumper, ISimpleEnt {
   public void setOffset(Vector2 ppos) {
     toffset=Position-ppos;
     rpp = ppos;
+    Depth+=parent.depthoffset;
   }
   public void parentChangeStat(int vis, int col, int act){
     if(vis!=0) Visible = vis>0;

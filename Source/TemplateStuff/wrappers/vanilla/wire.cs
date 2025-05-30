@@ -15,6 +15,7 @@ public class CWire:Wire, ISimpleEnt{
   public void setOffset(Vector2 ppos){
     fromOffset = Curve.Begin-ppos;
     toOffset = Curve.End-ppos;
+    Depth+=parent.depthoffset;
   }
   public void relposTo(Vector2 loc, Vector2 ls){
     Curve.Begin = fromOffset+loc;

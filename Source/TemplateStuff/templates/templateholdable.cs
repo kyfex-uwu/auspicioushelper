@@ -71,6 +71,8 @@ public class TemplateHoldable:Actor{
     respawning = d.Bool("respawning",false);
     respawndelay = d.Float("respawnDelay",2f);
     dontFlingOff = d.Bool("dontFlingOff",false);
+    showTutorial = d.Bool("tutorial",false);
+    startFloating = d.Bool("start_floating",false);
     SquishCallback = OnSquish2;
   }
   HashSet<Platform> Mysolids;
@@ -88,7 +90,7 @@ public class TemplateHoldable:Actor{
     base.Added(scene);
     make(scene);
     if(showTutorial){
-      tutorialGui = new BirdTutorialGui(this, new Vector2(0f, -24f), Dialog.Clean("tutorial_carry"), Dialog.Clean("tutorial_hold"), BirdTutorialGui.ButtonPrompt.Grab);
+      tutorialGui = new BirdTutorialGui(this, new Vector2(0f, -Height/2-8), Dialog.Clean("tutorial_carry"), Dialog.Clean("tutorial_hold"), BirdTutorialGui.ButtonPrompt.Grab);
       tutorialGui.Open = false;
       scene.Add(tutorialGui);
       Add(new Coroutine(tutorialRoutine()));

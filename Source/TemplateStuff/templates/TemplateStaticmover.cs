@@ -19,6 +19,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   bool averageSmear;
   string channel="";
   bool ridingTrigger;
+  bool enableUnrooted = false;
   
   public TemplateStaticmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d,d.Position+offset,depthoffset){
@@ -27,6 +28,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     channel = d.Attr("channel","");
     pastLiftspeed = new Vector2[smearamount];
     ridingTrigger = d.Bool("ridingTrigger",true);
+    enableUnrooted = d.Bool("EnableUnrooted");
     hooks.enable();
     Add(new BeforeAfterRender(()=>{
       if(this.ownShakeVec == Vector2.Zero) return;
@@ -120,6 +122,13 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     if(layer!=null){
       todraw = new List<Entity>();
       AddAllChildren(todraw);
+    }
+  }
+  public override void Awake(Scene scene) {
+    base.Awake(scene);
+    if(enableUnrooted && sm.Platform == null){
+      setVisCol(true, true);
+      Remove(sm);
     }
   }
   public override void Update(){

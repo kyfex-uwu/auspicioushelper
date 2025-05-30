@@ -49,6 +49,11 @@ public class CassetteMaterialLayer:IMaterialLayer{
             c.innerhigh = new Color(0.5f*h.ToVector4()); 
             c.innerlow = new Color(0.3f*h.ToVector4());
           break;
+          case "innercolor":
+            Color h2 = Util.hexToColor(pair.Value.Trim());
+            c.innerhigh = h2;
+            c.innerlow = h2;
+            break;
           case "x": c.patternvec.X=float.Parse(pair.Value); break;
           case "y": c.patternvec.Y=float.Parse(pair.Value); break;
           case "time": c.patternvec.Z=float.Parse(pair.Value); break;

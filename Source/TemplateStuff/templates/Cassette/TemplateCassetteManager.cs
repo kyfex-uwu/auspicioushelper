@@ -91,14 +91,15 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
       subordinate = true;
       material = new();
       bool usevanilla = !d.Bool("simple_style",false);
+      bool opaque = !d.Bool("translucent",false);
       for(int i=0; i<4; i++){
         string ch = d.Attr("channel_"+(i+1).ToString());
         if(string.IsNullOrWhiteSpace(ch)) continue;
         material[ch] = i switch {
-          0=>$"{{color:#42559a, x:1.57079632, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}}}",
-          1=>$"{{color:#5a1254, x:1.57079632, y:-1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}}}",
-          2=>$"{{color:#666a24, x:1.57079632, y:0, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}}}",
-          3=>$"{{color:#037231, x:0, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}}}",
+          0=>$"{{color:#1D539B, x:1.57079632, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:0E3463":"")}}}",
+          1=>$"{{color:#60247B, x:1.57079632, y:-1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:2F164E":"")}}}",
+          2=>$"{{color:#656C26, x:1.57079632, y:0, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:314318":"")}}}",
+          3=>$"{{color:#166E32, x:0, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:0B4520":"")}}}",
           _=>"{color:#fff, x:0.3,y:1.2}"
         };
         channels[i] = ch;

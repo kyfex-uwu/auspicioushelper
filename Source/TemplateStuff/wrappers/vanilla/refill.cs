@@ -14,6 +14,7 @@ public class RefillW:Refill,ISimpleEnt {
   public Vector2 toffset {get;set;}
   public void setOffset(Vector2 ppos){
     toffset = Position-ppos;
+    Depth+=parent.depthoffset;
   }
   public void relposTo(Vector2 loc, Vector2 ls){
     Position = toffset+loc;

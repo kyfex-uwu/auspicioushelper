@@ -15,7 +15,8 @@ entity.placements = {
       channel = "",
       liftspeed_smear = 4,
       smear_average = false,
-      ridingTrigger = true
+      ridingTrigger = true,
+      EnableUnrooted = false,
     }
   }
 }

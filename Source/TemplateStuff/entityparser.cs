@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using Celeste.Mod.auspicioushelper.Wrappers;
 using Microsoft.Xna.Framework;
 using Monocle;
 
@@ -178,6 +179,8 @@ public static class EntityParser{
       if (e.Has("texture")) movingPlatform.OverrideTexture = e.Attr("texture");
       return movingPlatform;
     });
+
+    clarify("wire",Types.unwrapped,static(Level l, LevelData d, Vector2 o, EntityData e)=>new CWire(e,o));
     defaultModdedSetup();
   }
   public static Level.EntityLoader getLoader(string name){

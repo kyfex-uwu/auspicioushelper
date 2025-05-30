@@ -38,11 +38,13 @@ public class TemplateGluable:Template{
     pastLiftspeed = new Vector2[smearamount];
     averageSmear = d.Bool("smear_average",false);
   }
+  bool added = false;
   public void make(Entity e){
     Depth = e.Depth-1;
     lpos = e.Position;
     Position = e.Position;
-    base.addTo(Scene);
+    added=true;
+    base.addTo(e.Scene);
   }
   public override void addTo(Scene scene){
     gluedto = FoundEntity.find(lookingFor)?.Entity;
@@ -50,13 +52,22 @@ public class TemplateGluable:Template{
   }
   public override void Awake(Scene scene){
     base.Awake(scene);
-    if(gluedto == null) addTo(Scene);
+    if(!added){
+      gluedto = FoundEntity.find(lookingFor)?.Entity;
+      if(gluedto != null) make(gluedto);
+    }
   }
   public override void Update(){
     base.Update();
+    if(!added){
+      gluedto = FoundEntity.find(lookingFor)?.Entity;
+      if(gluedto != null) make(gluedto);
+      return;
+    }
     if(gluedto.Scene == null){
       gluedto = null;
-      destroy(true);
+      destroyChildren(true);
+      added=false;
       return;
     } 
     if(gluedto.Position!=lpos){
