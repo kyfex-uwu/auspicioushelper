@@ -17,6 +17,7 @@ public static class EntityParser{
     unwrapped,
     basic,
     removeSMbasic,
+    initiallyerrors,
   }
   public class EWrap{
     public EntityData d;
@@ -34,7 +35,7 @@ public static class EntityParser{
   }
   public static EWrap makeWrapper(EntityData e, LevelData ldat = null){
     Types etype;
-    if(!parseMap.TryGetValue(e.Name, out etype)){
+    if(!parseMap.TryGetValue(e.Name, out etype) || etype==Types.initiallyerrors){
       bool bad=true;
       try {
         Entity t=null;

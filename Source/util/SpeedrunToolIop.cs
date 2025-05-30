@@ -14,16 +14,11 @@ internal static class SpeedrunToolIop{
   static Type interoptype = null;
   internal static List<object> toDeregister = new List<object>();
   static void loadState(Dictionary<Type, Dictionary<string, object>> values, Level level){
-    int? lastUsed = ChannelBooster.lastUsed?.id;
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
     MaterialPipe.layers.Clear();
     foreach(Entity e in Engine.Instance.scene.Entities){
       if(e is IChannelUser e_){
-        if(e_ is ChannelBooster b && b.id == lastUsed){
-          ChannelBooster.lastUsed = b;
-          DebugConsole.Write("Found matching booster");
-        }
         ChannelState.watch(e_);
       }
       if(e is PortalOthersider m) m.RemoveSelf();
@@ -56,7 +51,7 @@ internal static class SpeedrunToolIop{
     new object[] {
       typeof(ChannelState), new string[] { "channelStates"}
     }, new object[] {
-      typeof(ChannelBooster), new string[] { "lastUsed"}
+      typeof(IBooster), new string[] { "lastUsed"}
     }
   };
 

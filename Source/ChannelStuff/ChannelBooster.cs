@@ -43,10 +43,6 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
     RemoveSelf();
     outline.RemoveSelf();
   }
-  private const float RespawnTime = 1f;
-  //public static Booster boosterOfSins = new Booster(new Vector2(0,-999999), false) {Depth = 9+10};
-  //public static Booster boosterOfSins = (Booster)RuntimeHelpers.GetUninitializedObject(typeof(Booster));
-  public static ChannelBooster lastUsed = null;
   public static ParticleType P_Burst = new ParticleType{
     Source = GFX.Game["particles/blob"],
     Color = Calc.HexToColor("2c956e"),
