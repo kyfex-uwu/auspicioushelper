@@ -35,6 +35,9 @@ public class TemplateHoldable:Actor{
   float respawndelay;
   EntityData d;
   bool dontFlingOff=false;
+  bool hasBeenTouched = false;
+  bool showTutorial = false;
+  bool startFloating = false;
   public TemplateHoldable(EntityData d, Vector2 offset):base(d.Position+offset){
     Position+=new Vector2(d.Width/2, d.Height);
     hoffset = d.Nodes.Length>0?d.Nodes[0]-new Vector2(d.Width/2, d.Height):new Vector2(0,-d.Height/2);
@@ -76,9 +79,26 @@ public class TemplateHoldable:Actor{
     te.addTo(s);
     Mysolids = new (te.GetChildren<Solid>());
   }
+  BirdTutorialGui tutorialGui=null;
+  IEnumerator tutorialRoutine(){
+    yield return 0.25f;
+    if(tutorialGui!=null) tutorialGui.Open=true;
+  }
   public override void Added(Scene scene){
     base.Added(scene);
     make(scene);
+    if(showTutorial){
+      tutorialGui = new BirdTutorialGui(this, new Vector2(0f, -24f), Dialog.Clean("tutorial_carry"), Dialog.Clean("tutorial_hold"), BirdTutorialGui.ButtonPrompt.Grab);
+      tutorialGui.Open = false;
+      scene.Add(tutorialGui);
+      Add(new Coroutine(tutorialRoutine()));
+    }
+  }
+  void touched(){
+    hasBeenTouched=true;
+    if(tutorialGui==null) return;
+    tutorialGui.RemoveSelf();
+    tutorialGui=null;
   }
   public override void Removed(Scene scene){
     if(te!=null){
@@ -119,8 +139,8 @@ public class TemplateHoldable:Actor{
   }
   void OnPickup()
   {
-    if (lastPickup != null)
-    {
+    touched();
+    if (lastPickup != null){
       lastPickup.Speed = lastPickup.Speed * playerfrac + Speed * theofrac;
     }
     Speed = Vector2.Zero;
@@ -212,6 +232,7 @@ public class TemplateHoldable:Actor{
       te.setCollidability(false);
       //DebugConsole.Write($"out update: {Position}");
       if(OnGround()){
+        hasBeenTouched=true;
         float target = (!OnGround(Position + Vector2.UnitX * 3f))? 20f: (!OnGround(Position - Vector2.UnitX * 3f) ? -20f:0);
         Speed.X = Calc.Approach(Speed.X, target, 800f * Engine.DeltaTime);
         if (LiftSpeed == Vector2.Zero && prevLiftspeed != Vector2.Zero &&!dontFlingOff){
@@ -226,6 +247,7 @@ public class TemplateHoldable:Actor{
         }
       } else if(Hold.ShouldHaveGravity) {
         float num = gravity;
+        if(!hasBeenTouched && startFloating) num=0;
         if (Math.Abs(Speed.Y) <= 30f) num*=0.5f;
         float num2 = friction;
         if (Speed.Y < 0f) num2*=0.5f;
@@ -260,6 +282,7 @@ public class TemplateHoldable:Actor{
     pastLiftspeed[0]+=move/Math.Max(Engine.DeltaTime,0.005f);
     exlpos = ExactPosition;
     if(lpos!=Position){
+      touched();
       lpos = Position;
       inRelpos = true; AllowPushing = false;
       bool origpushing = false;

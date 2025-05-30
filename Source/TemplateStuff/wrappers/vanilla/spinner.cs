@@ -11,7 +11,6 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper.Wrappers;
 public class Spinner:CrystalStaticSpinner, ISimpleEnt{
-  public Template.Propagation prop =>Template.Propagation.Shake;
   public Template parent {get;set;} 
   static int uidctr = 0;
   int id;

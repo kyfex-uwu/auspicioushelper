@@ -173,6 +173,11 @@ public static class EntityParser{
       return (Entity) new Strawberry(e,offset,new EntityID(ld.Name,e.ID));
     };
 
+    clarify("movingPlatform",Types.platformbasic,static(Level l, LevelData d, Vector2 o, EntityData e)=>{
+      MovingPlatform movingPlatform = new MovingPlatform(e, o);
+      if (e.Has("texture")) movingPlatform.OverrideTexture = e.Attr("texture");
+      return movingPlatform;
+    });
     defaultModdedSetup();
   }
   public static Level.EntityLoader getLoader(string name){

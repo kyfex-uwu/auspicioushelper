@@ -38,6 +38,7 @@ public class Anti0fZone:Entity{
     ctriggers = d.Bool("triggers", false);
     csolids = d.Bool("solids", false);
     alwayswjc = d.Bool("always_walljumpcheck", false);
+    csolids |= alwayswjc;
     wholeroom = d.Bool("cover_whole_room",false);
     Collider = ci?new Hitbox(d.Width-12,d.Height-12,6,6):new Hitbox(d.Width,d.Height);
   }

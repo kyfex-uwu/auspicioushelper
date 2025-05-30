@@ -7,6 +7,7 @@ namespace Celeste.Mod.auspicioushelper.Wrappers;
 
 public class CWire:Wire, ISimpleEnt{
   public Template parent {get;set;}
+  public Vector2 toffset {get;set;}
   Vector2 fromOffset;
   Vector2 toOffset;
   public CWire(EntityData d, Vector2 o):base(d,o){
