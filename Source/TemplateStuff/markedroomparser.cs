@@ -38,15 +38,14 @@ internal static class MarkedRoomParser{
       if(d.Name == "auspicioushelper/templateFiller") continue;
       //DebugConsole.Write("Looking at entity "+d.Name);
       var hits = rects.collidePointAll(d.Position);
-      EntityParser.EWrap w = null;
-      if(hits.Count >0) w = EntityParser.makeWrapper(d, l);
-      if(w == null) continue;
+      bool w=false;
+      if(hits.Count >0) w = EntityParser.generateLoader(d, l);
+      if(!w) continue;
       foreach(int handle in hits){
         string tid = handleDict[handle];
-        //DebugConsole.Write("put into "+tid);
         templates.TryGetValue(tid, out var temp);
         if(temp == null) continue;
-        temp.childEntities.Add(w);
+        temp.ChildEntities.Add(d);
       }
     }
     foreach(DecalData d in l.FgDecals){

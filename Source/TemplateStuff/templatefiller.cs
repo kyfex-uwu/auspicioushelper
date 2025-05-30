@@ -25,7 +25,7 @@ public class templateFiller:Entity{
   internal Vector2 offset;
   internal Vector2 origin=>-offset+Position;
   internal List<DecalData> decals = new List<DecalData>();
-  internal List<EntityParser.EWrap> childEntities = new List<EntityParser.EWrap>();
+  internal List<EntityData> ChildEntities = new();
   internal templateFiller(EntityData d, Vector2 offset):base(d.Position){
     this.Collider = new Hitbox(d.Width, d.Height);
     name = d.Attr("template_name","");

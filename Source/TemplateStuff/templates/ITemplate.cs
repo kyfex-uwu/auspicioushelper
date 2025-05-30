@@ -113,7 +113,7 @@ public class Template:Entity, ITemplateChild{
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.virtLoc-t.origin;
     string fp = fullpath;
-    foreach(EntityParser.EWrap w in t.childEntities){
+    foreach(EntityData w in t.ChildEntities){
       Entity e = EntityParser.create(w,l,t.roomdat,simoffset,this,fp);
       if(e is ITemplateChild c){
         addEnt(c);
