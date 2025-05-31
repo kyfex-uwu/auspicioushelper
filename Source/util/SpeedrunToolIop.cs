@@ -14,6 +14,7 @@ internal static class SpeedrunToolIop{
   static Type interoptype = null;
   internal static List<object> toDeregister = new List<object>();
   static void loadState(Dictionary<Type, Dictionary<string, object>> values, Level level){
+    try{
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
     MaterialPipe.layers.Clear();
@@ -45,6 +46,11 @@ internal static class SpeedrunToolIop{
     }
     TemplateCassetteManager.unfrickMats(level);
     FoundEntity.clear(Engine.Instance.scene);
+    }catch(Exception ex){
+      DebugConsole.Write($"Auspicioushelper speedruntool failed: \n {ex}");
+      Logger.Log(typeof(auspicioushelperModule).ToString(),$"Failed Speedruntool fixing for reason:\n{ex} ");
+      throw new Exception();
+    }
   }
 
   static List<object[]> staticTypes = new List<object[]>{
@@ -120,6 +126,7 @@ internal static class SpeedrunToolIop{
     }
   }
   internal static HookManager hooks = new HookManager(srtloaduseapi, void()=>{
+    DebugConsole.Write("Unloading SRT interop");
     try{
       foreach(object o in toDeregister){
         SpeedrunToolImport.Unregister(o);

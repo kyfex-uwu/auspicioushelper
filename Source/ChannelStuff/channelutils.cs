@@ -136,6 +136,7 @@ public static class ChannelState{
     }
   }
   public static int watch(IChannelUser b){
+    if(b.channel == null) return 0;
     if (!watching.TryGetValue(b.channel, out var list)) {
       list = new List<IChannelUser>();
       watching[b.channel] = list;

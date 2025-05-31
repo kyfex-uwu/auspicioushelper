@@ -199,7 +199,7 @@ public static class EntityParser{
       case "theoCrystal": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new TheoCrystal(e, o);
       case "glider": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new Glider(e, o);
       case "theoCrystalPedestal": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new TheoCrystalPedestal(e, o);
-      case "badelineBoost": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new BadelineBoost(e, o);
+      case "badelineBoost": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new BadelineBoostW(e, o);
       case "wallBooster": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new WallBooster(e, o);
       case "bounceBlock": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new BounceBlock(e, o);
       case "coreModeToggle": return static (Level l, LevelData d, Vector2 o, EntityData e)=>new CoreModeToggle(e, o);

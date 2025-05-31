@@ -16,12 +16,10 @@ namespace Celeste.Mod.auspicioushelper;
 [Tracked]
 [CustomEntity("auspicioushelper/ChannelBooster")]
 public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IBooster{
-  bool pact;
   public void parentChangeStat(int vis, int col, int act){
     if(vis!=0) Visible=vis>0;
     if(col!=0) Collidable=col>0;
     if(act!=0) Active=act>0;
-    //Active = Collidable && pact;
   }
   public Vector2 toffset {get;set;}
   public Template parent {get;set;}
