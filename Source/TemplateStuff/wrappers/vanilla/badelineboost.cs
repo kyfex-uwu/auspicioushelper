@@ -13,8 +13,22 @@ using Monocle;
 using MonoMod;
 
 
-public class BadelineBoostW : Entity
+public class BadelineBoostW : Entity, ISimpleEnt
 {
+  public Template parent {get;set;}
+  public Vector2 toffset {get;set;}
+  bool pcollidable = true;
+  bool ocollidable = true;
+  bool setCollidability(bool to, ref bool field){
+    field = to;
+    return Collidable = pcollidable&&ocollidable;
+  }
+  public void parentChangeStat(int vis, int col, int act){
+    if(vis!=0) Visible=vis>0;
+    if(col!=0) setCollidability(col>0,ref pcollidable);
+    if(act!=0) Active = act>0;
+  }
+
   public const float MoveSpeed = 320f;
 
   public Sprite sprite;
@@ -108,6 +122,7 @@ public class BadelineBoostW : Entity
   
   public void OnPlayer(Player player)
   {
+    if(travelling) return;
     Add(new Coroutine(BoostRoutine(player)));
   }
 
@@ -119,7 +134,7 @@ public class BadelineBoostW : Entity
     nodeIndex++;
     sprite.Visible = false;
     sprite.Position = Vector2.Zero;
-    Collidable = false;
+    setCollidability(false, ref ocollidable);
     bool finalBoost = nodeIndex >= nodes.Length;
     Level level = Scene as Level;
     bool endLevel;
@@ -286,7 +301,7 @@ public class BadelineBoostW : Entity
           travelling = false;
           stretch.Visible = false;
           sprite.Visible = true;
-          Collidable = true;
+          setCollidability(true, ref ocollidable);
           Audio.Play("event:/char/badeline/booster_reappear", Position);
         }
       };
@@ -325,7 +340,7 @@ public class BadelineBoostW : Entity
   {
     travelling = true;
     nodeIndex++;
-    Collidable = false;
+    setCollidability(false, ref ocollidable);
     Level level = SceneAs<Level>();
     Vector2 from = Position;
     Vector2 to = nodes[nodeIndex];
@@ -356,7 +371,7 @@ public class BadelineBoostW : Entity
         travelling = false;
         stretch.Visible = false;
         sprite.Visible = true;
-        Collidable = true;
+        setCollidability(true, ref ocollidable);
         Audio.Play("event:/char/badeline/booster_reappear", Position);
       }
     };

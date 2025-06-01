@@ -188,7 +188,6 @@ public class Anti0fZone:Entity{
           // }
           wjcp = (alwayswjc||p.CollideCheck<Solid>(p.Position+Vector2.UnitX*5)) && p.WallJumpCheck(1);
           wjcn = (alwayswjc||p.CollideCheck<Solid>(p.Position-Vector2.UnitX*5)) && p.WallJumpCheck(-1);
-          //DebugConsole.Write($"from anti0f: {alwayswjc} {wjcp} {wjcn}");
           if(!(wjcp || wjcn)) return false;
           if(p.SuperWallJumpAngleCheck) p.SuperWallJump(wjcp?-1:1);
           else if(wjcp){
@@ -201,8 +200,8 @@ public class Anti0fZone:Entity{
             if(p.Facing==Facings.Left && Input.GrabCheck && p.Stamina>0f && p.Holding==null && !ClimbBlocker.Check(p.Scene, p, p.Position-Vector2.UnitX*3f)){
               var old = p.Speed;
               p.ClimbJump(); DebugConsole.Write($"0f'd cb {old} {p.Speed} {p.LiftSpeed} {p.liftSpeedTimer}");
-            } else if(p.SuperWallJumpAngleCheck)p.SuperWallJump(-1);
-            else p.WallJump(-1);
+            } else if(p.SuperWallJumpAngleCheck)p.SuperWallJump(1);
+            else p.WallJump(1);
           }
           p.StateMachine.State = 0;
           return true;

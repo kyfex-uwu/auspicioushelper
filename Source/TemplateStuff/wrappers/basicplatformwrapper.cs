@@ -19,7 +19,7 @@ internal class BasicPlatform:ITemplateChild{
     this.p=p;
     parent = t;
     toffset = offset;
-    if(p.OnDashCollide == null)
+    if(p.OnDashCollide == null && !(p is DreamBlock))
       p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
     lpos = p.Position;
   }

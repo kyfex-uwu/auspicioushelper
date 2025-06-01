@@ -1,0 +1,9 @@
+
+
+
+entities.auspicioushelper/Anti0fZone.attributes.description.solids=perform walljumps/cornerjumps on first possible pixel (prevents missing cb speed from 0f)
+entities.auspicioushelper/Anti0fZone.attributes.description.holdables=Pick up holdables on the first possible pixel
+entities.auspicioushelper/Anti0fZone.attributes.description.player_colliders=Hit player colliders on the first possible pixel (if speed or number of dashes changes, will stop your movement)
+entities.auspicioushelper/Anti0fZone.attributes.description.always_walljumpcheck=Always check for walljumps (needed if using sideways jumpthrus) (slow; only use in the area directly around the jumpthru)
+entities.auspicioushelper/Anti0fZone.attributes.description.triggers=Always hit triggers you travel through
+

@@ -10,7 +10,7 @@ local directions = {"down","up","left","right"}
 
 entity.placements = {
   {
-    name = "Template M*veblock",
+    name = "Template Moveblock",
     data = {
       template = "",
       depthoffset=5,

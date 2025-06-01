@@ -50,7 +50,7 @@ public static class EntityParser{
         etype = parseMap[d.Name] = l!=null?Types.unable:Types.initiallyerrors;
       }
     }
-    return etype!=Types.unwrapped;
+    return etype!=Types.unable;
   }
   public static Entity create(EntityData d, Level l, LevelData ld, Vector2 simoffset, Template t, string path){
     if(!parseMap.TryGetValue(d.Name,out var etype) || etype == Types.unable){
