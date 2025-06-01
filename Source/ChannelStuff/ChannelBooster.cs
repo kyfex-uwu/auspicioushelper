@@ -182,6 +182,12 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
       player.DashDir*=-1; 
       player.Speed*=-1;
     }
+    if(parent != null && parent.gatheredLiftspeed != Vector2.Zero){
+      player.Speed+=parent.gatheredLiftspeed;
+      player.LiftSpeed = parent.gatheredLiftspeed;
+    } else if(parent != null && player.liftSpeedTimer>0){
+      player.Speed+=player.LiftSpeed;
+    }
     if(selfswitching){
       ChannelState.SetChannel(channel, 1-currentState);
     }
@@ -233,6 +239,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
     sprite.Play("loop", restart: true);
     sprite.Visible = true;
     outline.Visible = false;
+    if(parent!=null) Position = parent.virtLoc+toffset;
     if(remanifest){
       Audio.Play("event:/game/04_cliffside/greenbooster_reappear", Position);
       ParticleSystem particlesBG = SceneAs<Level>().ParticlesBG;

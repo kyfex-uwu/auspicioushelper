@@ -116,9 +116,8 @@ public class TemplateZipmover:Template{
         Vector2 old = virtLoc;
         done = spos.towardsNext((float)(2*(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime));
         //DebugConsole.Write($"{at}, {spos.t}");
-        Vector2 oldOLS = ownLiftspeed;
-        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc, done?oldOLS+parentLiftspeed:gatheredLiftspeed);
+        if(!done) ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposSafe();
       }
       ownLiftspeed = Vector2.Zero;
       
@@ -151,8 +150,8 @@ public class TemplateZipmover:Template{
         Vector2 old = virtLoc;
         done = spos.towardsNext((float)(-(Math.PI/2)*Math.Sin(at*Math.PI/2)*Engine.DeltaTime/2));
         //virtLoc = Position+spos.pos;
-        ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
-        childRelposTo(virtLoc, gatheredLiftspeed);
+        if(!done) ownLiftspeed = Math.Sign(Engine.DeltaTime)*(virtLoc-old)/Engine.DeltaTime;
+        childRelposSafe();
       }
       ownLiftspeed = Vector2.Zero;
       shake(0.1f);

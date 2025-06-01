@@ -14,6 +14,8 @@ namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateStaticmover")]
 public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
+  public override Vector2 gatheredLiftspeed=>ownLiftspeed;
+  public override void relposTo(Vector2 loc, Vector2 liftspeed) {}
   int smearamount;
   Vector2[] pastLiftspeed;
   bool averageSmear;
@@ -40,7 +42,6 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     }));
     shakeHooks.enable();
   }
-  public override Vector2 gatheredLiftspeed => ownLiftspeed;
   void evalLiftspeed(bool precess = true){
     float mX=0;
     float mY=0;
@@ -112,7 +113,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
           flag = true;
           setCollidability(cachedCol);
         }
-        childRelposTo(virtLoc,ownLiftspeed);
+        childRelposSafe();
         if(flag)setCollidability(!cachedCol);
       },
       OnShake = (Vector2 shakevec)=>{

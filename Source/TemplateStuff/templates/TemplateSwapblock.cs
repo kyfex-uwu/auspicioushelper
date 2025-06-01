@@ -41,7 +41,7 @@ public class TemplateSwapblock:Template{
         target = target%spos.numsegs;
       }
       ownLiftspeed = (virtLoc-old).SafeNormalize()*speed;
-      childRelposTo(virtLoc,gatheredLiftspeed);
+      childRelposSafe();
     } else {
       speed=0;
       Audio.Stop(movesfx);

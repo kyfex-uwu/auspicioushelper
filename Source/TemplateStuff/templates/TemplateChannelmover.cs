@@ -38,7 +38,10 @@ public class TemplateChannelmover:Template, IChannelUser{
     float lprog = prog;
     prog = System.Math.Clamp(prog+dir*relspd*Engine.DeltaTime,0,1);
     if(lprog != prog){
-      childRelposTo(virtLoc,dir*relspd*movevec);
+      ownLiftspeed = dir*relspd*movevec;
+      childRelposSafe();
+    } else {
+      ownLiftspeed = Vector2.Zero;
     }
   }
 }

@@ -101,7 +101,7 @@ public static class EntityParser{
     parseMap["dreamBlock"] = Types.platformbasic;
     loaders["dreamBlock"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
     parseMap["jumpThru"] = Types.platformbasic;
-    loaders["jumpThru"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpthruPlatform(e,offset);
+    loaders["jumpThru"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new JumpThruW(e,offset);
     parseMap["glider"] = Types.unwrapped;
     loaders["glider"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new Glider(e,offset);
     parseMap["seekerBarrier"] = Types.platformbasic;

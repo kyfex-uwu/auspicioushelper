@@ -29,10 +29,10 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     if(!dislocated) base.relposTo(loc,liftspeed);
   }
   public virtual void disconnect(){
+    Position = Position.Round();
+    childRelposSafe();
     dislocated = true;
     prop &= ~Propagation.Shake;
-    Position = Position.Round();
-    childRelposTo(virtLoc,gatheredLiftspeed);
   }
   public virtual void reconnect(Vector2? fallback=null){
     dislocated = false;

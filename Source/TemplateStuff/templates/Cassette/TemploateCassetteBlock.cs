@@ -87,7 +87,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       at=Calc.Approach(at,-bumpTarget,Engine.DeltaTime*120);
       hoffset = at;
       ownLiftspeed = Vector2.UnitY*-60;
-      childRelposTo(virtLoc,gatheredLiftspeed);
+      childRelposSafe();
       yield return null;
     }
     ownLiftspeed=Vector2.Zero;
@@ -96,7 +96,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
       at=Calc.Approach(at,0,Engine.DeltaTime*30);
       hoffset = at;
       ownLiftspeed = Vector2.UnitY*30;
-      childRelposTo(virtLoc,gatheredLiftspeed);
+      childRelposSafe();
       yield return null;
     }
     ownLiftspeed=Vector2.Zero;

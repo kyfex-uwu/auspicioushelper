@@ -46,18 +46,6 @@ public static class portalHooks{
     return orig(self);
   }*/
 
-  private static void HitboxRender(On.Monocle.Hitbox.orig_Render orig, Hitbox h, Camera camera, Color color){
-    //DebugConsole.Write("Rendig");
-    if(PortalGateH.intersections.TryGetValue(h.Entity, out var info)){
-      info.getAbsoluteRects(h, out var r1, out var r2);
-      Rectangle a=r1.munane();
-      Rectangle b=r2.munane();
-      Draw.HollowRect(a.X,a.Y,a.Width,a.Height, color);
-      Draw.HollowRect(b.X,b.Y,b.Width,b.Height, color);
-    } else {
-      orig(h,camera, color);
-    }
-  }
   private static bool HitboxCollidePoint(On.Monocle.Hitbox.orig_Collide_Vector2 orig, Hitbox h, Vector2 p){
     if(PortalGateH.intersections.TryGetValue(h.Entity, out var info)){
       info.getAbsoluteRects(h, out var r1, out var r2);
@@ -150,7 +138,6 @@ public static class portalHooks{
     );
     boundsHook = new Hook(colliderBounds, Bounds_Detour);*/
 
-    On.Monocle.Hitbox.Render+=HitboxRender;
     On.Monocle.Hitbox.Intersects_float_float_float_float += HitboxIsect;
     On.Monocle.Hitbox.Intersects_Hitbox += HitboxIsectHb;
     On.Monocle.Hitbox.Collide_Vector2 += HitboxCollidePoint;
@@ -166,7 +153,6 @@ public static class portalHooks{
   }
   
   public static void unsetupHooks(){
-    On.Monocle.Hitbox.Render -= HitboxRender;
     On.Monocle.Hitbox.Intersects_float_float_float_float -= HitboxIsect;
     On.Monocle.Hitbox.Intersects_Hitbox -= HitboxIsectHb;
     On.Monocle.Hitbox.Collide_Vector2 -= HitboxCollidePoint;

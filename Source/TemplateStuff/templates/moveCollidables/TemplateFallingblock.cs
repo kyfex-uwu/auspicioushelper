@@ -84,7 +84,8 @@ public class TemplateFallingblock:TemplateMoveCollidable{
       for(int i=0; i<40; i++){
         speed = Calc.Approach(speed,160,500*Engine.DeltaTime);
         Position+=fds*speed*Engine.DeltaTime;
-        childRelposTo(virtLoc,fds*speed);
+        ownLiftspeed = fds*speed;
+        childRelposSafe();
         yield return null;
       }
       destroy(false);

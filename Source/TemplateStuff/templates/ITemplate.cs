@@ -83,6 +83,7 @@ public class Template:Entity, ITemplateChild{
     this.Visible = false;
     Depth = 10000+depthoffset;
     this.ownidpath=getOwnID(data);
+    skiphooks.enable();
   }
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){
     Position = loc+toffset;
@@ -93,6 +94,45 @@ public class Template:Entity, ITemplateChild{
       c.relposTo(loc, liftspeed);
     }
   }
+  static HashSet<Actor> alreadyX = new();
+  static HashSet<Actor> alreadyY = new();
+  static bool doingMove = false;
+  public void childRelposSafe(){
+    if(doingMove){
+      childRelposTo(virtLoc,gatheredLiftspeed);
+      return;
+    }
+    doingMove = true;
+    alreadyX.Clear(); alreadyY.Clear();
+    childRelposTo(virtLoc,gatheredLiftspeed);
+    alreadyX.Clear(); alreadyY.Clear();
+    doingMove = false;
+  }
+  static bool moveHHook(On.Celeste.Actor.orig_MoveHExact orig, Actor self, int move, Collision cb, Solid pusher){
+    if(pusher == null && cb == null && doingMove){
+      if(alreadyX.Contains(self)) return false;
+      alreadyX.Add(self);
+      Solid.riders.Remove(self);
+      return orig(self, move, cb, pusher);
+    }
+    return orig(self, move, cb, pusher);
+  }
+  static bool moveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor self, int move, Collision cb, Solid pusher){
+    if(pusher == null && cb == null && doingMove){
+      if(alreadyY.Contains(self)) return false;
+      alreadyY.Add(self);
+      Solid.riders.Remove(self);
+      return orig(self, move, cb, pusher);
+    }
+    return orig(self, move, cb, pusher);
+  }
+  static HookManager skiphooks = new HookManager(()=>{
+    On.Celeste.Actor.MoveHExact+=moveHHook;
+    On.Celeste.Actor.MoveVExact+=moveVHook;
+  },void ()=>{
+    On.Celeste.Actor.MoveHExact-=moveHHook;
+    On.Celeste.Actor.MoveVExact-=moveVHook;
+  }, auspicioushelperModule.OnEnterMap);
   internal Wrappers.FgTiles fgt = null;
   public void addEnt(ITemplateChild c){
     c.parent = this;
