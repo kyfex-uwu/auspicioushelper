@@ -52,6 +52,7 @@ public class SpriteAnimChain:Entity, IMaterialObject{
     ogen = new NoiseSamplerOS2_2DLoop(6*data.Float("tangent_freq",1f),20);
     tangm = data.Float("tangent_magnitude",16);
     textures = GFX.Game.GetAtlasSubtextures(data.Attr("atlas_directory","particles/starfield/"));
+    AddTag(Tags.TransitionUpdate);
   }
   public void addSprite(float time){
     chain.Enqueue(new ActiveSprite(time, ogen.getHandle(),(int)(addTimes.NextFloat()*textures.Count)));

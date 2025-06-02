@@ -17,7 +17,6 @@ public class TemplateFallingblock:TemplateMoveCollidable{
   Vector2 basefalldir = Vector2.UnitY;
   string tch;
   string rch;
-  bool triggered;
   string ImpactSfx = "event:/game/general/fallblock_impact";
   string ShakeSfx = "event:/game/general/fallblock_shake";
   float maxspeed;
@@ -42,7 +41,7 @@ public class TemplateFallingblock:TemplateMoveCollidable{
   IEnumerator Sequence(){
     float speed;
     bool first = true;
-    while(!hasRiders<Player>() || triggered){
+    while(!hasRiders<Player>() && !triggered){
       yield return null;
     }
     triggered = true;

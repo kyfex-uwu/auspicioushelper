@@ -5,14 +5,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Celeste.Mod.auspicioushelper.Wrappers;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Utils;
 
 namespace Celeste.Mod.auspicioushelper;
 
-public class TemplateMoveCollidable:TemplateDisappearer{ 
+public interface ITemplateTriggerable{
+  void OnTrigger(StaticMover s);
+}
+public class TemplateMoveCollidable:TemplateDisappearer, ITemplateTriggerable{ 
   public override Vector2 gatheredLiftspeed => dislocated?ownLiftspeed:base.gatheredLiftspeed;
+  public bool triggered;
   Vector2 movementCounter;
   public Vector2 exactPosition=>Position+movementCounter;
   public override Vector2 virtLoc => dislocated?Position.Round():Position;
@@ -21,6 +26,7 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     Position = Position.Round();
     movementCounter = Vector2.Zero;
     prop &= ~Propagation.Riding; 
+    triggerHooks.enable();
   }
   bool dislocated = false;
   
@@ -214,4 +220,24 @@ public class TemplateMoveCollidable:TemplateDisappearer{
     QueryBounds q = getQinfo(s.bounds._expand(v.X,v.Y),s.gotten);
     return new(q,s);
   }
+
+  public void OnTrigger(StaticMover sm){
+    triggered = true;
+  }
+  static void smtHook(On.Celeste.Platform.orig_OnStaticMoverTrigger orig, Platform p, StaticMover sm){
+    if(p is ITemplateChild c){
+      c.parent?.GetFromTree<ITemplateTriggerable>().OnTrigger(sm);
+    } else {
+      ChildMarker m = p.Get<ChildMarker>();
+      if(m!=null){
+        m.parent.GetFromTree<ITemplateTriggerable>().OnTrigger(sm);
+      }
+    }
+    orig(p,sm);
+  }
+  public static HookManager triggerHooks = new HookManager(()=>{
+    On.Celeste.Platform.OnStaticMoverTrigger+=smtHook;
+  },()=>{
+    On.Celeste.Platform.OnStaticMoverTrigger-=smtHook;
+  },auspicioushelperModule.OnEnterMap); 
 }

@@ -46,7 +46,15 @@ public interface ITemplateChild{
   void destroy(bool particles);
 }
 public interface IChildShaker{
-  public void onShake(Vector2 amount);
+  Vector2 lastShake {get;set;}
+  void OnShake(Vector2 amount);
+  void VanillaShake(Vector2 amount){
+    if(lastShake!=amount) OnShake(amount-lastShake);
+    lastShake = amount;
+  }
+  void OnShakeFrame(Vector2 amount){
+    VanillaShake(amount);
+  }
 }
 
 public class Template:Entity, ITemplateChild{
@@ -77,7 +85,7 @@ public class Template:Entity, ITemplateChild{
   public Template(EntityData data, Vector2 pos, int depthoffset):base(pos){
     string templateStr = data.Attr("template","");
     if(!MarkedRoomParser.templates.TryGetValue(templateStr, out t)){
-      DebugConsole.Write("No template found with identifier "+templateStr);
+      DebugConsole.Write($"No template found with identifier \"{templateStr}\" in {this} at {Position}");
     }
     this.depthoffset = depthoffset;
     this.Visible = false;
@@ -119,7 +127,9 @@ public class Template:Entity, ITemplateChild{
   }
   static bool moveVHook(On.Celeste.Actor.orig_MoveVExact orig, Actor self, int move, Collision cb, Solid pusher){
     if(pusher == null && cb == null && doingMove){
-      if(alreadyY.Contains(self)) return false;
+      if(alreadyY.Contains(self)){
+        return false;
+      }
       alreadyY.Add(self);
       Solid.riders.Remove(self);
       return orig(self, move, cb, pusher);
@@ -224,7 +234,7 @@ public class Template:Entity, ITemplateChild{
       }
     }
   }
-  public List<T> GetChildren<T>(Propagation p = Propagation.None) where T:Entity{
+  public List<T> GetChildren<T>(Propagation p = Propagation.None){
     List<Entity> list = new();
     if(p == Propagation.None) AddAllChildren(list);
     else AddAllChildrenProp(list,p);
@@ -281,7 +291,7 @@ public class Template:Entity, ITemplateChild{
       foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
         prevpos.TryAdd(e,e.Position);
         e.Position+=ownShakeVec;
-        if(e is IChildShaker s) s.onShake(ownShakeVec);
+        if(e is IChildShaker s) s.OnShakeFrame(ownShakeVec);
       }
     }));
     shakeHooks.enable();
@@ -294,7 +304,7 @@ public class Template:Entity, ITemplateChild{
     Remove(bar);
     bar=null;
     foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
-      if(e is IChildShaker s) s.onShake(ownShakeVec);
+      if(e is IChildShaker s) s.OnShakeFrame(ownShakeVec);
     }
     yield break;
   }
@@ -303,4 +313,10 @@ public class Template:Entity, ITemplateChild{
   },()=>{
     BeforeAfterRender.postafter.Remove(restorePos);
   });
+
+  public T GetFromTree<T>(){
+    if(this is T a) return a;
+    if(parent != null) return parent.GetFromTree<T>();
+    return default(T);
+  }
 }

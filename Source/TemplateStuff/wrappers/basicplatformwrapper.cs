@@ -83,3 +83,10 @@ internal class BasicPlatformDisobedient:BasicPlatform{
     lpos = p.Position;
   }
 }
+
+public class ChildMarker:Component{
+  public Template parent;
+  public ChildMarker(Template parent):base(false,false){
+    this.parent=parent;
+  }
+}

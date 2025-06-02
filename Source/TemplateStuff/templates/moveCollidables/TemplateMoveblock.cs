@@ -18,7 +18,6 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
   bool respawning;
   float maxrespawntimer;
   float maxStuckTime;
-  bool triggered;
   bool cansteer;
   int maxleniency;
   Vector2 origpos;

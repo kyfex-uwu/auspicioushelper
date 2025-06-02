@@ -68,7 +68,7 @@ internal class BgTiles:BackgroundTiles, ISimpleEnt, IBoundsHaver{
   }
 }
 
-internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
+internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver, IChildShaker{
   public Template.Propagation prop=> Template.Propagation.All;
   public Template parent {get;set;}
   public Vector2 toffset {get;set;}
@@ -195,4 +195,5 @@ internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver{
     if(col>0) EnableStaticMovers();
     else if(col<0) DisableStaticMovers();
   }
+  public Vector2 lastShake {get;set;} = Vector2.Zero;
 }

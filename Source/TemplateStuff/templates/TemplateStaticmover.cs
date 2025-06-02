@@ -13,7 +13,7 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateStaticmover")]
-public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
+public class TemplateStaticmover:TemplateDisappearer, IMaterialObject, ITemplateTriggerable{
   public override Vector2 gatheredLiftspeed=>ownLiftspeed;
   public override void relposTo(Vector2 loc, Vector2 liftspeed) {}
   int smearamount;
@@ -22,6 +22,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
   string channel="";
   bool ridingTrigger;
   bool enableUnrooted = false;
+  bool firstZeroAfter;
   
   public TemplateStaticmover(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateStaticmover(EntityData d, Vector2 offset, int depthoffset):base(d,d.Position+offset,depthoffset){
@@ -33,11 +34,17 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     enableUnrooted = d.Bool("EnableUnrooted");
     hooks.enable();
     Add(new BeforeAfterRender(()=>{
-      if(this.ownShakeVec == Vector2.Zero) return;
+      if(this.ownShakeVec == Vector2.Zero){
+        if(!firstZeroAfter) return;
+        firstZeroAfter = false;
+        foreach(IChildShaker e in GetChildren<IChildShaker>(Propagation.Shake)) e.OnShakeFrame(Vector2.Zero);
+        return;
+      }
+      firstZeroAfter=true;
       foreach(Entity e in GetChildren<Entity>(Propagation.Shake)){
         prevpos.TryAdd(e,e.Position);
         e.Position+=ownShakeVec;
-        if(e is IChildShaker s) s.onShake(ownShakeVec);
+        if(e is IChildShaker s) s.OnShakeFrame(ownShakeVec);
       }
     }));
     shakeHooks.enable();
@@ -138,6 +145,9 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject{
     if(ridingTrigger){
       if(hasRiders<Player>()) sm.TriggerPlatform();
     }
+  }
+  public void OnTrigger(StaticMover sm){
+    if(ridingTrigger) sm?.TriggerPlatform();
   }
   public void renderMaterial(IMaterialLayer l, SpriteBatch s, Camera c){
     SpriteBatch origsb = Draw.SpriteBatch;
