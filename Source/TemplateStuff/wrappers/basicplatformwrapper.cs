@@ -22,6 +22,7 @@ internal class BasicPlatform:ITemplateChild{
     if(p.OnDashCollide == null && !(p is DreamBlock))
       p.OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
     lpos = p.Position;
+    p.Add(new ChildMarker(t));
   }
   public Vector2 lpos;
   public virtual void relposTo(Vector2 loc, Vector2 liftspeed){

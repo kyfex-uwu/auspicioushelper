@@ -226,11 +226,11 @@ public class TemplateMoveCollidable:TemplateDisappearer, ITemplateTriggerable{
   }
   static void smtHook(On.Celeste.Platform.orig_OnStaticMoverTrigger orig, Platform p, StaticMover sm){
     if(p is ITemplateChild c){
-      c.parent?.GetFromTree<ITemplateTriggerable>().OnTrigger(sm);
+      c.parent?.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
     } else {
       ChildMarker m = p.Get<ChildMarker>();
       if(m!=null){
-        m.parent.GetFromTree<ITemplateTriggerable>().OnTrigger(sm);
+        m.parent.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
       }
     }
     orig(p,sm);

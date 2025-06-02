@@ -48,6 +48,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject, ITemplate
       }
     }));
     shakeHooks.enable();
+    TemplateMoveCollidable.triggerHooks.enable();
   }
   void evalLiftspeed(bool precess = true){
     float mX=0;
@@ -146,7 +147,7 @@ public class TemplateStaticmover:TemplateDisappearer, IMaterialObject, ITemplate
       if(hasRiders<Player>()) sm.TriggerPlatform();
     }
   }
-  public void OnTrigger(StaticMover sm){
+  public void OnTrigger(StaticMover othersm){
     if(ridingTrigger) sm?.TriggerPlatform();
   }
   public void renderMaterial(IMaterialLayer l, SpriteBatch s, Camera c){

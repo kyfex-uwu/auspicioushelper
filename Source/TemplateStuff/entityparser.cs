@@ -7,6 +7,7 @@ using System.Dynamic;
 using Celeste.Mod.auspicioushelper.Wrappers;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.Utils;
 
 namespace Celeste.Mod.auspicioushelper;
 public static class EntityParser{
@@ -89,7 +90,11 @@ public static class EntityParser{
         return null;
       case Types.removeSMbasic:
         List<StaticMover> SMRemove = new List<StaticMover>();
-        foreach(Component c in e.Components) if(c is StaticMover sm) SMRemove.Add(sm);
+        foreach(Component c in e.Components) if(c is StaticMover sm){
+          new DynamicData(sm).Set("__auspiciousTParent", t);
+          SMRemove.Add(sm);
+          smhooks.enable();
+        }
         foreach(StaticMover sm in SMRemove) e.Remove(sm);
         t.AddBasicEnt(e,simoffset+d.Position-t.virtLoc);
         return null;
@@ -97,6 +102,18 @@ public static class EntityParser{
         return null;
     }
   }
+  static void triggerPlatformsHook(On.Celeste.StaticMover.orig_TriggerPlatform orig, StaticMover sm){
+    var smd = new DynamicData(sm);
+    if(smd.TryGet<Template>("__auspiciousTParent", out var parent)){
+      parent.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
+    }
+    else orig(sm);
+  }
+  static HookManager smhooks = new HookManager(()=>{
+    On.Celeste.StaticMover.TriggerPlatform+=triggerPlatformsHook;
+  },()=>{
+    On.Celeste.StaticMover.TriggerPlatform-=triggerPlatformsHook;
+  },auspicioushelperModule.OnEnterMap);
   static EntityParser(){
     parseMap["dreamBlock"] = Types.platformbasic;
     loaders["dreamBlock"] = static (Level l, LevelData ld, Vector2 offset, EntityData e)=>(Entity) new DreamBlock(e,offset);
