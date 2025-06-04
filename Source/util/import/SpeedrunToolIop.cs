@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Monocle;
 using MonoMod.ModInterop;
 
-namespace Celeste.Mod.auspicioushelper;
+namespace Celeste.Mod.auspicioushelper.Import;
 
 internal static class SpeedrunToolIop{
   static Type interoptype = null;

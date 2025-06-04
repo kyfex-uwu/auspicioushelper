@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Celeste.Mod.auspicioushelper;
+using Celeste.Mod.auspicioushelper.Import;
+using Celeste.Mod.auspicioushelper.iop;
 using Microsoft.Xna.Framework;
 using Monocle;
+using MonoMod.ModInterop;
 
 namespace Celeste.Mod.auspicioushelper;
 
@@ -110,6 +113,7 @@ public class auspicioushelperModule : EverestModule {
     {
         base.LoadContent(firstLoad);
         SpeedrunToolIop.hooks.enable();
+        CommunalHelperIop.load();
         auspicioushelperGFX.loadContent();
         MaterialPipe.setup();
         DebugConsole.Write("Loading content");
@@ -131,9 +135,10 @@ public class auspicioushelperModule : EverestModule {
         DebugConsole.Write("Loading");
         ConditionalStrawb.hooks.enable();
         MapHider.uncache();
-        //EntityMarkingFlag.hooks.enable();
         
-        //TrackedCassette.hooks.enable();
+        typeof(Anti0fIopExp).ModInterop();
+        typeof(TemplateIopExp).ModInterop();
+        typeof(ChannelIopExp).ModInterop();
     }
     public override void Unload() {
         Everest.Events.Level.OnTransitionTo -= OnTransition;

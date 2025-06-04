@@ -25,7 +25,6 @@ public class Anti0fZone:Entity{
   bool cplayercolliders = true;
   bool cthrowables = false;
   bool csolids = false;
-  bool cposexit = false;
   bool alwayswjc = false;
   bool wholeroom = false;
   public Anti0fZone(EntityData d, Vector2 offset):base(d.Position+offset){
@@ -315,95 +314,22 @@ public class Anti0fZone:Entity{
   static void ClearRasters(){
     hrast.Clear(); crast.Clear(); trast.Clear(); srast.Clear(); rast.Clear();
   }
-  static float MinStepSize = 1;
-  static bool PlayerUpdateDetour2(Player p){
-    int _st = p.StateMachine.state;
-    Vector2 _ispeed = p.Speed;
-    int _idashes = p.Dashes;
-    Anti0fZone z = getHit(p);
-    if(_st==9 || _st == 22 || z==null) return false;
-
-    var dist = _ispeed*Engine.DeltaTime;
-    if(Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y))<=MathF.Max(z.maxstep,MinStepSize)) return false;
-    //DebugConsole.Write("Anti0f stuff begin");
-    bool exit()=>
-      p.StateMachine.state!=_st || p.Dashes!=_idashes || 
-      p.Speed!=_ispeed || p.Dead;
-    bool proc(float prog){
-      bool flag = false;
-      //DebugConsole.Write($"solids? {z.csolids}");
-      if(z.cthrowables) flag |= hrast.prog(p,prog);
-      if(z.cplayercolliders) flag |= crast.prog(p,prog);
-      if(z.ctriggers) flag |= trast.prog(p,prog);
-      if(z.csolids) flag |= srast.prog(p,prog);
-      return flag | exit();
-    }
-    start:  
-      float frac = 0;
-      float length = Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y));
-      int steps = (int)Math.Ceiling(length/MathF.Max(z.maxstep,MinStepSize));
-      Vector2 step = dist/(float)steps;
-      ClearRasters();
-      if(z.cthrowables) hrast.Fill(p, step, steps);
-      if(z.cplayercolliders) crast.Fill(p,step,steps);
-      if(z.ctriggers) trast.Fill(p,step,steps);
-      if(z.csolids) srast.Fill(p,step,steps);
-
-      oldSolids=null;
-      if(z.csolids) oldSolids = p.Scene.Tracker.Entities[typeof(Solid)];
-
-      for(int i=0; i<steps; i++){
-        frac = ((float)i+1)/(float)steps;
-        if(i!=0 && proc(i)){
-          DebugConsole.Write("exiting due to proc");
-          goto exit;
-        }
-        var lpos = p.ExactPosition;
-        bool flag = false;
-        if(p.MoveH(step.X,p.onCollideH)){
-          _ispeed.X=p.Speed.X;
-          flag = true;
-        }
-        if(p.MoveV(step.Y,p.onCollideV)){
-          _ispeed.Y=p.Speed.Y;
-          flag = true;
-        }
-        if(flag) goto reconsile;
-        if((lpos+step - p.ExactPosition).LengthSquared()>0.25){
-          if(z.cposexit) goto exit;
-          DebugConsole.Write("Position sharply changed while in anti0f! Attempting to reconsile");
-          goto reconsile;
-        }
-      }
-
-    exit:
-      if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
-      return true;
-    reconsile:
-      //DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
-      if(exit() || frac>=1) goto exit;
-      dist = _ispeed*Engine.DeltaTime*(1-frac);
-      if(_ispeed.X == 0) dist.X=0;
-      if(_ispeed.Y == 0) dist.Y=0;
-      if(dist == Vector2.Zero) goto exit;
-      if(z.csolids) p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
-      goto start;
-  }
   static bool PlayerUpdateDetour3(Player p){
     bool first = true;
     int _st = p.StateMachine.state;
     Vector2 _ispeed = p.Speed;
     int _idashes = p.Dashes;
-    if(_st==9 || _st == 22) return false;
+    if(_st==9 || _st == 22 || skipNormal.OrShortcircuit(p)) return false;
 
     var dist = _ispeed*Engine.DeltaTime;
     if(Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y))<=1) return false;
     bool exit()=>
       p.StateMachine.state!=_st || p.Dashes!=_idashes || 
-      p.Speed!=_ispeed || p.Dead;
+      p.Speed!=_ispeed || p.Dead || exitNormal.OrShortcircuit(p);
     float frac;
 
     oldSolids = p.Scene.Tracker.Entities[typeof(Solid)];
+    float totalfrac = 0;
     start:
       ClearRasters();
       float length = Math.Max(Math.Abs(dist.X), Math.Abs(dist.Y)); //L1 distance obviously
@@ -441,16 +367,61 @@ public class Anti0fZone:Entity{
       }
 
     exit:
+      ClearRasters();
       p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
       return true;
     reconsile:
-      DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {_ispeed}");
-      if(exit() || frac>=1) goto exit;
-      dist = _ispeed*Engine.DeltaTime*(1-frac);
+      totalfrac += frac;
+      DebugConsole.Write($"Reconsiling: {p.Speed} {frac} {totalfrac} {_ispeed} {dist}");
+      if(exit() || totalfrac>=1) goto exit;
+      dist = _ispeed*Engine.DeltaTime*(1-totalfrac);
       if(dist == Vector2.Zero) goto exit;
       p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
       goto start;
   }
+  static void NaiveMoveHook(On.Celeste.Actor.orig_NaiveMove orig, Actor a, Vector2 dist){
+    Player p = null;
+    if(a is Player play && Math.Max(Math.Abs(dist.X),Math.Abs(dist.Y))>1 && runNaive.Or(play)){
+      p=play;
+    } else {
+      orig(a,dist);
+      return;
+    }
+
+    int _st = p.StateMachine.state;
+    Vector2 _ispeed = p.Speed;
+    int _idashes = p.Dashes;
+    bool exit()=>
+      p.StateMachine.state!=_st || p.Dashes!=_idashes || 
+      p.Speed!=_ispeed || p.Dead || exitNaive.OrShortcircuit(p);
+    
+    float current = 0;
+    float length = Math.Max(Math.Abs(dist.X), Math.Abs(dist.Y)); //L1 distance obviously
+    Vector2 step = dist/length;
+    ClearRasters();
+    if(!rast.Fill(p,step,length,true)){
+      orig(a,dist);
+      return;
+    }
+    while(current<length){
+      float magn = rast.stepMagn(ref current, length);
+      bool rp = rast.prog(p,current);
+      if(rp||exit()){
+        DebugConsole.Write($"Explicit exit from naive move {p.Position}");
+        goto exit;
+      };
+      Vector2 lpos = p.ExactPosition;
+      orig(p,step*magn);
+      if((lpos+step*magn - p.ExactPosition).LengthSquared()>0.25) goto exit;
+    }
+    exit:
+      ClearRasters();
+  }
+
+  public static Util.FunctionList<Player> skipNormal = new(Util.FunctionList<Player>.InvocationMode.OrShortcircuit);
+  public static Util.FunctionList<Player> exitNormal = new(Util.FunctionList<Player>.InvocationMode.OrShortcircuit);
+  public static Util.FunctionList<Player> runNaive = new(Util.FunctionList<Player>.InvocationMode.Or);
+  public static Util.FunctionList<Player> exitNaive = new(Util.FunctionList<Player>.InvocationMode.OrShortcircuit);
 
   static ILHook updateHook;
   static void ILUpdateHook(ILContext ctx){
@@ -489,7 +460,9 @@ public class Anti0fZone:Entity{
     } else {
       updateHook = new ILHook(update, ILUpdateHook);
     }
+    On.Celeste.Actor.NaiveMove+=NaiveMoveHook;
   },void ()=>{
     updateHook.Dispose();
+    On.Celeste.Actor.NaiveMove-=NaiveMoveHook;
   },auspicioushelperModule.OnEnterMap);
 }

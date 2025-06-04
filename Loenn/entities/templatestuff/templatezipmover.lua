@@ -19,6 +19,8 @@ entity.placements = {
       depthoffset=5,
       return_type = "normal",
       activation_type = "ride",
+      channel = "",
+      propegateRiding = false,
       lastNodeIsKnot = true
     }
   }

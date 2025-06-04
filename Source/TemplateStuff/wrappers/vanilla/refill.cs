@@ -41,6 +41,7 @@ public class RefillW:Refill,ISimpleEnt {
       orig(rw);
       rw.selfCol = true;
       rw.Collidable = rw.parentCol;
+      rw.Depth+=rw.parent?.depthoffset??0;
     } else orig(self);
   }
   static HookManager hooks = new HookManager(()=>{

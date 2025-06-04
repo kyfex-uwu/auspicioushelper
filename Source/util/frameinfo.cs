@@ -1,17 +1,38 @@
 
+using System;
 using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
-internal static class currentUpdate{
-  internal static int num;
-  internal static void updateHook(On.Monocle.Scene.orig_Update update, Scene self){
-    num+=1; //doesn't matter if this overflows or anything <3
+
+[Tracked]
+public class UpdateHook:Component{
+  public Action beforeAction=null;
+  public Action afterAction=null;
+  public bool updatedThisFrame = false;
+  public UpdateHook(Action before=null, Action after=null):base(true,false){
+    beforeAction=before;afterAction =after;
+    hooks.enable();
+  }
+  public override void Update() {
+    base.Update();
+    updatedThisFrame = true;
+  }
+  internal static int framenum;
+  internal static void updateHook(On.Celeste.Level.orig_Update update, Level self){
+    foreach(UpdateHook u in self.Tracker.GetComponents<UpdateHook>()){
+      u.updatedThisFrame = false;
+      if(u.beforeAction!=null)u.beforeAction();
+    }
+    framenum+=1; //doesn't matter if this overflows or anything <3
     update(self);
+    foreach(UpdateHook u in self.Tracker.GetComponents<UpdateHook>()){
+      if(u.afterAction!=null)u.afterAction();
+    }
   }
   internal static HookManager hooks = new HookManager(()=>{
-    On.Monocle.Scene.Update+=updateHook;
+    On.Celeste.Level.Update+=updateHook;
   }, ()=>{
-    On.Monocle.Scene.Update-=updateHook;
+    On.Celeste.Level.Update-=updateHook;
   }).enable();
 }

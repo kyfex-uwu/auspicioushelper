@@ -7,3 +7,5 @@
   OptionalDependencies:
     - Name: SpeedrunTool
       Version: 3.0.0
+    - Name: CommunalHelper
+      Version: 1.21.1

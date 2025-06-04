@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
@@ -11,17 +12,18 @@ using Monocle;
 namespace Celeste.Mod.auspicioushelper;
 
 [CustomEntity("auspicioushelper/TemplateZipmover")]
-public class TemplateZipmover:Template{
-    public enum Themes{
-        Normal,
-        Moon
-    }
+public class TemplateZipmover:Template, ITemplateTriggerable, IChannelUser{
+  public enum Themes{
+    Normal,
+    Moon
+  }
   private SoundSource sfx = new SoundSource();
   Themes theme = Themes.Normal;
   public override Vector2 virtLoc=>Position+spos.pos;
   SplineAccessor spos;
   EntityData dat;
   Vector2 offset;
+  public string channel {get;set;} = null;
   public enum ReturnType{
     loop,
     none,
@@ -39,6 +41,7 @@ public class TemplateZipmover:Template{
   public TemplateZipmover(EntityData d, Vector2 offset, int depthoffset)
   :base(d,d.Position+offset,depthoffset){
     Add(new Coroutine(FancySequence()));
+    Add(upd = new UpdateHook());
     Add(sfx);
     dat=d;
     this.offset=offset;
@@ -54,7 +57,18 @@ public class TemplateZipmover:Template{
       "dashAutomatic"=>ActivationType.dashAutomatic,
       _=>ActivationType.ride,
     };
-    prop &= ~Propagation.Riding;
+    if(!d.Bool("propegateRiding"))prop &= ~Propagation.Riding;
+    if(!string.IsNullOrWhiteSpace(d.Attr("channel","")))channel = d.Attr("channel");
+  }
+  UpdateHook upd;
+  public override void Added(Scene scene) {
+    base.Added(scene);
+    if(channel!=null) ChannelState.watch(this);
+    
+  }
+  public void setChVal(int val){
+    if(triggered || triggerNextFrame) return;
+    if(val!=0) OnTrigger(null);
   }
   public override void addTo(Scene scene){
     Spline spline=null;
@@ -90,22 +104,31 @@ public class TemplateZipmover:Template{
     Audio.Stop(audio,true);
   }
   int dashed;
+  bool triggerNextFrame;
   public override void Update(){
+    if(triggerNextFrame && !triggered){
+      triggered=true;
+      triggerNextFrame=false;
+    }
     base.Update();
   }
+  
   
   private IEnumerator FancySequence(){
     bool done; float at;
     waiting:
       dashed = 0;
+      triggered = false;
       yield return null;
+      if(triggered) goto going;
       if(atype == ActivationType.ride || atype==ActivationType.rideAutomatic){
-        if(hasRiders<Player>()) goto going;
+        if(hasRiders<Player>()) OnTrigger(null);
       } else if(atype == ActivationType.dash || atype==ActivationType.dashAutomatic){
-        if(dashed!=0) goto going;
+        if(dashed!=0) OnTrigger(null);
       }
       goto waiting;
     going:
+      triggered = true;
       sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
       yield return 0.1f;
       at=0;
@@ -124,6 +147,7 @@ public class TemplateZipmover:Template{
       Input.Rumble(RumbleStrength.Strong, RumbleLength.Medium);
       SceneAs<Level>().Shake();
       shake(0.1f);
+      if(channel!=null)ChannelState.SetChannel(channel,0);
       yield return 0.25f;
 
       if((atype == ActivationType.rideAutomatic || atype==ActivationType.dashAutomatic) && 
@@ -138,6 +162,7 @@ public class TemplateZipmover:Template{
       }
 
     returning:
+      triggered=false;
       yield return 0.25f;
       sfx.Stop();
       sfx.Play((theme == Themes.Normal) ? "event:/game/01_forsaken_city/zip_mover" : "event:/new_content/game/10_farewell/zip_mover");
@@ -162,5 +187,13 @@ public class TemplateZipmover:Template{
   public override void Removed(Scene scene){
     base.Removed(scene);
     sfx.Stop();
+  }
+  public bool triggered;
+  public void OnTrigger(StaticMover sm){
+    //DebugConsole.Write($"{Position} triggered {upd.updatedThisFrame}");
+    if(upd.updatedThisFrame) triggered = true;
+    else triggerNextFrame = true;
+    if(channel != null) ChannelState.SetChannel(channel,1);
+    //if((prop&Propagation.Riding)!=0 && parent!=null)parent.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
   }
 }
