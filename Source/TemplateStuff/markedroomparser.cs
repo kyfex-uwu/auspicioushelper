@@ -15,7 +15,7 @@ internal static class MarkedRoomParser{
     var handleDict = new Dictionary<int, string>();
     foreach(EntityData d in l.Entities){
       if(d.Name == "auspicioushelper/templateFiller"){
-        templateFiller t = new templateFiller(d, Vector2.Zero){
+        templateFiller t = new templateFiller(d, l.Position){
           roomdat = l
         }; //we are in frame of room <3
         string id = prefix+t.name;

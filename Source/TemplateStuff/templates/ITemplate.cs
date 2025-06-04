@@ -158,8 +158,9 @@ public class Template:Entity, ITemplateChild{
   }
   void makeChildren(Scene scene){
     if(t==null) return;
-    if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset));
-    if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset));
+    //if(t.bgt!=null) addEnt(new Wrappers.BgTiles(t,virtLoc,depthoffset));
+    //if(t.fgt!=null) addEnt(fgt=new Wrappers.FgTiles(t, virtLoc, depthoffset));
+    t.AddTilesTo(this);
     Level l = SceneAs<Level>();
     Vector2 simoffset = this.virtLoc-t.origin;
     string fp = fullpath;
