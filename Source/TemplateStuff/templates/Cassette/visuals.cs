@@ -27,6 +27,9 @@ public class CassetteMaterialLayer:IMaterialLayer{
     public Color border = Util.hexToColor("fff");
     public Color innerlow = Util.hexToColor("333");
     public Color innerhigh = Util.hexToColor("aaa");
+    public Color fghigh = Util.hexToColor("88f");
+    public Color fglow = Util.hexToColor("448");
+    public float fgdepth = 1;
     public Vector4 patternvec = new Vector4(0.5f,0.5f,0,0);
     public float alphacutoff = 0.1f;
     public float stripecutoff = 0f;
