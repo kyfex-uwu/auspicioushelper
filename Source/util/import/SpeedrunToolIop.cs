@@ -17,7 +17,7 @@ internal static class SpeedrunToolIop{
     try{
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
-    MaterialPipe.layers.Clear();
+    MaterialPipe.ClearLayers();
     foreach(Entity e in Engine.Instance.scene.Entities){
       if(e is IChannelUser e_){
         ChannelState.watch(e_);

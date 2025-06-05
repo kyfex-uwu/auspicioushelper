@@ -12,17 +12,15 @@ public class FgCassetteVisuals:IMaterialLayerSimple{
   public MaterialLayerInfo info{get;}
   public RenderTarget2D outtex{get;}
   CassetteMaterialLayer.CassetteMaterialFormat f;
-  public FgCassetteVisuals(CassetteMaterialLayer.CassetteMaterialFormat format, string ch){
+  public FgCassetteVisuals(CassetteMaterialLayer.CassetteMaterialFormat format){
     f=format;
-    channel=ch;
     info = new(true, f.depth);
+    outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     resources.enable();
-    layers.Add(channel,this);
   }
-  public List<Template> templates=new();
-  public List<Entity> todraw;
+  public HashSet<Template> templates=new();
+  public List<Entity> todraw=new();
   public bool dirty=true;
-  string channel;
   public void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     if(dirty){
       todraw.Clear();
@@ -33,11 +31,13 @@ public class FgCassetteVisuals:IMaterialLayerSimple{
     EffectParameterCollection prm = shader.Parameters;
     prm["highcol"]?.SetValue(f.fghigh.ToVector4());
     prm["lowcol"]?.SetValue(f.fglow.ToVector4());
+    prm["fgsat"]?.SetValue(f.fgsat);
     MaterialPipe.gd.SetRenderTarget(outtex);
     MaterialPipe.gd.Clear(Color.Transparent);
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, shader, c.Matrix);
     foreach(Entity e in todraw) if(e.Scene!=null)e.Render();
     sb.End();
+    info.diddraw=true;
   }
   public void Add(Template t){
     dirty = true;
@@ -48,26 +48,22 @@ public class FgCassetteVisuals:IMaterialLayerSimple{
     templates.Remove(t);
   }
   public bool checkdo(){
-    return todraw.Count>0;
+    return templates.Count>0;
   }
   public void onRemove(){
-    if(layers.TryGetValue(channel, out var l) && l==this) layers.Remove(channel);
     templates.Clear();
     todraw.Clear();
   }
-  static Effect shader;
-  static Dictionary<string, FgCassetteVisuals> layers = new();
-  static HookManager resources = new (()=>{
-    shader = auspicioushelperGFX.LoadEffect("cassette/foreground");
-  },()=>{
-    foreach(var pair in layers){
-      List<Template> keep = new List<Template>();
-      foreach(Template e in pair.Value.templates){
-        if(e.Scene!=null)keep.Add(e);
-      }
-      pair.Value.templates = keep;
-      pair.Value.dirty = true;
+  public void Clean(){
+    HashSet<Template> keep = new();
+    foreach(Template e in templates){
+      if(e.Scene!=null)keep.Add(e);
     }
-    return false;
-  },auspicioushelperModule.OnReset);
+    templates = keep;
+    dirty = true;
+  }
+  static Effect shader;
+  static HookManager resources = new (()=>{
+    shader = auspicioushelperGFX.LoadEffect("cassette/fgtint");
+  },()=>{});
 }

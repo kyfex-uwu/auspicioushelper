@@ -92,14 +92,15 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
       material = new();
       bool usevanilla = !d.Bool("simple_style",false);
       bool opaque = !d.Bool("translucent",false);
+      bool tint = d.Bool("tintActive",true);
       for(int i=0; i<4; i++){
         string ch = d.Attr("channel_"+(i+1).ToString());
         if(string.IsNullOrWhiteSpace(ch)) continue;
         material[ch] = i switch {
-          0=>$"{{color:#1D539B, x:1.57079632, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:0E3463":"")}}}",
-          1=>$"{{color:#60247B, x:1.57079632, y:-1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:2F164E":"")}}}",
-          2=>$"{{color:#656C26, x:1.57079632, y:0, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:314318":"")}}}",
-          3=>$"{{color:#166E32, x:0, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:0B4520":"")}}}",
+          0=>$"{{color:#1D539B, x:1.57079632, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:0E3463":"")}{(tint?",fg:1, fgsat:0.5, fghigh: 49aaf0, fglow:248":"")}}}",
+          1=>$"{{color:#60247B, x:1.57079632, y:-1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"1, style:vanilla":"1, style:simple")}{(opaque?", innercolor:2F164E":"")}{(tint?",fg:1, fgsat:0.5, fghigh: f049be, fglow:825":"")}}}",
+          2=>$"{{color:#656C26, x:1.57079632, y:0, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:314318":"")}{(tint?",fg:1, fgsat:0.5, fghigh: fcdc3a, fglow:871":"")}}}",
+          3=>$"{{color:#166E32, x:0, y:1.57079632, stripecutoff:-0.01, phase:{(usevanilla?"3.141592653, style:vanilla":"0, style:simple")}{(opaque?", innercolor:0B4520":"")}{(tint?",fg:1, fgsat:0.5, fghigh: 38e04e, fglow:172":"")}}}",
           _=>"{color:#fff, x:0.3,y:1.2}"
         };
         channels[i] = ch;
@@ -113,10 +114,10 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
       var format = CassetteMaterialLayer.CassetteMaterialFormat.fromDict(Util.kvparseflat(Util.stripEnclosure(pair.Value)));
       CassetteMaterialLayer other;
       if(CassetteMaterialLayer.layers.TryGetValue(pair.Key, out other)){
-        if(other.GetHashCode() != format.gethash()){
+        if(other.format.gethash() != format.gethash()){
           MaterialPipe.removeLayer(other);
           other = null;
-        }
+        } 
       }
       if(other == null) other = new CassetteMaterialLayer(format, pair.Key);
       CassetteMaterialLayer.layers[pair.Key]=other;

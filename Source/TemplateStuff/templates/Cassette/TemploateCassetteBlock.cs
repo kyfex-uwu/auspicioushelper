@@ -39,12 +39,27 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
   }
   public override void Added(Scene scene){
     base.Added(scene);
-    ChannelState.watch(this);
+    int num = ChannelState.watch(this);
     if(CassetteMaterialLayer.layers.TryGetValue(channel,out var layer) || freeze){
       AddAllChildren(todraw);
       if(layer != null)layer.dump(todraw);
+      if(layer.fg!=null){
+        parentChangeStatBypass(-1,0,0);
+        if(num!=0) layer.fg.Add(this);
+      }
     }
-    setChVal(ChannelState.readChannel(channel));
+    if(num==0)setChVal(0);
+  }
+  public override int VisChangeHandler(int n, bool parentVis, bool selfVis) {
+    if(!CassetteMaterialLayer.layers.TryGetValue(channel,out var layer) || layer.fg==null){
+      return base.VisChangeHandler(n, parentVis,selfVis);
+    }
+    if(n==1){
+      layer.fg.Add(this);
+    } else {
+      layer.fg.Remove(this);
+    }
+    return 0;
   }
   public void tryManifest(){
     Player p = Scene?.Tracker.GetEntity<Player>();

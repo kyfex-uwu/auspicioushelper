@@ -29,6 +29,8 @@ public class CassetteMaterialLayer:IMaterialLayer{
     public Color innerhigh = Util.hexToColor("aaa");
     public Color fghigh = Util.hexToColor("88f");
     public Color fglow = Util.hexToColor("448");
+    public float fgsat = 0.5f;
+    public bool hasfg;
     public float fgdepth = 1;
     public Vector4 patternvec = new Vector4(0.5f,0.5f,0,0);
     public float alphacutoff = 0.1f;
@@ -78,6 +80,13 @@ public class CassetteMaterialLayer:IMaterialLayer{
               break;
             }
           break;
+          case "fg": 
+            c.hasfg = true;
+            if(float.TryParse(pair.Value,out var fgd)) c.fgdepth = fgd;
+            break;
+          case "fghigh": c.fghigh = Util.hexToColor(pair.Value); break;
+          case "fglow": c.fglow = Util.hexToColor(pair.Value); break;
+          case "fgsat": c.fgsat = float.Parse(pair.Value); break;
         }
       }
       if(c.shader == "__default__"){
@@ -88,12 +97,15 @@ public class CassetteMaterialLayer:IMaterialLayer{
       return c;
     }
     public int gethash(){
-      return HashCode.Combine(border, innerlow, innerhigh, patternvec, alphacutoff, stripecutoff, depth);
+      return HashCode.Combine(border, innerlow, innerhigh, patternvec, alphacutoff, stripecutoff, depth, HashCode.Combine(
+        hasfg, fghigh, fglow, fgdepth
+      ));
     }
   }
   public static Dictionary<string, CassetteMaterialLayer> layers = new Dictionary<string,CassetteMaterialLayer>();
   Effect shader;
   Effect preshader;
+  public FgCassetteVisuals fg = null;
   public CassetteMaterialLayer(CassetteMaterialFormat format, string channel){
     this.channel = channel;
     this.depth = format.depth;
@@ -113,9 +125,13 @@ public class CassetteMaterialLayer:IMaterialLayer{
         default: preshader = auspicioushelperGFX.LoadEffect("cassette/"+format.preshader);break;
       }
     }
+    if(format.hasfg) fg = new FgCassetteVisuals(format);
   }
   List<Entity> items = new List<Entity>();
   bool dirty;
+  public void onEnable(){
+    if(fg!=null) MaterialPipe.addLayer(fg);
+  }
   public void render(Camera c, SpriteBatch sb, RenderTarget2D back){
     if(dirty){
       items.Sort(EntityList.CompareDepth);
@@ -166,6 +182,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
   public void onRemove(){
     trying.Clear();
     if(layers.TryGetValue(channel, out var l) && l==this) layers.Remove(channel);
+    if(fg!=null)MaterialPipe.removeLayer(fg);
   }
   public void dump(List<Entity> l){
     foreach(Entity e in l){
@@ -197,6 +214,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
       }
       pair.Value.items = keep;
       pair.Value.trying.Clear();
+      pair.Value.fg?.Clean();
     }
     return false;
   },auspicioushelperModule.OnReset);

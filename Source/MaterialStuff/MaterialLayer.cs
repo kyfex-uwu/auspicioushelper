@@ -31,6 +31,7 @@ public interface IMaterialLayer{
   void render(Camera c, SpriteBatch sb, RenderTarget2D back);
   bool checkdo();
   void onRemove(){}
+  void onEnable(){}
 }
 
 public class BasicMaterialLayer:IMaterialLayer{

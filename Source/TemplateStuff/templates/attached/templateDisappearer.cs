@@ -33,14 +33,20 @@ public class TemplateDisappearer:Template{
     if(other == false) return 0;
     return action?1:-1;
   }
+  public virtual int VisChangeHandler(int n, bool parentvis, bool selfvis){
+    return n;
+  }
   public override void parentChangeStat(int vis, int col, int act){
     int nvis = 0; int ncol=0; int nact = 0;
     if(vis!=0) nvis = permute(vis>0, ref parentVis, selfVis);
     if(col!=0) ncol = permute(col>0, ref parentCol, selfCol);
     if(act!=0) nact = permute(col>0, ref parentAct, selfAct);
-    if(nvis!=0 || ncol!=0){
-      base.parentChangeStat(nvis,ncol,nact);
+    if(nvis!=0 || ncol!=0 || nact!=0){
+      base.parentChangeStat(nvis!=0?VisChangeHandler(nvis, parentVis,selfVis):nvis,ncol,nact);
     }
+  }
+  public void parentChangeStatBypass(int vis, int col, int act){
+    base.parentChangeStat(vis, col, act);
   }
   public virtual void setCollidability(bool n){
     if(n == selfCol) return;
@@ -50,20 +56,19 @@ public class TemplateDisappearer:Template{
   public virtual void setVisibility(bool n){
     if(n == selfVis) return;
     int nvis = permute(n, ref selfVis, parentVis);
-    if(nvis != 0) base.parentChangeStat(nvis,0,0);
+    if(nvis != 0) base.parentChangeStat(nvis!=0?VisChangeHandler(nvis, parentVis,selfVis):nvis,0,0);
   }
   public virtual void setAct(bool n){
     if(n == selfAct) return;
     int nact = permute(n, ref selfAct, parentAct);
-    if(nact != 0) base.parentChangeStat(nact, 0,0);
+    if(nact != 0) base.parentChangeStat(0,0,nact);
   }
   public virtual void setVisCol(bool vis, bool col){
     int nvis = 0;
     if(vis != selfVis) nvis = permute(vis, ref selfVis, parentVis);
     int ncol = 0;
     if(col != selfCol) ncol = permute(col, ref selfCol, parentCol);
-    //DebugConsole.Write($" set {vis} {col} {selfVis}");
-    if(nvis!=0 || ncol!=0) base.parentChangeStat(nvis,ncol,0);
+    if(nvis!=0 || ncol!=0) base.parentChangeStat(nvis!=0?VisChangeHandler(nvis, parentVis,selfVis):nvis,ncol,0);
   }
   public virtual void setVisColAct(bool vis, bool col, bool act){
     int nvis = 0;
@@ -73,7 +78,7 @@ public class TemplateDisappearer:Template{
     int nact = 0;
     if(act != selfAct) nact = permute(act, ref selfAct, parentAct);
     //DebugConsole.Write($" set {vis} {col} {selfVis}");
-    if(nvis!=0 || ncol!=0 || nact!=0) base.parentChangeStat(nvis,ncol,nact);
+    if(nvis!=0 || ncol!=0 || nact!=0) base.parentChangeStat(nvis!=0?VisChangeHandler(nvis, parentVis,selfVis):nvis,ncol,nact);
   }
   public bool getParentCol(){
     return parentCol;

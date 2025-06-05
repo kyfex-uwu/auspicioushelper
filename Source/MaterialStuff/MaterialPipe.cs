@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using Monocle;
 using MonoMod.Cil;
+using System;
 
 namespace Celeste.Mod.auspicioushelper;
 
@@ -17,7 +18,8 @@ namespace Celeste.Mod.auspicioushelper;
 
 
 public static class MaterialPipe {
-  public static List<IMaterialLayer> layers = new List<IMaterialLayer>();
+  static List<IMaterialLayer> layers = new List<IMaterialLayer>();
+  public static void ClearLayers()=>layers.Clear();
   public static bool dirty;
   public static GraphicsDevice gd;
   static bool orderFlipped;
@@ -31,10 +33,15 @@ public static class MaterialPipe {
       return;
     }
     Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-
     SpriteBatch sb = Draw.SpriteBatch;
     gd = Engine.Instance.GraphicsDevice;
     RenderTarget2D t = GameplayBuffers.Gameplay;
+    if(toRemove.Count>0){
+      List<IMaterialLayer> nlist = new();
+      foreach(var i in layers) if(!toRemove.Contains(i) && i.enabled) nlist.Add(i);
+      layers = nlist;
+      toRemove.Clear();
+    }
     if(dirty) layers.Sort((a, b) => -a.depth.CompareTo(b.depth));
     dirty=false;
 
@@ -102,7 +109,6 @@ public static class MaterialPipe {
         leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
       );
       if(l.independent){
-        //DebugConsole.Write("pasting prerendered layer");
         sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
       } else {
         sb.End();
@@ -136,24 +142,27 @@ public static class MaterialPipe {
     yield break;
   }
   public static void addLayer(IMaterialLayer l){
-    if(!leaving.Remove(l))entering.Add(l);
-    if(layers.Contains(l)) return; //we do not allow that, no sir
+    if(!leaving.Remove(l)) entering.Add(l);
+    toRemove.Remove(l);
+    l.enabled=true;
+    l.onEnable();
+    if(layers.Contains(l)) return;
     dirty = true;
     layers.Add(l);
-    l.enabled=true;
   }
+  static HashSet<IMaterialLayer> toRemove = new();
   public static void removeLayer(IMaterialLayer l){
-    layers.Remove(l);
-    l.enabled=false;
+    toRemove.Add(l);
+    l.enabled = false;
     l.onRemove();
+    leaving.Remove(l);
+    entering.Remove(l);
   }
   public static void onDie(){
     foreach(var l in layers) leaving.Add(l);
   }
   public static void remLeaving(){
-    List<IMaterialLayer> nlayers = new();
-    foreach(var l in layers) if(!leaving.Contains(l)) nlayers.Add(l);
-    layers = nlayers;
+    foreach(IMaterialLayer l in leaving) removeLayer(l);
     leaving.Clear();
   }
   public static Rectangle obtainInvertedRectangle(Camera c){
