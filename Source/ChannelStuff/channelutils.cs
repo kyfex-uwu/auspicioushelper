@@ -175,17 +175,16 @@ public static class ChannelState{
     for(;idx<ch.Length;idx++) if(ch[idx]=='[')break;
     string clean = ch.Substring(0,idx);
 
-    if(clean!=ch && ch[ch.Length-1] == ']'){
-      List<ModifierDesc> mods =null;
-      if(!modifiers.TryGetValue(clean,out mods)){
+    if(ch.Length>0 && clean!=ch && ch[ch.Length-1] == ']'){
+      if(!modifiers.TryGetValue(clean,out var mods)){
         modifiers.Add(clean, mods = new List<ModifierDesc>());
       }
       ModifierDesc mod = new ModifierDesc(ch);
       mods.Add(mod);
       return channelStates[ch] = mod.apply(readChannel(clean));
     } else {
-      channelStates.Add(ch,0);
-      return 0;
+      channelStates.TryAdd(ch,0);
+      return channelStates[ch];
     }
   }
   public static void unwatchTemporary(){

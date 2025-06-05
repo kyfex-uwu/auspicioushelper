@@ -92,7 +92,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
       material = new();
       bool usevanilla = !d.Bool("simple_style",false);
       bool opaque = !d.Bool("translucent",false);
-      bool tint = d.Bool("tintActive",true);
+      bool tint = d.Bool("tintActive",false);
       for(int i=0; i<4; i++){
         string ch = d.Attr("channel_"+(i+1).ToString());
         if(string.IsNullOrWhiteSpace(ch)) continue;
@@ -133,6 +133,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
         var l = new List<Entity>();
         c.AddAllChildren(l);
         layer.dump(l);
+        if(layer.fg!=null && c.getSelfCol()&&c.getParentCol())layer.fg.Add(c);
       }
     }
   }

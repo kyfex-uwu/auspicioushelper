@@ -43,7 +43,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
     if(CassetteMaterialLayer.layers.TryGetValue(channel,out var layer) || freeze){
       AddAllChildren(todraw);
       if(layer != null)layer.dump(todraw);
-      if(layer.fg!=null){
+      if(layer?.fg!=null){
         parentChangeStatBypass(-1,0,0);
         if(num!=0) layer.fg.Add(this);
       }
