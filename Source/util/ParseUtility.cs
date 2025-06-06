@@ -209,4 +209,31 @@ public static class Util{
     }
     public static implicit operator Func<T1, bool>(FunctionList<T1> fl) => fl.Invoke;
   }
+
+  public static float SineInOut(float val)=>-MathF.Cos(MathF.PI*val)/2+0.5f;
+  public static float SineInOut(float val, out float derivative){
+    derivative = MathF.PI*MathF.Sin(MathF.PI*val)/2;
+    return SineInOut(val);
+  }
+  public static float Approach(float val, float target, float amount, out int sign){
+    if(val == target){
+      sign = 0; return val;
+    }
+    if(val>target){
+      sign = -MathF.Sign(amount);
+      return MathF.Max(target, val-amount);
+    }
+    sign = MathF.Sign(amount);
+    return MathF.Min(target, val+amount);
+  }
+  public static float Spike(float val)=>MathF.Max(0,1-Math.Abs(2*val-1));
+  public static float Spike(float val, out float derivative){
+    derivative = val>0.5f?-2:2;
+    return Spike(val);
+  }
+  public static float QuadIn(float val)=>val*val;
+  public static float QuadIn(float val, out float derivative){
+    derivative = 2*val;
+    return QuadIn(val);
+  }
 }

@@ -130,9 +130,12 @@ public class Template:Entity, ITemplateChild{
       if(alreadyY.Contains(self)){
         return false;
       }
-      alreadyY.Add(self);
-      Solid.riders.Remove(self);
-      return orig(self, move, cb, pusher);
+      bool flag = !orig(self, move, cb, pusher);
+      if(flag || move<0){
+        alreadyY.Add(self);
+        Solid.riders.Remove(self);
+      }
+      return flag;
     }
     return orig(self, move, cb, pusher);
   }
