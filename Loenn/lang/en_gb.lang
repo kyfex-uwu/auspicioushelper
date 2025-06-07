@@ -81,4 +81,8 @@ entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f0=Portal 1 F
 entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f1=Portal 2 Facing Right
 entities.auspicioushelper/PortalGateH.attributes.description.right_facing_f0=If the first portal should face right
 entities.auspicioushelper/PortalGateH.attributes.description.right_facing_f1=If the second portal should face right
+entities.auspicioushelper/PortalGateH.attributes.name.giveRCB=Gives Reverse Corner Boost
+entities.auspicioushelper/PortalGateH.attributes.description.giveRCB=Whether the portal should give reverse corner boost on exiting portal
+
+# 
 

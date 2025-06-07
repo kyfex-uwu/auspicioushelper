@@ -17,7 +17,8 @@ entity.placements = {
       right_facing_f0=false,
       right_facing_f1=true,
       color_hex="ffffffaa",
-      attached=false
+      attached=false,
+      giveRCB = true,
     }
   }
 }
