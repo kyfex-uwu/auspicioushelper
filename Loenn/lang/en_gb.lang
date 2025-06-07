@@ -84,5 +84,6 @@ entities.auspicioushelper/PortalGateH.attributes.description.right_facing_f1=If 
 entities.auspicioushelper/PortalGateH.attributes.name.giveRCB=Gives Reverse Corner Boost
 entities.auspicioushelper/PortalGateH.attributes.description.giveRCB=Whether the portal should give reverse corner boost on exiting portal
 
-# 
-
+# Spiral Boss Beam
+entities.auspicioushelper/SpiralBossBeam.placements.name.main=Spiral Boss Beam
+entities.auspicioushelper/SpiralBossBeam.placements.description.main=por tole

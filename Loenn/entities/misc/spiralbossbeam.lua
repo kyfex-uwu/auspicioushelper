@@ -5,28 +5,38 @@ local spiralbossbeam = {}
 
 spiralbossbeam.name = "auspicioushelper/SpiralBossBeam"
 spiralbossbeam.depth = 2000
-spiralbossbeam.nodeLimits = {0,1}
 spiralbossbeam.nodeLineRenderType = "line"
 
 spiralbossbeam.placements = {
   {
-    name = "Spiral Boss Beam",
+    name = "main",
     data = {
       start_angle = 0.,
       speed = 1.
     }
   }
 }
+
 function spiralbossbeam.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSpriteStruct.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
+    local toReturn = {}
+    
+    for i=3,0,-1 do 
+        local sprite = drawableSprite.fromTexture("loenn/auspicioushelper/spiralbossbeam", {
+            x=entity.x,
+            y=entity.y,
+            r=entity.start_angle+math.pi/2 - i*entity.speed*0.1,
+            color = {1,1,1,1-(i/3)*0.8}
+        })
+        sprite:setJustification(0.5, 1)
+
+        table.insert(toReturn, sprite)
+    end
+
+    return toReturn
 end
 
 function spiralbossbeam.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+    return utils.rectangle(entity.x-8, entity.y-8, 16,16)
 end
 
 return spiralbossbeam

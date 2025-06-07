@@ -27,11 +27,11 @@ entity.fieldInformation = {
 }
 
 entity.texture = "loenn/auspicioushelper/portal"
-entity.scale = function(room, entity)
+function entity.scale(room, entity)
     return {entity.right_facing_f0 and 1 or -1,entity.height}    
 end
 entity.justification = {0,0}
-entity.color = function(room, entity)
+function entity.color(room, entity)
     local parsed, r, g, b, a = utils.parseHexColor(entity.color_hex)
     return parsed and {r, g, b, a} or {1,1,1}
 end
