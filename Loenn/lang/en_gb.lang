@@ -1,4 +1,7 @@
 # hiiii -kyfex
+mods.auspicioushelper.name=Auspicious Helper
+
+### Triggers
 
 # Channel Player Trigger
 triggers.auspicioushelper/ChannelPlayerTrigger.placements.name.main=Channel Player Trigger
@@ -21,8 +24,11 @@ triggers.auspicioushelper/HoldableReleaseTrigger.placements.description.main=For
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.force_throw=Whether the player should throw the item or just drop it
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.only_once=If this should only trigger once
 
+### Entities
+
 # Anti 0f Zone
 entities.auspicioushelper/Anti0fZone.placements.name.main=Anti 0f Zone
+entities.auspicioushelper/Anti0fZone.placements.description.main=Prevents certain zero-frameable inputs from happening while inside this entity
 entities.auspicioushelper/Anti0fZone.attributes.name.always_walljumpcheck=Walljumps
 entities.auspicioushelper/Anti0fZone.attributes.description.solids=Perform walljumps/cornerjumps on first possible pixel (prevents missing cornerboost speed from 0f)
 entities.auspicioushelper/Anti0fZone.attributes.description.holdables=Pick up holdables on the first possible pixel
@@ -30,3 +36,16 @@ entities.auspicioushelper/Anti0fZone.attributes.description.player_colliders=Hit
 entities.auspicioushelper/Anti0fZone.attributes.description.always_walljumpcheck=Check for walljumps you would otherwise travel through (needed if using sideways jumpthrus) (slow; only use in the area directly around the jumpthru)
 entities.auspicioushelper/Anti0fZone.attributes.description.triggers=Hit triggers you otherwise would travel through
 entities.auspicioushelper/Anti0fZone.attributes.description.cover_whole_room=Makes this entity cover the whole room
+
+# Beam Blocker
+entities.auspicioushelper/BeamBlocker.placements.name.main=Beam Blocker
+entities.auspicioushelper/BeamBlocker.placements.description.main=Stops Badeline's beam from going through this entity, similar to a wall
+
+# Cassette Gate
+entities.auspicioushelper/CassetteGate.placements.name.main=[WIP] Cassette Gate
+entities.auspicioushelper/CassetteGate.placements.description.main=A Heart Gate but unlocked with a cassette instead
+entities.auspicioushelper/CassetteGate.attributes.description.horizontal=Whether this gate is horizontal or not
+
+# Die Water
+entities.auspicioushelper/DieWater.placements.name.main=Die Water
+entities.auspicioushelper/DieWater.placements.description.main=Water that uhm. uh. kills you

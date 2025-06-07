@@ -1,27 +1,23 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local xnaColors = require("consts.xna_colors")
 
 local entity = {}
 
 entity.name = "auspicioushelper/DieWater"
-entity.depth = 2000
+entity.depth = -9999
 
 entity.placements = {
   {
-    name = "Die water",
+    name = "main",
     data = {
       width = 8,
       height=8
     }
   }
 }
-function entity.sprite(room, entity)
-  color = {1, 1, 1, 0.3}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
 
+entity.fillColor = {xnaColors.LightBlue[1] * 0.3, xnaColors.LightBlue[2] * 0.3, xnaColors.LightBlue[3] * 0.3, 0.6}
+entity.borderColor = {1,xnaColors.LightBlue[2] * 0.3, xnaColors.LightBlue[3] * 0.3, 0.8}
 
 return entity
