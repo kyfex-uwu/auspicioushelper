@@ -23,7 +23,7 @@ entity.placements = {
   }
 }
 
-entity.texture = "loenn/auspicioushelper/template/tblk"
+entity.texture = "loenn/auspicioushelper/template/tmoon"
 
 function entity.rectangle(room, entity)
   return utils.rectangle(entity.x-6, entity.y-6, 12, 12)

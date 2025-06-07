@@ -217,7 +217,15 @@ public class TemplateMoveCollidable:TemplateDisappearer, ITemplateTriggerable{
   public Query getq(Vector2 maxpotentialmovemagn){
     QueryIn s = getQself();
     Vector2 v = maxpotentialmovemagn.Abs().Ceiling();
-    QueryBounds q = getQinfo(s.bounds._expand(v.X,v.Y),s.gotten);
+    HashSet<Solid> toExclude = new(s.gotten);
+    foreach(Solid p in s.gotten){
+      foreach(StaticMover sm in p.staticMovers){
+        if(sm.Entity is TemplateStaticmover smt){
+          foreach(Solid sl in smt.GetChildren<Solid>(Propagation.Shake)) toExclude.Add(sl);
+        }
+      }
+    }
+    QueryBounds q = getQinfo(s.bounds._expand(v.X,v.Y),toExclude);
     return new(q,s);
   }
 
