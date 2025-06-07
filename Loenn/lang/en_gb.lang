@@ -1,6 +1,8 @@
 # hiiii -kyfex
 mods.auspicioushelper.name=Auspicious Helper
 
+# .channel = The channel to listen to
+
 ### Triggers
 
 # Channel Player Trigger
@@ -24,7 +26,7 @@ triggers.auspicioushelper/HoldableReleaseTrigger.placements.description.main=For
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.force_throw=Whether the player should throw the item or just drop it
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.only_once=If this should only trigger once
 
-### Entities
+### Misc Entities
 
 # Anti 0f Zone
 entities.auspicioushelper/Anti0fZone.placements.name.main=Anti 0f Zone
@@ -104,3 +106,22 @@ entities.auspicioushelper/TrackedCassette.attributes.description.identifier=A un
 # Vertical Fling Bird
 entities.auspicioushelper/VerticalFlingBird.placements.name.main=Vertical Fling Bird 
 entities.auspicioushelper/VerticalFlingBird.placements.description.main=A bird that flies up off the screen after it flings you
+
+### Channel Stuff
+
+# Channel Block
+entities.auspicioushelper/ChannelBlock.placements.name.main=Channel Block 
+entities.auspicioushelper/ChannelBlock.placements.description.main=A block that is only solid if its given channel is active/odd
+entities.auspicioushelper/ChannelBlock.attributes.description.channel=The channel to listen to
+entities.auspicioushelper/ChannelBlock.attributes.description.inverted=If the block should only be solid when the channel is not active/even
+entities.auspicioushelper/ChannelBlock.attributes.description.safe=If the block should be "safe" (you can collect strawberries when standing on it
+
+# Channel Booster
+entities.auspicioushelper/ChannelBooster.placements.name.main=Channel Booster
+entities.auspicioushelper/ChannelBooster.placements.description.main=A booster that can only be entered depending on its given channel
+entities.auspicioushelper/ChannelBooster.attributes.description.channel=The channel to listen to
+entities.auspicioushelper/ChannelBooster.attributes.description.self_activating=Should the given channel toggle when the player exits the booster
+entities.auspicioushelper/ChannelBooster.attributes.name.state0=Inactive State
+entities.auspicioushelper/ChannelBooster.attributes.description.state0=How the booster should behave when inactive/even
+entities.auspicioushelper/ChannelBooster.attributes.name.state1=Active State
+entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the booster should behave when active/odd
