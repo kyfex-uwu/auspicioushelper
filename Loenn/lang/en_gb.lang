@@ -101,3 +101,6 @@ entities.auspicioushelper/TrackedCassette.attributes.description.line_width=How 
 entities.auspicioushelper/TrackedCassette.attributes.description.flag=The flag to set on collect
 entities.auspicioushelper/TrackedCassette.attributes.description.identifier=A unique identifier for this cassette
 
+# Vertical Fling Bird
+entities.auspicioushelper/VerticalFlingBird.placements.name.main=Vertical Fling Bird 
+entities.auspicioushelper/VerticalFlingBird.placements.description.main=A bird that flies up off the screen after it flings you
