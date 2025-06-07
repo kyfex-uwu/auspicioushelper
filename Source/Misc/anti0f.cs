@@ -60,7 +60,6 @@ public class Anti0fZone:Entity{
       ),maxt);
     }
     public bool prog(Player p, float step){
-      DebugConsole.Write("here");
       if(!Input.GrabCheck || p.IsTired || p.Holding!=null) return false;
       switch(p.StateMachine.state){
         case 0: case 7:
@@ -71,7 +70,8 @@ public class Anti0fZone:Entity{
       }
       prog(step);
       foreach(var h in active){
-        if(h.o.Check(p) && h.o.Pickup(p)){
+        if(h.o.Check(p) && p.Pickup(h.o)){
+          DebugConsole.Write("Picked up");
           p.StateMachine.State = 8; 
           return true;
         }

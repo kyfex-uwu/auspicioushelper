@@ -13,7 +13,10 @@ entity.placements = {
     name = "Template Swapblock",
     data = {
       template = "",
-      depthoffset=5
+      depthoffset=5,
+      max_speed = 360,
+      max_return_speed = 144,
+      returning = false,
     }
   }
 }
