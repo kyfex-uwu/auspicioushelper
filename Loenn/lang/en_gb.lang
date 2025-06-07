@@ -74,7 +74,7 @@ entities.auspicioushelper/MaterialController.attributes.description.reload=Reloa
 
 # Portal Gate H
 entities.auspicioushelper/PortalGateH.placements.name.main=Portal Gate (Horizontal)
-entities.auspicioushelper/PortalGateH.placements.description.main=por tole
+entities.auspicioushelper/PortalGateH.placements.description.main=A portal that can correctly display entities that intersect it
 entities.auspicioushelper/PortalGateH.attributes.description.attached=If the portals are attached to solids
 entities.auspicioushelper/PortalGateH.attributes.description.color_hex=The portal color
 entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f0=Portal 1 Facing Right
@@ -86,4 +86,18 @@ entities.auspicioushelper/PortalGateH.attributes.description.giveRCB=Whether the
 
 # Spiral Boss Beam
 entities.auspicioushelper/SpiralBossBeam.placements.name.main=Spiral Boss Beam
-entities.auspicioushelper/SpiralBossBeam.placements.description.main=por tole
+entities.auspicioushelper/SpiralBossBeam.placements.description.main=A Boss Beam that rotates
+entities.auspicioushelper/SpiralBossBeam.attributes.description.start_angle=The starting angle in radians
+entities.auspicioushelper/SpiralBossBeam.attributes.description.speed=The rotation speed in radians/sec
+
+# Tracked Cassette
+entities.auspicioushelper/TrackedCassette.placements.name.main=Tracked Cassette
+entities.auspicioushelper/TrackedCassette.placements.description.main=A customizable cassette
+entities.auspicioushelper/TrackedCassette.attributes.name.dont_unlock_bside=Don't Unlock B-Side
+entities.auspicioushelper/TrackedCassette.attributes.description.dont_unlock_bside=Whether to unlock the B-Side on collect
+entities.auspicioushelper/TrackedCassette.attributes.description.use_raw_message=Whether to use the raw text in "message" or try and translate it
+entities.auspicioushelper/TrackedCassette.attributes.description.message=The message to display on collect
+entities.auspicioushelper/TrackedCassette.attributes.description.line_width=How wide the cassette collect message should be
+entities.auspicioushelper/TrackedCassette.attributes.description.flag=The flag to set on collect
+entities.auspicioushelper/TrackedCassette.attributes.description.identifier=A unique identifier for this cassette
+
