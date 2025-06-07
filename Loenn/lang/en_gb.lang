@@ -49,3 +49,36 @@ entities.auspicioushelper/CassetteGate.attributes.description.horizontal=Whether
 # Die Water
 entities.auspicioushelper/DieWater.placements.name.main=Die Water
 entities.auspicioushelper/DieWater.placements.description.main=Water that uhm. uh. kills you
+
+# Lava Sandwich Aligner
+entities.auspicioushelper/lavasandwichAligner.placements.name.main=[WIP] Lava Sandwich Aligner
+entities.auspicioushelper/lavasandwichAligner.placements.description.main=Aligns the lava sandwich to center on this entity instead of the center of the screen
+entities.auspicioushelper/lavasandwichAligner.attributes.name.y=Y (hover for info)
+entities.auspicioushelper/lavasandwichAligner.attributes.description.y=Y position of the entity, and the Y position to center the sandwich on
+
+# Material Controller
+entities.auspicioushelper/MaterialController.placements.name.main=Material Controller
+entities.auspicioushelper/MaterialController.placements.description.main=Adds a shader pass to the level, not a lot of documentation for this
+entities.auspicioushelper/MaterialController.attributes.description.path=Path to the material
+entities.auspicioushelper/MaterialController.attributes.description.params=
+entities.auspicioushelper/MaterialController.attributes.description.identifier=
+entities.auspicioushelper/MaterialController.attributes.description.depth=The depth of this material (affects only things rendered below this)
+entities.auspicioushelper/MaterialController.attributes.description.Fade_in=How to fade in
+entities.auspicioushelper/MaterialController.attributes.description.fadeOut=How to fade out
+entities.auspicioushelper/MaterialController.attributes.description.independent=Whether this is independent (?)
+entities.auspicioushelper/MaterialController.attributes.description.simple=Whether this is simple (?)
+entities.auspicioushelper/MaterialController.attributes.description.always=Whether this is always (?)
+entities.auspicioushelper/MaterialController.attributes.description.useprev=Whether this uses the previous frame
+entities.auspicioushelper/MaterialController.attributes.description.usebg=Whether this uses the background
+entities.auspicioushelper/MaterialController.attributes.description.reload=Reload this material on load
+
+# Portal Gate H
+entities.auspicioushelper/PortalGateH.placements.name.main=Portal Gate (Horizontal)
+entities.auspicioushelper/PortalGateH.placements.description.main=por tole
+entities.auspicioushelper/PortalGateH.attributes.description.attached=If the portals are attached to solids
+entities.auspicioushelper/PortalGateH.attributes.description.color_hex=The portal color
+entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f0=Portal 1 Facing Right
+entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f1=Portal 2 Facing Right
+entities.auspicioushelper/PortalGateH.attributes.description.right_facing_f0=If the first portal should face right
+entities.auspicioushelper/PortalGateH.attributes.description.right_facing_f1=If the second portal should face right
+
