@@ -3,6 +3,7 @@ local entities = require("entities")
 local decals = require("decals")
 local utils = require("utils")
 local logging = require("logging")
+local depths = require("consts.object_depths")
 
 local settings = require("mods").getModSettings("auspicioushelper")
 local menubar = require("ui.menubar").menubar
@@ -87,9 +88,23 @@ return {
                 local toInsert = ({entities.getEntityDrawable(movedEntity._name, nil, room, movedEntity, nil)})[1]
                 if toInsert.draw == nil then 
                     for _,v in ipairs(toInsert) do table.insert(toDraw, v) end
-                else table.insert(toDraw, toInsert) end
+                else table.insert(toDraw, {
+                    func=toInsert, 
+                    depth=(type(entity.depth) == "func" and entity.depth(room, movedEntity, nil) or entity.depth) or 0})
+                end
             end
         end
+        for _,entity in ipairs(data[2].decalsBg) do
+            if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
+                entity.y >= data[1].y-(entity.height or 0) and entity.y <= data[1].y+data[1].height then
+                    
+                local movedEntity = utils.deepcopy(entity)
+                movedEntity.x=x + (entity.x - data[1].x) + offset[1]
+                movedEntity.y=y + (entity.y - data[1].y) + offset[2]
+                local toInsert = ({decals.getDrawable(entity.texture, nil, room, movedEntity, nil)})[1]
+                table.insert(toDraw, {func=toInsert, depth=entity.depth or depths.bgDecals})
+            end
+        end 
         for _,entity in ipairs(data[2].decalsFg) do
             if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
                 entity.y >= data[1].y-(entity.height or 0) and entity.y <= data[1].y+data[1].height then
@@ -97,20 +112,20 @@ return {
                 local movedEntity = utils.deepcopy(entity)
                 movedEntity.x=x + (entity.x - data[1].x) + offset[1]
                 movedEntity.y=y + (entity.y - data[1].y) + offset[2]
-                local toInsert = ({decals.getDrawable(string.sub(entity.texture,0,-4), nil, room, entity, nil)})[1]
-                table.insert(toDraw, toInsert)
+                local toInsert = ({decals.getDrawable(entity.texture, nil, room, movedEntity, nil)})[1]
+                table.insert(toDraw, {func=toInsert, depth=entity.depth or depths.fgDecals})
             end
         end 
     --tiles
     
---         table.sort(toDraw, function (a, b)
---             return (a.depth or 0) > (b.depth or 0)
---         end)
+        table.sort(toDraw, function (a, b)
+            return a.depth > b.depth
+        end)
 
         --data[1].tilesFg
         
         for _,v in ipairs(toDraw) do
-            v:draw() 
+            v.func:draw() 
         end
     end,
     templateID_from_entity = templateID_from_entity,
