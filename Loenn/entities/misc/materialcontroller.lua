@@ -9,7 +9,7 @@ materialcontroller.depth = 2000
 local ftypes = {"Always","Never","Linear","Cosine","Sqrt"}
 materialcontroller.placements = {
   {
-    name = "Material Controller",
+    name = "main",
     data = {
       path="",
       identifier="",
@@ -27,12 +27,6 @@ materialcontroller.placements = {
   }
 }
 materialcontroller.fieldInformation = {
-  channel = {
-    fieldType="string"
-  },
-  value = {
-    fieldType="integer"
-  },
   Fade_in = {
     options = ftypes
   },
@@ -41,10 +35,5 @@ materialcontroller.fieldInformation = {
   }
 }
 materialcontroller.texture = "loenn/auspicioushelper/controllers/material"
-
-
-function materialcontroller.rectangle(room, entity)
-  return utils.rectangle(entity.x-4, entity.y-4, 8,8)
-end
 
 return materialcontroller

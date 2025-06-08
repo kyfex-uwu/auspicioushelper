@@ -1,5 +1,7 @@
 local drawableSprite = require("structs.drawable_sprite")
+local drawableRectangle = require("structs.drawable_rectangle")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local channelblock = {}
 
@@ -8,32 +10,25 @@ channelblock.depth = 2000
 
 channelblock.placements = {
   {
-    name = "Channel Block",
+    name = "main",
     data = {
       width = 8,
       height = 8,
       channel = "",
       inverted = false,
       safe = false,
-      alwayspresent = false
+      --alwayspresent = false
     }
   }
 }
-channelblock.fieldInformation = {
-  channel = {
-    fieldType="string"
-  }
-}
-function channelblock.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
 
-function channelblock.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
+function channelblock.sprite(room, entity)
+    return {
+        drawableRectangle.fromRectangle("bordered", entity.x, entity.y, entity.width, entity.height, 
+            entity.inverted and aelperLib.channel_color_dark_halfopacity or aelperLib.channel_color, 
+            entity.inverted and aelperLib.channel_color_halfopacity or aelperLib.channel_color_dark), 
+        aelperLib.channel_spriteicon_entitycenter(entity),
+    }
 end
 
 return channelblock
