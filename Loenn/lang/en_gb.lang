@@ -22,7 +22,7 @@ triggers.auspicioushelper/ConditionalStrawbCollectTrigger.attributes.description
 
 # Release Holdable Trigger
 triggers.auspicioushelper/HoldableReleaseTrigger.placements.name.main=Release Holdable Trigger
-triggers.auspicioushelper/HoldableReleaseTrigger.placements.description.main=Forces the player to drop what they're holding
+triggers.auspicioushelper/HoldableReleaseTrigger.placements.description.main=Set holdable timer to 0, allowing immediate release
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.force_throw=Whether the player should throw the item or just drop it
 triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.only_once=If this should only trigger once
 
@@ -31,17 +31,17 @@ triggers.auspicioushelper/HoldableReleaseTrigger.attributes.description.only_onc
 # Anti 0f Zone
 entities.auspicioushelper/Anti0fZone.placements.name.main=Anti 0f Zone
 entities.auspicioushelper/Anti0fZone.placements.description.main=Prevents certain zero-frameable inputs from happening while inside this entity
-entities.auspicioushelper/Anti0fZone.attributes.name.always_walljumpcheck=Walljumps
+entities.auspicioushelper/Anti0fZone.attributes.name.always_walljumpcheck=Check Unsolid Walljumps
 entities.auspicioushelper/Anti0fZone.attributes.description.solids=Perform walljumps/cornerjumps on first possible pixel (prevents missing cornerboost speed from 0f)
 entities.auspicioushelper/Anti0fZone.attributes.description.holdables=Pick up holdables on the first possible pixel
 entities.auspicioushelper/Anti0fZone.attributes.description.player_colliders=Hit player colliders on the first possible pixel (if speed or number of dashes changes, will stop your movement)
-entities.auspicioushelper/Anti0fZone.attributes.description.always_walljumpcheck=Check for walljumps you would otherwise travel through (needed if using sideways jumpthrus) (slow; only use in the area directly around the jumpthru)
-entities.auspicioushelper/Anti0fZone.attributes.description.triggers=Hit triggers you otherwise would travel through
+entities.auspicioushelper/Anti0fZone.attributes.description.always_walljumpcheck=Check for walljumps off of non-solids each pixel (needed if using sideways jumpthrus) (slow; only use in the area directly around the jumpthru)
+entities.auspicioushelper/Anti0fZone.attributes.description.triggers=Hit triggers on the first possible pixel
 entities.auspicioushelper/Anti0fZone.attributes.description.cover_whole_room=Makes this entity cover the whole room
 
 # Beam Blocker
 entities.auspicioushelper/BeamBlocker.placements.name.main=Beam Blocker
-entities.auspicioushelper/BeamBlocker.placements.description.main=Stops Badeline's beam from going through this entity, similar to a wall
+entities.auspicioushelper/BeamBlocker.placements.description.main=Stops  Spiral Boss Beam from going through this entity, similar to a wall
 
 # Cassette Gate
 entities.auspicioushelper/CassetteGate.placements.name.main=[WIP] Cassette Gate
@@ -60,23 +60,23 @@ entities.auspicioushelper/lavasandwichAligner.attributes.description.y=Y positio
 
 # Material Controller
 entities.auspicioushelper/MaterialController.placements.name.main=Material Controller
-entities.auspicioushelper/MaterialController.placements.description.main=Adds a shader pass to the level, not a lot of documentation for this
-entities.auspicioushelper/MaterialController.attributes.description.path=Path to the material
-entities.auspicioushelper/MaterialController.attributes.description.params=
-entities.auspicioushelper/MaterialController.attributes.description.identifier=
-entities.auspicioushelper/MaterialController.attributes.description.depth=The depth of this material (affects only things rendered below this)
-entities.auspicioushelper/MaterialController.attributes.description.Fade_in=How to fade in
-entities.auspicioushelper/MaterialController.attributes.description.fadeOut=How to fade out
-entities.auspicioushelper/MaterialController.attributes.description.independent=Whether this is independent (?)
-entities.auspicioushelper/MaterialController.attributes.description.simple=Whether this is simple (?)
-entities.auspicioushelper/MaterialController.attributes.description.always=Whether this is always (?)
-entities.auspicioushelper/MaterialController.attributes.description.useprev=Whether this uses the previous frame
-entities.auspicioushelper/MaterialController.attributes.description.usebg=Whether this uses the background
-entities.auspicioushelper/MaterialController.attributes.description.reload=Reload this material on load
+entities.auspicioushelper/MaterialController.placements.description.main=Adds a shader pass to the level, reccomended to look at wiki
+entities.auspicioushelper/MaterialController.attributes.description.path=Path to shader
+entities.auspicioushelper/MaterialController.attributes.description.params=Paramaters to pass to the shader
+entities.auspicioushelper/MaterialController.attributes.description.identifier=Shorthand for shader (only share identifiers if path and params are identical)
+entities.auspicioushelper/MaterialController.attributes.description.depth=The level at which the layer is added to the scene
+entities.auspicioushelper/MaterialController.attributes.description.Fade_in=How to fade in during transitions
+entities.auspicioushelper/MaterialController.attributes.description.fadeOut=How to fade out during transitions
+entities.auspicioushelper/MaterialController.attributes.description.independent=If this doesn't need the <depth as a texture (check when possible for performance) (gp texture set to slot 3 when unchecked)
+entities.auspicioushelper/MaterialController.attributes.description.simple=Whether this is simple (used in WIP system, always check)
+entities.auspicioushelper/MaterialController.attributes.description.always=Whether to always perform (used in WIP system, always check)
+entities.auspicioushelper/MaterialController.attributes.description.useprev=Whether to pass the previous output of this layer to the texture (on slot 4)
+entities.auspicioushelper/MaterialController.attributes.description.usebg=Whether to render BG styleground layers and pass them
+entities.auspicioushelper/MaterialController.attributes.description.reload=Reload the effect whenever this entity is added (use for debugging)
 
 # Portal Gate H
 entities.auspicioushelper/PortalGateH.placements.name.main=Portal Gate (Horizontal)
-entities.auspicioushelper/PortalGateH.placements.description.main=A portal that can correctly display entities that intersect it
+entities.auspicioushelper/PortalGateH.placements.description.main=A portal that slices entities that are halfway though it
 entities.auspicioushelper/PortalGateH.attributes.description.attached=If the portals are attached to solids
 entities.auspicioushelper/PortalGateH.attributes.description.color_hex=The portal color
 entities.auspicioushelper/PortalGateH.attributes.name.right_facing_f0=Portal 1 Facing Right
@@ -109,7 +109,7 @@ entities.auspicioushelper/VerticalFlingBird.placements.description.main=A bird t
 
 # Entity ID Marker
 entities.auspicioushelper/EntityMarkingFlag.placements.name.main=Entity Marker
-entities.auspicioushelper/EntityMarkingFlag.placements.description.main=Finds an entity by ID and assigns it a string id
+entities.auspicioushelper/EntityMarkingFlag.placements.description.main=Finds an entity by ID and assigns it a string id. Add to a zztemplates room.
 entities.auspicioushelper/EntityMarkingFlag.attributes.description.path=The entity ID
 entities.auspicioushelper/EntityMarkingFlag.attributes.description.identifier=The unique identifier to give the entity, when found
 
@@ -144,7 +144,7 @@ entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the b
 entities.auspicioushelper/TemplateBlock.placements.name.main=Template Breakable Block
 entities.auspicioushelper/TemplateBlock.placements.description.main=A static block that can be made with a template
 entities.auspicioushelper/TemplateBlock.attributes.description.template=The name of the template to use. (<room>/<name>)
-entities.auspicioushelper/TemplateBlock.attributes.description.depthoffset=The depth of this template block - 10000
+entities.auspicioushelper/TemplateBlock.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateBlock.attributes.description.visible=Whether the template is visible or not
 entities.auspicioushelper/TemplateBlock.attributes.description.collidable=Whether the template is collidable or not
 entities.auspicioushelper/TemplateBlock.attributes.description.active=Whether the template will update or not
