@@ -107,6 +107,15 @@ entities.auspicioushelper/TrackedCassette.attributes.description.identifier=A un
 entities.auspicioushelper/VerticalFlingBird.placements.name.main=Vertical Fling Bird 
 entities.auspicioushelper/VerticalFlingBird.placements.description.main=A bird that flies up off the screen after it flings you
 
+# Entity ID Marker
+entities.auspicioushelper/EntityMarkingFlag.placements.name.main=Entity Marker
+entities.auspicioushelper/EntityMarkingFlag.placements.description.main=Finds an entity by ID and assigns it a string id
+entities.auspicioushelper/EntityMarkingFlag.attributes.description.path=The entity ID
+entities.auspicioushelper/EntityMarkingFlag.attributes.description.identifier=The unique identifier to give the entity, when found
+
+# Spline
+entities.auspicioushelper/Spline.placements.name.main=[WIP] Spline
+
 ### Channel Stuff
 
 # Channel Block
@@ -125,3 +134,9 @@ entities.auspicioushelper/ChannelBooster.attributes.name.state0=Inactive State
 entities.auspicioushelper/ChannelBooster.attributes.description.state0=How the booster should behave when inactive/even
 entities.auspicioushelper/ChannelBooster.attributes.name.state1=Active State
 entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the booster should behave when active/odd
+
+# todo
+
+### Templates Stuff
+
+#
