@@ -23,19 +23,17 @@ public static class MaterialPipe {
   public static bool dirty;
   public static GraphicsDevice gd;
   static bool orderFlipped;
+  public static Camera camera;
 
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orderFlipped = false;
     if(transroutine!=null) transroutine.Update();
-    if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
-      orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
-      //DebugConsole.Write("default rend");
+    if(layers.Count==0){
+      orig(self, scene);
       return;
     }
-    Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-    SpriteBatch sb = Draw.SpriteBatch;
+    camera = self.Camera;
     gd = Engine.Instance.GraphicsDevice;
-    RenderTarget2D t = GameplayBuffers.Gameplay;
     if(toRemove.Count>0){
       List<IMaterialLayer> nlist = new();
       foreach(var i in layers) if(!toRemove.Contains(i) && i.enabled) nlist.Add(i);
@@ -70,53 +68,37 @@ public static class MaterialPipe {
         bgReorderer.enable();
       }
       if(l.independent){
-        if(l.checkdo())l.render(self.Camera,sb);
+        if(l.checkdo()){
+          l.render(self.Camera,sb);
+          l.diddraw = true;
+        }
         else l.diddraw = false;
       }
     }
-    
-    float ndepth = layers.Count>0?layers[0].depth:float.NegativeInfinity;
-    int ldx = 0;
-    begin(self.Camera, sb, t);
-    foreach(Entity e in scene.Entities.entities){
-      if(e.Visible && !e.TagCheck(Tags.HUD) && e.actualDepth>=ndepth){
-        e.Render();
-      } else {
-        while(ndepth>e.actualDepth){
-          rlayer(self.Camera, sb, t, layers[ldx]);
-          ldx++;
-          ndepth = layers.Count>ldx?layers[ldx].depth:float.NegativeInfinity;
-        }
-        if(e.Visible && !e.TagCheck(Tags.HUD))e.Render();
-      }
-    }
-    while(ldx<layers.Count){
-      rlayer(self.Camera, sb, t, layers[ldx++]);
-    }
-    //sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)self.Camera.Position.X,(int)self.Camera.Position.Y,10,10),Draw.Pixel.ClipRect,Color.White);
+    orig(self, scene);
     gd.SamplerStates[1]=SamplerState.LinearClamp;
     gd.SamplerStates[2]=SamplerState.LinearClamp;
     sb.End();
   }
 
-  public static void begin(Camera c, SpriteBatch sb, RenderTarget2D t){
-    gd.SetRenderTarget(t);
-    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+  public static void continueDefault(){
+    gd.SetRenderTarget(GameplayBuffers.Gameplay);
+    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
   }
   public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, IMaterialLayer l){
     if(l.checkdo()){
-      float alpha = transroutine == null? 1:(
-        leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
-      );
+      float alpha = 
       if(l.independent){
         sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
       } else {
-        sb.End();
-        l.render(c,sb,t);
-        begin(c, sb, t);
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
+        
       }
     }
+  }
+  public static float GetTransitionAlpha(IMaterialLayer l){
+    return transroutine == null? 1:(
+      leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
+    );
   }
 
   static float camAt;
@@ -164,14 +146,6 @@ public static class MaterialPipe {
   public static void remLeaving(){
     foreach(IMaterialLayer l in leaving) removeLayer(l);
     leaving.Clear();
-  }
-  public static Rectangle obtainInvertedRectangle(Camera c){
-    Matrix m = Matrix.Invert(c.Matrix);
-    Vector2 c1 = Vector2.Transform(Vector2.Zero,m);
-    Vector2 c2 = Vector2.Transform(new Vector2(320,180),m);
-    return new Rectangle(
-      (int)c1.X, (int)c1.Y, (int)(c2.X-c1.X), (int)(c2.Y-c2.Y)
-    );
   }
 
   static void reorderBg(ILContext ctx){

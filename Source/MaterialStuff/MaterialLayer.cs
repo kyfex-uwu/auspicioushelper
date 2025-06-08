@@ -22,13 +22,21 @@ public interface IMaterialLayer{
     //DebugConsole.Write($"Roomchange: {leaving} {camAt}");
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
   }
-  bool usesbg(){
-    return false;
+  bool usesbg {get;}
+  void render(Camera c, SpriteBatch sb);
+  void paste(){
+    Color c = Color.White*alpha*MaterialPipe.GetTransitionAlpha(this);
+    if(independent){
+      if(!diddraw) return;
+      Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
+    } else {
+      if(!checkdo()) return;
+      Draw.SpriteBatch.End();
+      render(MaterialPipe.camera, Draw.SpriteBatch);
+      MaterialPipe.continueDefault();
+      Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
+    }
   }
-  void render(Camera c, SpriteBatch sb){
-    render(c,sb,null);
-  }
-  void render(Camera c, SpriteBatch sb, RenderTarget2D back);
   bool checkdo();
   void onRemove(){}
   void onEnable(){}
