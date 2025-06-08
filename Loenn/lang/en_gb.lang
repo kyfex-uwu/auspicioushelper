@@ -136,19 +136,19 @@ entities.auspicioushelper/ChannelBooster.attributes.description.state0=How the b
 entities.auspicioushelper/ChannelBooster.attributes.name.state1=Active State
 entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the booster should behave when active/odd
 
-# todo
+# todo: the rest of them
 
 ### Templates Stuff
 
 # Template Block
-entities.auspicioushelper/TemplateBlock.placements.name.main=Template Block
-entities.auspicioushelper/TemplateBlock.placements.description.main=
+entities.auspicioushelper/TemplateBlock.placements.name.main=Template Breakable Block
+entities.auspicioushelper/TemplateBlock.placements.description.main=A static block that can be made with a template
 entities.auspicioushelper/TemplateBlock.attributes.description.template=The name of the template to use. (<room>/<name>)
-entities.auspicioushelper/TemplateBlock.attributes.description.depthoffset=
-entities.auspicioushelper/TemplateBlock.attributes.description.visible=
-entities.auspicioushelper/TemplateBlock.attributes.description.collidable=
-entities.auspicioushelper/TemplateBlock.attributes.description.active=
-entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or_summit_launch=
-entities.auspicioushelper/TemplateBlock.attributes.description.persistent=
-entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=
-entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=
+entities.auspicioushelper/TemplateBlock.attributes.description.depthoffset=The depth of this template block - 10000
+entities.auspicioushelper/TemplateBlock.attributes.description.visible=Whether the template is visible or not
+entities.auspicioushelper/TemplateBlock.attributes.description.collidable=Whether the template is collidable or not
+entities.auspicioushelper/TemplateBlock.attributes.description.active=Whether the template will update or not
+entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or_summit_launch=If the template can only be broken when in a red bubble or summit launching
+entities.auspicioushelper/TemplateBlock.attributes.description.persistent=If the template will respawn after being broken
+entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=Whether or not you can dash into this template to break it
+entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=The sound effect to play when this template is broken
