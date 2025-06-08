@@ -10,11 +10,11 @@ entity.nodeLineRenderType = "line"
 
 entity.placements = {
   {
-    name = "Tracked Cassette",
+    name = "main",
     data = {
       dont_unlock_bside=false,
       use_raw_message=true,
-      always_show=false,
+      --always_show=false,
       message="",
       identifier="",
       flag = "",
@@ -22,16 +22,7 @@ entity.placements = {
     }
   }
 }
-function entity.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, 8, 8) 
-  sprite.color = color 
-  return sprite
-end
-
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, 8, 8)
-end
+entity.texture = "collectables/cassette/idle00"
+entity.color = {225/255, 186/255, 255/255}
 
 return entity

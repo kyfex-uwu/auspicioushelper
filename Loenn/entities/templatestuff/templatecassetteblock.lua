@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -18,14 +19,15 @@ entity.placements = {
   }
 }
 
-entity.texture = "loenn/auspicioushelper/template/tcass"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
---entity.fillColor = {0.5,0,1}
-
-
-
+function entity.draw(room, entity, viewport)
+    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
+    drawableSprite.fromTexture("loenn/auspicioushelper/template/tcass", {
+        x=entity.x,
+        y=entity.y,
+    }):draw()
+end
 
 return entity

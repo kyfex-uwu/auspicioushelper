@@ -8,23 +8,18 @@ beamblocker.depth = 2000
 
 beamblocker.placements = {
   {
-    name = "Beam Blocker",
+    name = "main",
     data = {
       width = 8,
       height = 8
     }
   }
 }
-function beamblocker.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
 
 function beamblocker.rectangle(room, entity)
   return utils.rectangle(entity.x, entity.y, entity.width, entity.height)
 end
+beamblocker.fillColor = {0,0.5,0.5,0.3}
+beamblocker.borderColor = {0,0.5,0.5,0.7}
 
 return beamblocker

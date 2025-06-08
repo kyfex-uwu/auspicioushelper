@@ -9,7 +9,7 @@ entity.nodeLimits = {0,1}
 
 entity.placements = {
   {
-    name = "Anti 0f zone",
+    name = "main",
     data = {
       width = 8,
       height = 8,
@@ -27,6 +27,14 @@ function entity.rectangle(room, entity)
 end
 entity.fillColor = {1,0.6,0.2,0.2}
 entity.borderColor = {0.7,0.4,0.1,0.7}
-
+entity.fieldOrder = {
+    "x", "y", "width", "height",
+    "player_colliders",
+    "holdables",
+    "triggers",
+    "solids",
+    "always_walljumpcheck",
+    "cover_whole_room"
+}
 
 return entity
