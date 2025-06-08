@@ -60,8 +60,8 @@ return {
         
         local toDraw = {}
         local offset = {
-            data[1].x - (data[1].nodes[1] or {x=data[1].x}).x,
-            data[1].y - (data[1].nodes[1] or {x=data[1].y}).y,
+            data[1].x - (data[1].nodes or {{x=data[1].x}})[1].x,
+            data[1].y - (data[1].nodes or {{x=data[1].y}})[1].y,
         }
         for _,entity in ipairs(data[2].entities) do
             if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
