@@ -302,6 +302,7 @@ public class TemplateHoldable:Actor{
       Position = lpos;
     }
     lpos = Position;
+    Hold.CheckAgainstColliders();
   }
   bool inRelpos;
   const int smearamount = 3;
