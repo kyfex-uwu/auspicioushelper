@@ -4,6 +4,20 @@ local decals = require("decals")
 local utils = require("utils")
 local logging = require("logging")
 
+local settings = require("mods").getModSettings("auspicioushelper")
+local menubar = require("ui.menubar").menubar
+local viewMenu = $(menubar):find(menu -> menu[1] == "view")[2]
+if not $(viewMenu):find(item -> item[1] == "auspicioushelper_legacyicons") then
+    table.insert(viewMenu,{
+        "auspicioushelper_legacyicons",
+        function() settings.auspicioushelper_legacyicons = not settings.auspicioushelper_legacyicons end,
+        "checkbox",
+        function() return settings.auspicioushelper_legacyicons or false end
+    })
+end
+
+--#####--
+
 local dark_multiplier = 0.65
 
 local channel_color = {230/255, 167/255, 50/255}
@@ -100,4 +114,8 @@ return {
         end
     end,
     templateID_from_entity = templateID_from_entity,
+    
+    getIcon = function(name)
+        return settings.auspicioushelper_legacyicons and (name.."_legacy") or name
+    end,
 }
