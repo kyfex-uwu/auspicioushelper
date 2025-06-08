@@ -7,12 +7,12 @@ local entity = {}
 
 entity.name = "auspicioushelper/Spline"
 entity.depth = 2000
-entity.nodeLimits = {1,100}
+entity.nodeLimits = {1,-1}
 entity.nodeLineRenderType = "line"
 
 entity.placements = {
   {
-    name = "spline",
+    name = "main",
     data = {
       identifier = "",
       spline_type = "basic",

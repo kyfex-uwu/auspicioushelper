@@ -115,6 +115,7 @@ entities.auspicioushelper/EntityMarkingFlag.attributes.description.identifier=Th
 
 # Spline
 entities.auspicioushelper/Spline.placements.name.main=[WIP] Spline
+entities.auspicioushelper/Spline.placements.description.main=WIP
 
 ### Channel Stuff
 
@@ -139,4 +140,15 @@ entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the b
 
 ### Templates Stuff
 
-#
+# Template Block
+entities.auspicioushelper/TemplateBlock.placements.name.main=Template Block
+entities.auspicioushelper/TemplateBlock.placements.description.main=
+entities.auspicioushelper/TemplateBlock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateBlock.attributes.description.depthoffset=
+entities.auspicioushelper/TemplateBlock.attributes.description.visible=
+entities.auspicioushelper/TemplateBlock.attributes.description.collidable=
+entities.auspicioushelper/TemplateBlock.attributes.description.active=
+entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or_summit_launch=
+entities.auspicioushelper/TemplateBlock.attributes.description.persistent=
+entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=
+entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=
