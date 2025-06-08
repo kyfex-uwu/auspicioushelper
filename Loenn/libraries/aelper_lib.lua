@@ -1,9 +1,11 @@
 local drawableSprite = require("structs.drawable_sprite")
+local drawableRectangle = require("structs.drawable_rectangle")
 local entities = require("entities")
 local decals = require("decals")
 local utils = require("utils")
 local logging = require("logging")
 local depths = require("consts.object_depths")
+local matrix = require("utils.matrix")
 
 local settings = require("mods").getModSettings("auspicioushelper")
 local menubar = require("ui.menubar").menubar
@@ -116,13 +118,28 @@ return {
                 table.insert(toDraw, {func=toInsert, depth=entity.depth or depths.fgDecals})
             end
         end 
-    --tiles
+        for tx = -1, data[1].width/8+2 do
+            for ty = -1, data[1].height/8+2 do
+                if (tx<=0 or ty<=0 or tx>data[1].width/8 or ty>data[1].height/8) == false then
+                    if data[2].tilesFg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
+                        table.insert(toDraw, {
+                            func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                                {0.8,0.8,0.8},{1,1,1}),
+                            depth=depths.fgTerrain})
+                    end
+                if data[2].tilesBg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
+                        table.insert(toDraw, {
+                            func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                                {0.5,0.5,0.5},{0.6,0.6,0.6}),
+                            depth=depths.bgTerrain})
+                    end
+                end
+            end
+        end
     
         table.sort(toDraw, function (a, b)
             return a.depth > b.depth
         end)
-
-        --data[1].tilesFg
         
         for _,v in ipairs(toDraw) do
             v.func:draw() 
