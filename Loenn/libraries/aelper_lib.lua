@@ -1,15 +1,8 @@
 local drawableSprite = require("structs.drawable_sprite")
 local entities = require("entities")
+local decals = require("decals")
 local utils = require("utils")
 local logging = require("logging")
-
-local oldPlaceItem = entities.placeItem
-entities.placeItem = function(room, layer, item)
-    print("placed item")
-    return oldPlaceItem(room, layer, item)
-end
-
---#####--
 
 local dark_multiplier = 0.65
 
@@ -57,7 +50,6 @@ return {
     
         if data.oldName then delete_template(entity, oldName) end
         local template_name = templateID_from_entity(entity, room)
-        logging.info("[Auspicious Helper] "..template_name)
         templates[template_name] = templates[template_name] or {}
         
         table.insert(templates[template_name], {entity, room})
@@ -84,10 +76,24 @@ return {
                 else table.insert(toDraw, toInsert) end
             end
         end
+        for _,entity in ipairs(data[2].decalsFg) do
+            if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
+                entity.y >= data[1].y-(entity.height or 0) and entity.y <= data[1].y+data[1].height then
+                    
+                local movedEntity = utils.deepcopy(entity)
+                movedEntity.x=x + (entity.x - data[1].x) + offset[1]
+                movedEntity.y=y + (entity.y - data[1].y) + offset[2]
+                local toInsert = ({decals.getDrawable(string.sub(entity.texture,0,-4), nil, room, entity, nil)})[1]
+                table.insert(toDraw, toInsert)
+            end
+        end 
+    --tiles
     
-        table.sort(toDraw, function (a, b)
-            return (a.depth or 0) > (b.depth or 0)
-        end)
+--         table.sort(toDraw, function (a, b)
+--             return (a.depth or 0) > (b.depth or 0)
+--         end)
+
+        --data[1].tilesFg
         
         for _,v in ipairs(toDraw) do
             v:draw(0.9) 
