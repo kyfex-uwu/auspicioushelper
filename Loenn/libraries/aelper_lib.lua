@@ -110,7 +110,7 @@ return {
         --data[1].tilesFg
         
         for _,v in ipairs(toDraw) do
-            v:draw(0.9) 
+            v:draw() 
         end
     end,
     templateID_from_entity = templateID_from_entity,
