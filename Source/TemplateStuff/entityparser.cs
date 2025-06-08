@@ -53,6 +53,7 @@ public static class EntityParser{
     }
     return etype!=Types.unable;
   }
+  public static Template currentParent {get; private set;} = null;
   public static Entity create(EntityData d, Level l, LevelData ld, Vector2 simoffset, Template t, string path){
     if(!parseMap.TryGetValue(d.Name,out var etype) || etype == Types.unable){
       return null;
@@ -65,8 +66,9 @@ public static class EntityParser{
     
     var loader = getLoader(d.Name);
     if(loader == null) return null;
+    currentParent = t;
     Entity e = loader(l,ld,simoffset,d);
-    if(e==null) return null;
+    if(e==null) goto done;
     if(path!=null && EntityMarkingFlag.flagged.TryGetValue(path+$"/{d.ID}",out var ident)){
       new FoundEntity(d,ident).finalize(e);
     }
@@ -76,10 +78,10 @@ public static class EntityParser{
           if(etype == Types.platformdisobedient)
             t.addEnt(new Wrappers.BasicPlatformDisobedient(p,t,simoffset+d.Position-t.virtLoc));
           t.addEnt(new Wrappers.BasicPlatform(p,t,simoffset+d.Position-t.virtLoc));
-          return null;
+          goto done;
         }else{
           DebugConsole.Write("Wrongly classified!!! "+d.Name);
-          return null;
+          goto done;
         }
       case Types.unwrapped:
         return e;
@@ -87,7 +89,7 @@ public static class EntityParser{
         if(e!=null){
           t.AddBasicEnt(e,simoffset+d.Position-t.virtLoc);
         }
-        return null;
+        goto done;
       case Types.removeSMbasic:
         List<StaticMover> SMRemove = new List<StaticMover>();
         foreach(Component c in e.Components) if(c is StaticMover sm){
@@ -97,10 +99,13 @@ public static class EntityParser{
         }
         foreach(StaticMover sm in SMRemove) e.Remove(sm);
         t.AddBasicEnt(e,simoffset+d.Position-t.virtLoc);
-        return null;
+        goto done;
       default:
-        return null;
+        goto done;
     }
+    done:
+      currentParent = null;
+      return null;
   }
   static void triggerPlatformsHook(On.Celeste.StaticMover.orig_TriggerPlatform orig, StaticMover sm){
     var smd = new DynamicData(sm);
@@ -175,7 +180,7 @@ public static class EntityParser{
       if (e.Has("texture")) movingPlatform.OverrideTexture = e.Attr("texture");
       return movingPlatform;
     });
-    clarify("blackGem",Types.basic,static(Level l, LevelData d, Vector2 o, EntityData e)=>new HeartGem(e,o));
+    clarify("blackGem",Types.basic,HookVanilla.HeartGem);
     clarify("wire",Types.unwrapped,static(Level l, LevelData d, Vector2 o, EntityData e)=>new CWire(e,o));
     defaultModdedSetup();
   }

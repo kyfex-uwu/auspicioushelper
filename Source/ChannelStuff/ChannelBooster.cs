@@ -34,8 +34,11 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
       insideplayer.MoveTowardsX(npos.X,100);
       insideplayer.MoveTowardsY(npos.Y,100);
       insideplayer.boostTarget = npos;
-      insideplayer.LiftSpeed = liftspeed;
+      if(givels)insideplayer.LiftSpeed = liftspeed;
     }
+  }
+  public bool hasRiders<T>() where T:Actor{
+    return insideplayer!=null;
   }
   public void destroy(bool particles){
     RemoveSelf();
@@ -109,6 +112,8 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
   public int id;
   public static int idctr = 0;
   public Color iinnerColor;
+  bool trigger;
+  bool givels;
 
 
 
@@ -142,6 +147,8 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
     channel = data.Attr("channel","");
     selfswitching = data.Bool("self_activating", false);
     id=idctr++;
+    trigger = data.Bool("triggerTemplates",false);
+    givels = data.Bool("give_liftspeed",false);
   }
   public override void Added(Scene scene)
   {
@@ -167,6 +174,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
       IBooster.startBoostPlayer(player, this);
       Audio.Play("event:/game/04_cliffside/greenbooster_enter", Position);
       sprite.Play("inside");
+      if(trigger) parent?.GetFromTree<ITemplateTriggerable>()?.OnTrigger(null);
       //sprite.FlipX = player.Facing == Facings.Left;
     }
   }
@@ -182,11 +190,13 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
       player.DashDir*=-1; 
       player.Speed*=-1;
     }
-    if(parent != null && parent.gatheredLiftspeed != Vector2.Zero){
-      player.Speed+=parent.gatheredLiftspeed;
-      player.LiftSpeed = parent.gatheredLiftspeed;
-    } else if(parent != null && player.liftSpeedTimer>0){
-      player.Speed+=player.LiftSpeed;
+    if(givels){
+      if(parent != null && parent.gatheredLiftspeed != Vector2.Zero){
+        player.Speed+=parent.gatheredLiftspeed;
+        player.LiftSpeed = parent.gatheredLiftspeed;
+      } else if(parent != null && player.liftSpeedTimer>0){
+        player.Speed+=player.LiftSpeed;
+      }
     }
     if(selfswitching){
       ChannelState.SetChannel(channel, 1-currentState);
@@ -231,6 +241,7 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
       dashRoutine.Active = false;
       base.Tag = 0;
     }
+    insideplayer=null;
   }
   public void Respawn(bool remanifest, bool change){
     

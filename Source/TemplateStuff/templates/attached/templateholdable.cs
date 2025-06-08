@@ -40,7 +40,7 @@ public class TemplateHoldable:Actor{
   bool startFloating = false;
   public TemplateHoldable(EntityData d, Vector2 offset):base(d.Position+offset){
     Position+=new Vector2(d.Width/2, d.Height);
-    hoffset = d.Nodes.Length>0?d.Nodes[0]-new Vector2(d.Width/2, d.Height):new Vector2(0,-d.Height/2);
+    hoffset = d.Nodes.Length>0?(d.Nodes[0]-new Vector2(d.Width/2, d.Height)-d.Position):new Vector2(0,-d.Height/2);
     Collider = new Hitbox(d.Width,d.Height,-d.Width/2,-d.Height);
     lpos = Position;
     Add(Hold = new Holdable(d.Float("cannot_hold_timer",0.1f)));
