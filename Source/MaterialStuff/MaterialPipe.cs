@@ -36,7 +36,7 @@ public static class MaterialPipe {
     gd = Engine.Instance.GraphicsDevice;
     if(toRemove.Count>0){
       List<IMaterialLayer> nlist = new();
-      foreach(var i in layers) if(!toRemove.Contains(i) && i.enabled) nlist.Add(i);
+      foreach(var i in layers) if(!toRemove.Contains(i)) nlist.Add(i);
       layers = nlist;
       toRemove.Clear();
     }
@@ -53,13 +53,12 @@ public static class MaterialPipe {
       curdepth=e.actualDepth;
     }
     //strawberries change their depth for the sole reason of making my life harder...;
-    if(!sorted){
-      scene.Entities.entities.Sort(EntityList.CompareDepth);
-    }
+    if(!sorted)scene.Entities.entities.Sort(EntityList.CompareDepth);
+    
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
     foreach(IMaterialLayer l in layers){
-      if(l.usesbg() && !orderFlipped && Engine.Instance.scene is Level v){
+      if(l.usesbg && !orderFlipped && Engine.Instance.scene is Level v){
         gd.SetRenderTarget(GameplayBuffers.Level);
         gd.Clear(v.BackgroundColor);
         v.Background.Render(v);
@@ -69,7 +68,7 @@ public static class MaterialPipe {
       }
       if(l.independent){
         if(l.checkdo()){
-          l.render(self.Camera,sb);
+          l.render();
           l.diddraw = true;
         }
         else l.diddraw = false;
@@ -78,22 +77,11 @@ public static class MaterialPipe {
     orig(self, scene);
     gd.SamplerStates[1]=SamplerState.LinearClamp;
     gd.SamplerStates[2]=SamplerState.LinearClamp;
-    sb.End();
   }
 
   public static void continueDefault(){
     gd.SetRenderTarget(GameplayBuffers.Gameplay);
     Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
-  }
-  public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, IMaterialLayer l){
-    if(l.checkdo()){
-      float alpha = 
-      if(l.independent){
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
-      } else {
-        
-      }
-    }
   }
   public static float GetTransitionAlpha(IMaterialLayer l){
     return transroutine == null? 1:(
@@ -127,6 +115,11 @@ public static class MaterialPipe {
     if(!leaving.Remove(l)) entering.Add(l);
     toRemove.Remove(l);
     l.enabled=true;
+    if(Engine.Instance.scene is Level lv){
+      lv.Add(new LayerMarkingEntity(l));
+    } else {
+      DebugConsole.Write("Added layer during non-level. This is wrong.");
+    }
     l.onEnable();
     if(layers.Contains(l)) return;
     dirty = true;
@@ -137,6 +130,8 @@ public static class MaterialPipe {
     toRemove.Add(l);
     l.enabled = false;
     l.onRemove();
+    l.markingEntity.RemoveSelf();
+    l.markingEntity=null;
     leaving.Remove(l);
     entering.Remove(l);
   }

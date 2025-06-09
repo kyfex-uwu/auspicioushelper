@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monocle;
 
@@ -22,6 +23,7 @@ internal static class RenderTargetPool{
   }
   public static int currentWidth {get; private set;} = 320;
   public static int currentHeight {get; private set;} = 180;
+  public static Vector2 pixelSize=>new Vector2(1/currentWidth,1/currentHeight);
   static int state =0;
   public class RenderTargetHandle {
     int index=-1;

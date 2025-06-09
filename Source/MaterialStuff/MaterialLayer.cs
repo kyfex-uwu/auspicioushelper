@@ -12,29 +12,32 @@ namespace Celeste.Mod.auspicioushelper;
 
 
 public interface IMaterialLayer{
+  Entity markingEntity {get;set;}
   bool enabled {get;set;}
   float depth {get;}
   RenderTarget2D outtex {get;}
   bool independent {get;}
   bool diddraw {get;set;}
   float alpha {get=>1;}
+  bool drawInScene=>true;
   float transalpha(bool leaving, float camAt){
     //DebugConsole.Write($"Roomchange: {leaving} {camAt}");
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
   }
   bool usesbg {get;}
   void render(Camera c, SpriteBatch sb);
+  void render()=>render(MaterialPipe.camera,Draw.SpriteBatch);
   void paste(){
     Color c = Color.White*alpha*MaterialPipe.GetTransitionAlpha(this);
     if(independent){
-      if(!diddraw) return;
+      if(!diddraw||!drawInScene) return;
       Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
     } else {
       if(!checkdo()) return;
       Draw.SpriteBatch.End();
       render(MaterialPipe.camera, Draw.SpriteBatch);
       MaterialPipe.continueDefault();
-      Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
+      if(drawInScene)Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
     }
   }
   bool checkdo();
@@ -42,100 +45,110 @@ public interface IMaterialLayer{
   void onEnable(){}
 }
 
-public class BasicMaterialLayer:IMaterialLayer{
-  public bool independent {get;set;}
-  public float depth {get;set;}
-  public RenderTarget2D mattex;
-  public RenderTarget2D outtex {get; private set;}
-  public List<IMaterialObject> willDraw = new List<IMaterialObject>();
-  public virtual bool matsToDraw=>willDraw.Count>0;
-  public Effect normalShader;
-  public bool both;
-  public bool always;
-  public bool diddraw {get;set;}
-  public bool enabled {get;set;}
-  public Effect quietShader = null;
-  public bool clearWilldraw = true;
-  public virtual float alpha=>1;
-  public virtual bool usesbg(){return false;}
-  public virtual float transalpha(bool leaving, float camAt){
-    return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
+[Tracked]
+internal class LayerMarkingEntity:Entity{
+  IMaterialLayer layer;
+  public LayerMarkingEntity(IMaterialLayer layer):base(Vector2.Zero){
+    AddTag(Tags.Persistent);
+    this.layer=layer;
+    layer.markingEntity=this;
+    Depth = (int)layer.depth;
   }
-  public BasicMaterialLayer(float _depth, Effect outshader = null, bool _independent = true, bool outonly = false, bool alwaysdraw=false){
-    outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
-    if(!outonly){
-      mattex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
-    }
-    normalShader=outshader;
-    both=!outonly;
-    always = alwaysdraw;
-    depth = _depth;
-    diddraw=false;
-    independent = _independent;
+  public override void Removed(Scene scene) {
+    if(layer.enabled) DebugConsole.Write("You are leaking materialLayers. Something has gone horribly wrong.");
+    base.Removed(scene);
   }
-  public virtual void planDraw(IMaterialObject obj){
-    if(enabled)willDraw.Add(obj);
+  public override void Render() {
+    base.Render();
+    if(layer.enabled) layer.paste();
+    else DebugConsole.Write("Rendering a disabled layer. This should not persist");
   }
-  public virtual void render(Camera c, SpriteBatch sb){
-    render(c, sb, null);
-  }
-  public virtual void rasterMats(SpriteBatch sb, Camera c){
-    foreach(IMaterialObject e in willDraw){
-      e.renderMaterial(this, sb, c);
-    }
-  }
-  public virtual void render(Camera c, SpriteBatch sb, RenderTarget2D back){
-    //DebugConsole.Write("Rendering layer");
-    Effect shader = auspicioushelperModule.Settings.UseQuietShader && quietShader!=null? quietShader:normalShader;
-    if(shader!=null){
-      if(back != null){
-        MaterialPipe.gd.Textures[2]=back;
-      }
-      EffectParameter timeUniform = shader.Parameters["time"];
-      if(timeUniform != null){
-        //DebugConsole.Write((Engine.Scene as Level).TimeActive.ToString());
-        timeUniform.SetValue((Engine.Scene as Level).TimeActive+2);
-      } 
-      EffectParameter camPosUniform = shader.Parameters["cpos"];
-      if(camPosUniform != null){
-        camPosUniform.SetValue(c.Position);
-      } 
-      EffectParameter photoSensitive = shader.Parameters["quiet"];
-      if(photoSensitive != null){
-        //DebugConsole.Write((Settings.Instance.DisableFlashes? 1f:0f).ToString());
-        photoSensitive.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
-      } 
-      if(usesbg()){
-        MaterialPipe.gd.Textures[3] = GameplayBuffers.Level;
-        MaterialPipe.gd.SamplerStates[3] = SamplerState.PointClamp;
-      }
-    }
+}
 
-    MaterialPipe.gd.SetRenderTarget(both?mattex:outtex);
-    MaterialPipe.gd.Clear(Color.Transparent);
-    if(matsToDraw){
-      sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
-      rasterMats(sb,c);
-      sb.End();
-    }
-    if(both){
-      //DebugConsole.Write("doing deferred shader");
-      MaterialPipe.gd.Textures[1] = mattex;
-      MaterialPipe.gd.SetRenderTarget(outtex);
-      MaterialPipe.gd.Clear(Color.Transparent);
-      sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, shader, Matrix.Identity);
-      sb.Draw(mattex,Vector2.Zero,Color.White);
-      sb.End();
-    }
-    if(clearWilldraw)willDraw.Clear();
-    diddraw = true;
+
+
+public class MaterialLayerInfo{
+  public bool enabled;
+  public bool independent;
+  public bool usesbg;
+  public bool diddraw;
+  public float depth;
+  public Entity markingEnt;
+  public MaterialLayerInfo(bool independent, float depth, bool usebg = false){
+    this.independent=independent; this.depth=depth; usesbg=usebg;
   }
+}
+public interface IMaterialLayerSimple:IMaterialLayer{
+  MaterialLayerInfo info {get;}
+  bool IMaterialLayer.enabled {get=>info.enabled; set=>info.enabled=value;}
+  bool IMaterialLayer.independent{get=>info.independent;}
+  bool IMaterialLayer.diddraw {get=>info.diddraw; set=>info.diddraw=value;}
+  float IMaterialLayer.depth {get=>info.depth;}
+  bool IMaterialLayer.usesbg {get=>info.usesbg;}
+  Entity IMaterialLayer.markingEntity {get=>info.markingEnt; set{
+    if(info.markingEnt!=null){
+      DebugConsole.Write("Setting marking ent while one already exists. Weird.");
+      info.markingEnt.RemoveSelf();
+    }
+    info.markingEnt=value;
+  }}
+}
+
+public class BasicMaterialItemLayer:IMaterialLayerSimple{
+  public MaterialLayerInfo info {get;}
+  VirtualShaderList passes;
+  List<RenderTargetPool.RenderTargetHandle> handles;
+  LayerFormat format;
+  public class LayerFormat{
+    public float depth;
+    public bool independent=true;
+    public bool alwaysRender=false;
+    public bool quadfirst=false;
+    public bool useBg=false;
+    public bool clearWilldraw=false;
+  }
+  public BasicMaterialItemLayer(VirtualShaderList passes, LayerFormat l){
+    info = new(l.independent,l.depth,l.useBg);
+    format = l;
+    this.passes=passes;
+    foreach(var pass in passes) handles.Add(new RenderTargetPool.RenderTargetHandle(false));
+  }
+  public virtual void onEnable(){
+    foreach(var h in handles)h.Claim();
+  }
+  public virtual void onRemove(){
+    foreach(var h in handles)h.Free();
+  }
+  List<IMaterialObject> willdraw=new();
   public virtual bool checkdo(){
-    return enabled && (always || willDraw.Count>0 || diddraw);
+    return format.alwaysRender || willdraw.Count>0;
   }
-  public RenderTarget2D swapOuttex(RenderTarget2D other){
-    RenderTarget2D temp = outtex;
-    if(other != null)outtex = other;
-    return temp;
+  public static void StartSb(SpriteBatch sb, Effect e=null, Camera c=null){
+    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, e, c?.Matrix??Matrix.Identity);
+  }
+  public virtual void rasterMats(SpriteBatch sb,Camera c){
+    foreach(var o in willdraw) o.renderMaterial(this,sb,c);
+  }
+  public virtual void render(SpriteBatch sb, Camera c){
+    passes.setbaseparams();
+    GraphicsDevice gd = MaterialPipe.gd;
+    for(int i=0; i<passes.Count; i++){
+      gd.SetRenderTarget(handles[i]);
+      gd.Clear(Color.Transparent);
+      if(i==0){
+        if(!format.quadfirst && willdraw.Count==0) continue;
+        StartSb(sb,passes[i],c);
+        if(format.quadfirst){
+
+        }
+        rasterMats(sb,c);
+        sb.End();
+      } else {
+        StartSb(sb,passes[i]);
+        sb.Draw(handles[i-1],Vector2.Zero,Color.White);
+        sb.End();
+      }
+    }
+    if(format.clearWilldraw) willdraw.Clear();
   }
 }
