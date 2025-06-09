@@ -51,7 +51,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
     prop &= ~Propagation.Riding;
     Depth = d.Int("decal_depth",-10001)+depthoffset;
     if(decalOffset.Count>0) {
-      arrows = GFX.Game.GetAtlasSubtextures(d.Attr("arrow_texture","objects/auspicioushelper/templates/movearrows/small"));
+      arrows = GFX.Game.GetAtlasSubtextures("objects/auspicioushelper/templates/movearrows/"+d.Attr("arrow_texture","small"));
       Visible = true;
     }
   }

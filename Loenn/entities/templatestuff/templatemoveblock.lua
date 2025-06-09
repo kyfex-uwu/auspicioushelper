@@ -25,7 +25,7 @@ entity.placements = {
       Max_stuck=0.15,
       cansteer=false,
       movesfx = "event:/game/04_cliffside/arrowblock_move",
-      arrow_texture = "objects/auspicioushelper/templates/movearrows/small",
+      arrow_texture = "small",
       decal_depth = -10001,
       max_leniency=4
     }
