@@ -15,10 +15,10 @@ namespace Celeste.Mod.auspicioushelper;
 
 class FadeMaterialLayer:BasicMaterialLayer{
   public float _alpha = 1;
-  public override float alpha => _alpha;
-  public override bool matsToDraw=>todraw.Count>0;
+  public float alpha => _alpha;
   List<Entity> todraw;
-  public FadeMaterialLayer(List<Entity> things, int depth):base(depth,null,true,true,false){
+  public override bool drawMaterials=>true; 
+  public FadeMaterialLayer(List<Entity> things, int depth):base([null],depth){
     todraw = things;
   }
   public override void rasterMats(SpriteBatch sb, Camera c){

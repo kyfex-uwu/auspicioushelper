@@ -46,7 +46,16 @@ public class VirtualShader{
     shader.Parameters[key]?.SetValue(t);
     if(quiet!=null)quiet.Parameters[key]?.SetValue(t);
   }
+  public void setparamvalex(string key, Vector4 t){
+    shader.Parameters[key]?.SetValue(t);
+    if(quiet!=null)quiet.Parameters[key]?.SetValue(t);
+  }
+  public void setparamvalex(string key, Vector2 t){
+    shader.Parameters[key]?.SetValue(t);
+    if(quiet!=null)quiet.Parameters[key]?.SetValue(t);
+  }
   public static implicit operator Effect(VirtualShader v)=>v.quiet!=null&&auspicioushelperModule.Settings.UseQuietShader?v.quiet:v.shader;
+  public static implicit operator VirtualShader(Effect eff)=>new VirtualShader(eff);
 }
 
 public class VirtualShaderList:IEnumerable<VirtualShader>{
@@ -63,6 +72,13 @@ public class VirtualShaderList:IEnumerable<VirtualShader>{
   public void setparamvalex(string key, float[] t){
     foreach(var s in shaders) s?.setparamvalex(key, t);
   }
+  public void setparamvalex(string key, Vector4 t){
+    foreach(var s in shaders) s?.setparamvalex(key, t);
+  }
+  public void setparamvalex(string key, Vector2 t){
+    foreach(var s in shaders) s?.setparamvalex(key, t);
+  }
+  
   public void setparamvalex(string key, bool t, int idx){
     shaders[idx]?.setparamvalex(key, t);
   }
@@ -88,4 +104,5 @@ public class VirtualShaderList:IEnumerable<VirtualShader>{
   public VirtualShader this[int x]{
     get=>shaders[x];
   }
+  public void Add(VirtualShader n)=>shaders.Add(n);
 }

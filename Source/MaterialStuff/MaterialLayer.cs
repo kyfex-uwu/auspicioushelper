@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Celeste.Mod.auspicioushelper;
 using Microsoft.Xna.Framework;
 using Celeste.Mod;
+using System;
 
 namespace Celeste.Mod.auspicioushelper;
 
@@ -25,8 +26,8 @@ public interface IMaterialLayer{
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
   }
   bool usesbg {get;}
-  void render(Camera c, SpriteBatch sb);
-  void render()=>render(MaterialPipe.camera,Draw.SpriteBatch);
+  void render(SpriteBatch sb, Camera c);
+  void render()=>render(Draw.SpriteBatch,MaterialPipe.camera);
   void paste(){
     Color c = Color.White*alpha*MaterialPipe.GetTransitionAlpha(this);
     if(independent){
@@ -35,7 +36,7 @@ public interface IMaterialLayer{
     } else {
       if(!checkdo()) return;
       Draw.SpriteBatch.End();
-      render(MaterialPipe.camera, Draw.SpriteBatch);
+      render();
       MaterialPipe.continueDefault();
       if(drawInScene)Draw.SpriteBatch.Draw(outtex, Vector2.Zero+MaterialPipe.camera.Position,c);
     }
@@ -43,6 +44,10 @@ public interface IMaterialLayer{
   bool checkdo();
   void onRemove(){}
   void onEnable(){}
+}
+public interface IMaterialObject{
+  public void registerMaterials(){}
+  public void renderMaterial(IMaterialLayer l, SpriteBatch sb, Camera c);
 }
 
 [Tracked]
@@ -55,7 +60,7 @@ internal class LayerMarkingEntity:Entity{
     Depth = (int)layer.depth;
   }
   public override void Removed(Scene scene) {
-    if(layer.enabled) DebugConsole.Write("You are leaking materialLayers. Something has gone horribly wrong.");
+    if(layer.enabled) throw new Exception("You are leaking materialLayers. Something has gone wrong.");
     base.Removed(scene);
   }
   public override void Render() {
@@ -86,7 +91,7 @@ public interface IMaterialLayerSimple:IMaterialLayer{
   float IMaterialLayer.depth {get=>info.depth;}
   bool IMaterialLayer.usesbg {get=>info.usesbg;}
   Entity IMaterialLayer.markingEntity {get=>info.markingEnt; set{
-    if(info.markingEnt!=null){
+    if(info.markingEnt!=null && value!=null){
       DebugConsole.Write("Setting marking ent while one already exists. Weird.");
       info.markingEnt.RemoveSelf();
     }
@@ -94,11 +99,12 @@ public interface IMaterialLayerSimple:IMaterialLayer{
   }}
 }
 
-public class BasicMaterialItemLayer:IMaterialLayerSimple{
+public class BasicMaterialLayer:IMaterialLayerSimple{
   public MaterialLayerInfo info {get;}
-  VirtualShaderList passes;
+  public VirtualShaderList passes;
   List<RenderTargetPool.RenderTargetHandle> handles;
   LayerFormat format;
+  public RenderTarget2D outtex=>handles[handles.Count-1];
   public class LayerFormat{
     public float depth;
     public bool independent=true;
@@ -107,12 +113,13 @@ public class BasicMaterialItemLayer:IMaterialLayerSimple{
     public bool useBg=false;
     public bool clearWilldraw=false;
   }
-  public BasicMaterialItemLayer(VirtualShaderList passes, LayerFormat l){
+  public BasicMaterialLayer(VirtualShaderList passes, LayerFormat l){
     info = new(l.independent,l.depth,l.useBg);
     format = l;
     this.passes=passes;
     foreach(var pass in passes) handles.Add(new RenderTargetPool.RenderTargetHandle(false));
   }
+  public BasicMaterialLayer(VirtualShaderList passes, float depth):this(passes,new LayerFormat{depth=depth}){}
   public virtual void onEnable(){
     foreach(var h in handles)h.Claim();
   }
@@ -129,6 +136,7 @@ public class BasicMaterialItemLayer:IMaterialLayerSimple{
   public virtual void rasterMats(SpriteBatch sb,Camera c){
     foreach(var o in willdraw) o.renderMaterial(this,sb,c);
   }
+  public virtual bool drawMaterials => format.quadfirst || willdraw.Count!=0;
   public virtual void render(SpriteBatch sb, Camera c){
     passes.setbaseparams();
     GraphicsDevice gd = MaterialPipe.gd;
@@ -136,10 +144,12 @@ public class BasicMaterialItemLayer:IMaterialLayerSimple{
       gd.SetRenderTarget(handles[i]);
       gd.Clear(Color.Transparent);
       if(i==0){
-        if(!format.quadfirst && willdraw.Count==0) continue;
+        if(!drawMaterials) continue;
         StartSb(sb,passes[i],c);
         if(format.quadfirst){
-
+          Vector2 tlc = c.ScreenToCamera(Vector2.Zero);
+          Vector2 size = c.CameraToScreen(RenderTargetPool.size)-tlc;
+          sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)tlc.X,(int)tlc.Y,(int)size.X,(int)size.Y),Color.White);
         }
         rasterMats(sb,c);
         sb.End();

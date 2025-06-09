@@ -114,12 +114,12 @@ public static class MaterialPipe {
   public static void addLayer(IMaterialLayer l){
     if(!leaving.Remove(l)) entering.Add(l);
     toRemove.Remove(l);
+    if(l.enabled) return;
     l.enabled=true;
     if(Engine.Instance.scene is Level lv){
+      if(l.markingEntity!=null) throw new Exception("Layer marking entities are leaking");
       lv.Add(new LayerMarkingEntity(l));
-    } else {
-      DebugConsole.Write("Added layer during non-level. This is wrong.");
-    }
+    } else throw new Exception("Added layer during non-level. This is wrong.");
     l.onEnable();
     if(layers.Contains(l)) return;
     dirty = true;
@@ -127,6 +127,7 @@ public static class MaterialPipe {
   }
   static HashSet<IMaterialLayer> toRemove = new();
   public static void removeLayer(IMaterialLayer l){
+    if(l.enabled==false) return;
     toRemove.Add(l);
     l.enabled = false;
     l.onRemove();
