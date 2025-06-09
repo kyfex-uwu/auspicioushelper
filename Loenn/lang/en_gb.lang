@@ -121,7 +121,7 @@ entities.auspicioushelper/Spline.placements.description.main=WIP
 
 # Channel Block
 entities.auspicioushelper/ChannelBlock.placements.name.main=Channel Block 
-entities.auspicioushelper/ChannelBlock.placements.description.main=A block that is only solid if its given channel is active/odd
+entities.auspicioushelper/ChannelBlock.placements.description.main=A block that is only solid if its given channel is active/odd. (the modder uses this in their maps and didn't really make it with the intent for others to. It is reccomended to use template cassette blocks since they have all the same functionality and actually have visuals)
 entities.auspicioushelper/ChannelBlock.attributes.description.channel=The channel to listen to
 entities.auspicioushelper/ChannelBlock.attributes.description.inverted=If the block should only be solid when the channel is not active/even
 entities.auspicioushelper/ChannelBlock.attributes.description.safe=If the block should be "safe" (you can collect strawberries when standing on it
@@ -136,7 +136,107 @@ entities.auspicioushelper/ChannelBooster.attributes.description.state0=How the b
 entities.auspicioushelper/ChannelBooster.attributes.name.state1=Active State
 entities.auspicioushelper/ChannelBooster.attributes.description.state1=How the booster should behave when active/odd
 
-# todo: the rest of them
+#channel clear Controller
+entities.auspicioushelper/ChannelClearController.placements.description.main=Entity that manages channel resetting when constructed in a room
+entities.auspicioushelper/ChannelClearController.attributes.description.channel=Sets this singular channel to the specified value
+entities.auspicioushelper/ChannelClearController.attributes.description.value=Set the channel to this value
+entities.auspicioushelper/ChannelClearController.attributes.description.clear_prefix=Set all channel values with this prefix to 0
+entities.auspicioushelper/ChannelClearController.attributes.description.clear_all=Completely reset all channel values to 0
+
+#channelhotcoldwatcher
+entities.auspicioushelper/ChannelHotColdWatcher.placements.description.main=Set a channel based on the core mode
+entities.auspicioushelper/ChannelHotColdWatcher.attributes.description.channel=The channel to set
+entities.auspicioushelper/ChannelHotColdWatcher.attributes.description.Hot_value=the value to set in hot mode
+entities.auspicioushelper/ChannelHotColdWatcher.attributes.description.Cold_value=the value to set in chilly mode
+
+#channeljelly
+entities.auspicioushelper/ChannelJelly.placements.description.main=A jellyfish that changes state based on channel
+entities.auspicioushelper/ChannelJelly.attributes.description.channel=The channel to watch
+entities.auspicioushelper/ChannelJelly.attributes.description.state0=The state to use when the channel is even
+entities.auspicioushelper/ChannelJelly.attributes.description.state1=The state to use when the channel is odd
+
+#channelmath
+entities.auspicioushelper/ChannelMathController.placements.description.main=Run compiled expressions on channels, flags and entity states. Reccomended to read the wiki, read the compiler, get a PHD, and hit the modder
+entities.auspicioushelper/ChannelMathController.attributes.description.compiled_operations=Encoded compiled operations, gotten from the compiler website
+entities.auspicioushelper/ChannelMathController.attributes.description.run_immediately=Run immediately when a watched channel changes. This can very easily cause infinite loops and is not reccomended unless you know what you are doing.
+entities.auspicioushelper/ChannelMathController.attributes.description.custom_polling_rate=If defined, will run the code every X frames. If not defined, will run whenever a channel that is being used in an expression updates.
+entities.auspicioushelper/ChannelMathController.attributes.description.debug=Whether to print debug information to the auspicioushelper debug console (windows only)
+
+#channelsw
+entities.auspicioushelper/ChannelSwitch.placements.description.main=Core switch that actually toggles channels
+entities.auspicioushelper/ChannelSwitch.attributes.description.channel=Channel to set
+entities.auspicioushelper/ChannelSwitch.attributes.description.on_only=Only triggerable in the on state
+entities.auspicioushelper/ChannelSwitch.attributes.description.off_only=Only triggerable in the off state
+entities.auspicioushelper/ChannelSwitch.attributes.description.player_toggle=Whether the player can hit
+entities.auspicioushelper/ChannelSwitch.attributes.description.throwable_toggle=Whether throwables can hit
+entities.auspicioushelper/ChannelSwitch.attributes.description.seeker_toggle=Whether seekers can hit
+entities.auspicioushelper/ChannelSwitch.attributes.description.on_value=Value to set when on
+entities.auspicioushelper/ChannelSwitch.attributes.description.off_value=Value to set when off
+entities.auspicioushelper/ChannelSwitch.attributes.description.cooldown=Cooldown for hitting this particular switch (the channel itself is not constrained)
+
+#channelmvoer
+entities.auspicioushelper/ChannelMover.placements.description.main=A block that moves between nodes based on channel. (the modder uses this in their maps and didn't really make it with the intent for others to. It is reccomended to use template channel blocks since they have all the same functionality and actually have visuals)
+
+#channelplayerwatcher
+entities.auspicioushelper/ChannelPlayerWatcher.placements.description.main=It is reccomended to use a channel player trigger instead. This is much the same but covers whole room.
+
+#channelreskinnedspinner
+entities.auspicioushelper/ChannelReskinnedSpinner.placements.description.main=This is an entity for emptynoise(tollab) and is not supported in other contexts (I didn't even end up using it since white spinners so beautifl)
+
+#channelsprite
+entities.auspicioushelper/ChannelSprite.placements.description.main=Sprite that can display animations defined in Sprites.xml based on a channel. Check auspicioushelper's Sprites.xml for an example setup.
+entities.auspicioushelper/ChannelSprite.attributes.description.channel=the channel to watch
+entities.auspicioushelper/ChannelSprite.attributes.description.attached=Whether to attach the entity to solids
+entities.auspicioushelper/ChannelSprite.attributes.description.edge_type=How to pick the case when the channel is less than zero or greater than cases-1
+entities.auspicioushelper/ChannelSprite.attributes.description.xml_spritename=name of the XML sprite
+entities.auspicioushelper/ChannelSprite.attributes.description.cases=number of cases defined in XML
+entities.auspicioushelper/ChannelSprite.attributes.description.offsetX=shift sprite's X direction from placement(why didn't I use nodes?)
+entities.auspicioushelper/ChannelSprite.attributes.description.offsetY=shift sprite's Y direction from placement(why didn't I use nodes?)
+entities.auspicioushelper/ChannelSprite.attributes.description.depth=it's what you would expect from this field
+
+#channeltheo
+entities.auspicioushelper/ChannelTheo.placements.description.main=I got peer pressured into making this on my third day of modding (it was fun though). Jank.
+entities.auspicioushelper/ChannelTheo.attributes.description.channel=When nonzero, used the cursed behavior
+entities.auspicioushelper/ChannelTheo.attributes.description.switch_thrown_momentum=Player and holdable switch momentum when throwing
+entities.auspicioushelper/ChannelTheo.attributes.description.swap_thrown_positions=Switch positions with holdable dangerously when throwing(may clip player)
+entities.auspicioushelper/ChannelTheo.attributes.description.swap_thrown_positions_nodie=Don't clip player into wall when switching positions
+entities.auspicioushelper/ChannelTheo.attributes.description.player_momentum_weight=Check template holdable for explanation don't wana write
+entities.auspicioushelper/ChannelTheo.attributes.description.theo_momentum_weight=check playermomentum
+
+#channelvfxspritechain
+entities.auspicioushelper/SpriteAnimChain.placements.description.main=This is an entity for emptynoise(tollab) and is not supported in other contexts
+
+#conditionalstrawb
+entities.auspicioushelper/ConditionalStrawb.placements.description.main=Conditional strawberry that does not increase map strawberry count. Winged strawberry flies to the node when specified. Must be collected in conditional strawb collect trigger
+entities.auspicioushelper/ConditionalStrawb.attributes.description.strawberry_id=Name of the strawberry to use in collect triggers
+entities.auspicioushelper/ConditionalStrawb.attributes.description.appear_on_ch=Only appear when the specified channel is the specified value
+entities.auspicioushelper/ConditionalStrawb.attributes.description.appear_roomenter_only=Only check the appearance channel when entering the room (i'm not sure unchecking this works; never tested)
+entities.auspicioushelper/ConditionalStrawb.attributes.description.appear_channel=Channel to check whether strawberry should appear
+entities.auspicioushelper/ConditionalStrawb.attributes.description.appear_chvalue=Only appear if the appear channel has this value
+entities.auspicioushelper/ConditionalStrawb.attributes.description.fly_on_ch=Whether strawberry should fly away when the given channel has the specified value
+entities.auspicioushelper/ConditionalStrawb.attributes.description.fly_channel=Channel to watch for flying away
+entities.auspicioushelper/ConditionalStrawb.attributes.description.fly_value=Fly away if fly channel has this value
+entities.auspicioushelper/ConditionalStrawb.attributes.description.deathless=Act like a golden, returning to this strawberry's initial room when you die with it
+entities.auspicioushelper/ConditionalStrawb.attributes.description.winged=Fly to node (or off the screen if no node) when you dash
+entities.auspicioushelper/ConditionalStrawb.attributes.description.wingedfollower=Can fly away when the strawberry is following you
+entities.auspicioushelper/ConditionalStrawb.attributes.description.persist_on_death=The strawberry will stick around even if you die
+entities.auspicioushelper/ConditionalStrawb.attributes.description.sprites=The sprites to use for this. Currently not working, will fix later.
+
+#conditionalstrawbtracked
+entities.auspicioushelper/ConditionalStrawbTracked.placements.description.main=Conditional strawberry that adds to the map's strawberry count. Winged strawberry flies to the node when specified. Must be collected in conditional strawb collect trigger
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.strawberry_id=Name of the strawberry to use in collect triggers
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.appear_on_ch=Only appear when the specified channel is the specified value
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.appear_roomenter_only=Only check the appearance channel when entering the room (i'm not sure unchecking this works; never tested)
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.appear_channel=Channel to check whether strawberry should appear
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.appear_chvalue=Only appear if the appear channel has this value
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.fly_on_ch=Whether strawberry should fly away when the given channel has the specified value
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.fly_channel=Channel to watch for flying away
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.fly_value=Fly away if fly channel has this value
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.deathless=Act like a golden, returning to this strawberry's initial room when you die with it
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.winged=Fly to node (or off the screen if no node) when you dash
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.wingedfollower=Can fly away when the strawberry is following you
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.persist_on_death=The strawberry will stick around even if you die
+entities.auspicioushelper/ConditionalStrawbTracked.attributes.description.sprites=The sprites to use for this. Currently not working, will fix later.
 
 ### Templates Stuff
 
@@ -152,6 +252,8 @@ entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or
 entities.auspicioushelper/TemplateBlock.attributes.description.persistent=If the template will respawn after being broken
 entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=Whether or not you can dash into this template to break it
 entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=The sound effect to play when this template is broken
+entities.auspicioushelper/TemplateBlock.attributes.description.propagateRiding=Whether to pass player riders to parent template in compound templates
+entities.auspicioushelper/TemplateBlock.attributes.description.propagateShaking=Whether shake this block when the parent shakes when in compound template
 entities.auspicioushelper/TemplateBlock.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 # Template Cassette Block
@@ -160,13 +262,13 @@ entities.auspicioushelper/TemplateCassetteBlock.placements.description.main=A ca
 entities.auspicioushelper/TemplateCassetteBlock.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateCassetteBlock.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateCassetteBlock.attributes.description.freeze=Whether or not this template's entities should update when inactive
-entities.auspicioushelper/TemplateCassetteBlock.attributes.description.do_boost= unsure, bumps the template up when activates?
-entities.auspicioushelper/TemplateCassetteBlock.attributes.description.channel= unsure
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.do_boost= bounces the template up when activates (jank)
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.channel= Will be present when channel is nonzero; also used for rendering.
 entities.auspicioushelper/TemplateCassetteBlock.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 # Template Channelmover
 entities.auspicioushelper/TemplateChannelmover.placements.name.main=Template Channelmover
-entities.auspicioushelper/TemplateChannelmover.placements.description.main=A block that can be made with a template
+entities.auspicioushelper/TemplateChannelmover.placements.description.main=A template that moves between two nodes based on a channel
 entities.auspicioushelper/TemplateChannelmover.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateChannelmover.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateChannelmover.attributes.description.channel=The channel to listen to. When this channel is active/odd, this template moves to the end node
@@ -181,14 +283,14 @@ entities.auspicioushelper/TemplateFakewall.attributes.description.template=The n
 entities.auspicioushelper/TemplateFakewall.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateFakewall.attributes.description.freeze=If this template's entities should update or not
 entities.auspicioushelper/TemplateFakewall.attributes.name.dontOnTransitionInto=Don't Transition Into
-entities.auspicioushelper/TemplateFakewall.attributes.description.dontOnTransitionInto=Whether this template should play the disappearing animation or not if the player spawns inside this entity
+entities.auspicioushelper/TemplateFakewall.attributes.description.dontOnTransitionInto=Whether this template should play the disappearing animation or not if the player transitions into this entity
 entities.auspicioushelper/TemplateFakewall.attributes.description.disappear_depth=The depth of this template as it's disappearing
 entities.auspicioushelper/TemplateFakewall.attributes.description.fade_speed=How fast this template disappears. (It takes 1/fadespeed seconds)
 entities.auspicioushelper/TemplateFakewall.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 # Template Falling Block
 entities.auspicioushelper/TemplateFallingblock.placements.name.main=Template Falling Block
-entities.auspicioushelper/TemplateFallingblock.placements.description.main=A falling block that can be made with a template
+entities.auspicioushelper/TemplateFallingblock.placements.description.main=A falling block that can be made with a template. All interior solids collide with world.
 entities.auspicioushelper/TemplateFallingblock.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateFallingblock.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateFallingblock.attributes.description.direction=The direction to fall in
@@ -208,8 +310,29 @@ entities.auspicioushelper/templateFiller.attributes.description.template_name=Th
 # Template Holdable
 entities.auspicioushelper/templateholdable.placements.name.main=Template Holdable
 entities.auspicioushelper/templateholdable.placements.description.main=A holdable that can be made with a template
+entities.auspicioushelper/templateholdable.attributes.description.cannot_hold_timer=How long one must wait before being allowed to pick up this entity after dropping it
+entities.auspicioushelper/templateholdable.attributes.description.Holdable_collider_expand=How much the holdable collider should extend from the base collider in every direction
+entities.auspicioushelper/templateholdable.attributes.description.slowfall=like a jelly
+entities.auspicioushelper/templateholdable.attributes.description.slowrun=Does the holdable encumber?
+entities.auspicioushelper/templateholdable.attributes.description.always_collidable=Whether this should collide with other actors even when it is being held (will not collide with the holder)
+entities.auspicioushelper/templateholdable.attributes.description.player_momentum_weight=When grabbed, how much the final player velocity should use the player's velocity
+entities.auspicioushelper/templateholdable.attributes.description.holdable_momentum_weight=When grabbed, how much the final player velocity should use the holdable's velocity
+entities.auspicioushelper/templateholdable.attributes.description.wallhitsound=sound to play when hitting walls or floor
+entities.auspicioushelper/templateholdable.attributes.description.wallhit_speedretain=When hitting walls, how much speed to retain
+entities.auspicioushelper/templateholdable.attributes.description.gravity=How quickly to approach terminal velocity
+entities.auspicioushelper/templateholdable.attributes.description.terminal_velocity=Max falling speed
+entities.auspicioushelper/templateholdable.attributes.description.friction=Air friction
+entities.auspicioushelper/templateholdable.attributes.description.die_to_barrier=Die to seeker barriers
+entities.auspicioushelper/templateholdable.attributes.description.respawning=
+entities.auspicioushelper/templateholdable.attributes.description.respawnDelay=Time it takes to respawn
+entities.auspicioushelper/templateholdable.attributes.description.dontFlingOff=When liftspeed stops or becomes pointed downwards, whether this holdable should be flung
+entities.auspicioushelper/templateholdable.attributes.description.start_floating=Yea like if it starts floating
+entities.auspicioushelper/templateholdable.attributes.description.dangerous=Whether to crush things like hearts
+entities.auspicioushelper/templateholdable.attributes.description.voidDieOffset=How far below the screen the bottom of the collider must be for this to die
+entities.auspicioushelper/templateholdable.attributes.description.tutorial=Show grabbing tutorial
 entities.auspicioushelper/templateholdable.attributes.name._loenn_display_template=[LÖNN] Display Template
 # hoo boy
+# lmao ikr?
 
 # Template Moon Block
 entities.auspicioushelper/TemplateMoonblock.placements.name.main=Template Moon Block
@@ -231,7 +354,7 @@ entities.auspicioushelper/TemplateMoveblock.placements.description.main=A move b
 entities.auspicioushelper/TemplateMoveblock.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateMoveblock.attributes.description.depthoffset=How much to offset the depth of contained entities
 entities.auspicioushelper/TemplateMoveblock.attributes.description.direction=The direction to move in
-entities.auspicioushelper/TemplateMoveblock.attributes.description.uncollidable_blocks= not quite sure
+entities.auspicioushelper/TemplateMoveblock.attributes.description.uncollidable_blocks=Even uncollidable blocks in this template will stop the block's movement when hitting something
 entities.auspicioushelper/TemplateMoveblock.attributes.description.speed=The speed this template will move at
 entities.auspicioushelper/TemplateMoveblock.attributes.description.acceleration=How fast this template will accelerate to its top speed
 entities.auspicioushelper/TemplateMoveblock.attributes.description.respawning=Whether or not this template will respawn
@@ -239,20 +362,21 @@ entities.auspicioushelper/TemplateMoveblock.attributes.description.respawn_timer
 entities.auspicioushelper/TemplateMoveblock.attributes.description.Max_stuck=How long this template can be stuck before it breaks
 entities.auspicioushelper/TemplateMoveblock.attributes.description.cansteer=If the player can steer this template
 entities.auspicioushelper/TemplateMoveblock.attributes.description.movesfx=The sound to play while this template is moving
-entities.auspicioushelper/TemplateMoveblock.attributes.description.max_leniency=The maximum amount of pixels this template can wiggle by to avoid being stuck
+entities.auspicioushelper/TemplateMoveblock.attributes.description.max_leniency=The maximum amount of pixels this template can corner correct to avoid being stuck
 entities.auspicioushelper/TemplateMoveblock.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 #i dunno
+#it is wymiki's house
 # Template Static Mover
 entities.auspicioushelper/TemplateStaticmover.placements.name.main=Template Staticmover
-entities.auspicioushelper/TemplateStaticmover.placements.description.main=A move block that can be made with a template
+entities.auspicioushelper/TemplateStaticmover.placements.description.main=Attach a template to an existing solid
 entities.auspicioushelper/TemplateStaticmover.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateStaticmover.attributes.description.depthoffset=How much to offset the depth of contained entities
-entities.auspicioushelper/TemplateStaticmover.attributes.description.liftspeed_smear=
-entities.auspicioushelper/TemplateStaticmover.attributes.description.smear_average=
-entities.auspicioushelper/TemplateStaticmover.attributes.description.ridingTrigger=
-entities.auspicioushelper/TemplateStaticmover.attributes.description.EnableUnrooted=
-entities.auspicioushelper/TemplateStaticmover.attributes.description.channel=
+entities.auspicioushelper/TemplateStaticmover.attributes.description.liftspeed_smear=How many past frames of movement to use to calculate liftspeed
+entities.auspicioushelper/TemplateStaticmover.attributes.description.smear_average=Whether to smear by averaging past movement (default is take largest movement)
+entities.auspicioushelper/TemplateStaticmover.attributes.description.ridingTrigger=Whether riding this template should trigger the parent (a-la spring on zipmover)
+entities.auspicioushelper/TemplateStaticmover.attributes.description.EnableUnrooted=Whether this template can display without being attached to anything
+entities.auspicioushelper/TemplateStaticmover.attributes.description.channel=The cassette material channel used for displaying this while inactive. If left blank, the template will be destroyed and remade every time the attached block enables/disables
 entities.auspicioushelper/TemplateStaticmover.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 # Template Swap Block
@@ -267,14 +391,14 @@ entities.auspicioushelper/TemplateSwapblock.attributes.name._loenn_display_templ
 
 # Template Zip Mover
 entities.auspicioushelper/TemplateZipmover.placements.name.main=Template Zip Mover
-entities.auspicioushelper/TemplateZipmover.placements.description.main=A zip mover that can be made with a template
+entities.auspicioushelper/TemplateZipmover.placements.description.main=A zip mover that can be made with a template. Supports multiple nodes and multiple stops. To add a stop use two stacked nodes 
 entities.auspicioushelper/TemplateZipmover.attributes.description.template=The name of the template to use. (<room>/<name>)
 entities.auspicioushelper/TemplateZipmover.attributes.description.depthoffset=How much to offset the depth of contained entities
-entities.auspicioushelper/TemplateZipmover.attributes.description.return_type=
-entities.auspicioushelper/TemplateZipmover.attributes.description.activation_type=
-entities.auspicioushelper/TemplateZipmover.attributes.description.channel=
-entities.auspicioushelper/TemplateZipmover.attributes.description.propegateRiding=
-entities.auspicioushelper/TemplateZipmover.attributes.description.lastNodeIsKnot=
+entities.auspicioushelper/TemplateZipmover.attributes.description.return_type=The behavior this template has when reaching the last node
+entities.auspicioushelper/TemplateZipmover.attributes.description.activation_type=How this template is activated
+entities.auspicioushelper/TemplateZipmover.attributes.description.channel=Channel to use for grouped template zipmover movement (all zipmovers on the same channel trigger eachother)
+entities.auspicioushelper/TemplateZipmover.attributes.description.propegateRiding=Whether to tell parent templates if this has a rider
+entities.auspicioushelper/TemplateZipmover.attributes.description.lastNodeIsKnot=Make the last node a stop even if it is not stacked. Can be disabled to allow for crooked paths on the last segment of a looping path.
 entities.auspicioushelper/TemplateZipmover.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 ### silly
