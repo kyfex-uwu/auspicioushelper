@@ -13,11 +13,13 @@ entity.nodeLineRenderType = "none"
 
 entity.placements = {
   {
-    name = "Template Filler",
+    name = "main",
     data = {
       width = 8,
       height = 8,
-      template_name = ""
+      template_name = "",
+      
+      _loenn_display_template = true,
     }
   }
 }
@@ -28,7 +30,7 @@ function entity.sprite(room, entity)
     if oldTemplateName ~= nil and oldTemplateName ~= entity.template_name then
         aelperLib.update_template(entity, room, {oldName=oldTemplateName})
     end
-    oldTemplateNames[entity._id] = templateID_from_entity(entity, room)
+    oldTemplateNames[entity._id] = aelperLib.templateID_from_entity(entity, room)
     
     return drawableRectangle.fromRectangle("bordered", entity.x, entity.y, entity.width, entity.height, 
         {195/255, 138/255, 255/255,0.3}, {195/255*0.65, 138/255*0.65, 255/255*0.65,1}) 

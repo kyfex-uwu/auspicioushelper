@@ -42,6 +42,8 @@ entity.placements = {
       dangerous = false,
       voidDieOffset = 100,
       tutorial = false,
+      
+      _loenn_display_template = true,
     }
   }
 }

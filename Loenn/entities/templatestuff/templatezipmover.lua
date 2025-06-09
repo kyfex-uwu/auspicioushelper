@@ -14,7 +14,7 @@ local atypes = {"ride","rideAutomatic","dash","dashAutomatic"}
 
 entity.placements = {
   {
-    name = "Template Zipmover",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
@@ -22,17 +22,21 @@ entity.placements = {
       activation_type = "ride",
       channel = "",
       propegateRiding = false,
-      lastNodeIsKnot = true
+      lastNodeIsKnot = true,
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   return_type ={
     options = rtypes,
+    editable=false,
   },
   activation_type={
-    options = atypes
-  }
+    options = atypes,
+    editable=false,
+  },
 }
 
 function entity.selection(room, entity)
@@ -43,12 +47,6 @@ function entity.selection(room, entity)
     
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16), nodes
 end
-function entity.draw(room, entity, viewport)
-    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tzip"), {
-        x=entity.x,
-        y=entity.y,
-    }):draw()
-end
+entity.draw = aelperLib.get_entity_draw("tzip")
 
 return entity

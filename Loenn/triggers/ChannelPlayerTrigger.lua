@@ -19,16 +19,18 @@ trigger.placements = {
       channel = "",
       value = 1,
       op = "set",
-      action = "dash",
+      action = "enter",
       only_once = false
     }
 }
 trigger.fieldInformation = {
   op = {
-    options=ops
+    options=ops,
+    editable=false,
   },
   action = {
-    options = actions
+    options = actions,
+    editable=false,
   },
   value = {
     fieldType="integer"

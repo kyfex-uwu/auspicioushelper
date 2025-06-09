@@ -9,7 +9,7 @@ entity.depth = -13000
 
 entity.placements = {
   {
-    name = "Template Staticmover",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
@@ -18,6 +18,8 @@ entity.placements = {
       smear_average = false,
       ridingTrigger = true,
       EnableUnrooted = false,
+      
+      _loenn_display_template = true,
     }
   }
 }
@@ -25,12 +27,6 @@ entity.placements = {
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
-function entity.draw(room, entity, viewport)
-    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tstat"), {
-        x=entity.x,
-        y=entity.y,
-    }):draw()
-end
+entity.draw = aelperLib.get_entity_draw("tstat")
 
 return entity

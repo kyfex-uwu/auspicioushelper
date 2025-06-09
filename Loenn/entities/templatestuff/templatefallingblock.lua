@@ -11,7 +11,7 @@ local directions = {"down","up","left","right"}
 
 entity.placements = {
   {
-    name = "Template Falling Block",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
@@ -21,25 +21,24 @@ entity.placements = {
       gravity = 500,
       max_speed = 130,
       impact_sfx = "event:/game/general/fallblock_impact",
-      shake_sfx = "event:/game/general/fallblock_shake"
+      shake_sfx = "event:/game/general/fallblock_shake",
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   direction = {
-    options = directions
-  }
+    options = directions,
+    editable=false
+  },
+  impact_sfx = {options = {"event:/game/general/fallblock_impact"}},
+  shake_sfx = {options = {"event:/game/general/fallblock_shake"}},
 }
 
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
-function entity.draw(room, entity, viewport)
-    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tfall"), {
-        x=entity.x,
-        y=entity.y,
-    }):draw()
-end
+entity.draw = aelperLib.get_entity_draw("tfall")
 
 return entity
