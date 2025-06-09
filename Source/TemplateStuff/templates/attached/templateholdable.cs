@@ -207,10 +207,9 @@ public class TemplateHoldable:Actor{
       DebugConsole.Write("Called multiple times to reset routine (bad)");
       yield break;
     }
-    hasBeenTouched = false;
     resetting = true;
     Collidable = false;
-    Position = origpos;
+    Position = lpos =origpos;
     Speed = Vector2.Zero;
     te.destroy(true);
     Mysolids.Clear();
@@ -220,6 +219,7 @@ public class TemplateHoldable:Actor{
       yield break;
     }
     yield return respawndelay;
+    hasBeenTouched=false;
     if(Scene!=null)make(Scene);
     Collidable = true;
     resetting = false;
