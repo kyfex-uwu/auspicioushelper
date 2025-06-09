@@ -23,10 +23,15 @@ entity.placements = {
   }
 }
 
-entity.texture = "loenn/auspicioushelper/template/tmoon"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
+end
+function entity.draw(room, entity, viewport)
+    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
+    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tmoon"), {
+        x=entity.x,
+        y=entity.y,
+    }):draw()
 end
 --entity.borderColor = {0.3,1,0.3}
 
