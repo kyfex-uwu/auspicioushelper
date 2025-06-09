@@ -40,6 +40,8 @@ entity.placements = {
       respawnDelay = 1.5,
       start_floating = false,
       tutorial = false,
+      
+      _loenn_display_template = true,
     }
   }
 }

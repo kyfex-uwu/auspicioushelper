@@ -152,6 +152,130 @@ entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or
 entities.auspicioushelper/TemplateBlock.attributes.description.persistent=If the template will respawn after being broken
 entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=Whether or not you can dash into this template to break it
 entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=The sound effect to play when this template is broken
+entities.auspicioushelper/TemplateBlock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Cassette Block
+entities.auspicioushelper/TemplateCassetteBlock.placements.name.main=Template Cassette Block
+entities.auspicioushelper/TemplateCassetteBlock.placements.description.main=A cassette block that can be made with a template
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.freeze=Whether or not this template's entities should update when inactive
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.do_boost= unsure, bumps the template up when activates?
+entities.auspicioushelper/TemplateCassetteBlock.attributes.description.channel= unsure
+entities.auspicioushelper/TemplateCassetteBlock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Channelmover
+entities.auspicioushelper/TemplateChannelmover.placements.name.main=Template Channelmover
+entities.auspicioushelper/TemplateChannelmover.placements.description.main=A block that can be made with a template
+entities.auspicioushelper/TemplateChannelmover.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateChannelmover.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateChannelmover.attributes.description.channel=The channel to listen to. When this channel is active/odd, this template moves to the end node
+entities.auspicioushelper/TemplateChannelmover.attributes.description.move_time=How long in seconds it takes to move from one node to the other
+entities.auspicioushelper/TemplateChannelmover.attributes.description.asymmetry=What to divide the return speed by (ex. move_time=2 and asymmetry=4, return move speed is 0.5sec)
+entities.auspicioushelper/TemplateChannelmover.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Fake Wall
+entities.auspicioushelper/TemplateFakewall.placements.name.main=Template Fake Wall
+entities.auspicioushelper/TemplateFakewall.placements.description.main=A fake wall that can be made with a template
+entities.auspicioushelper/TemplateFakewall.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateFakewall.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateFakewall.attributes.description.freeze=If this template's entities should update or not
+entities.auspicioushelper/TemplateFakewall.attributes.name.dontOnTransitionInto=Don't Transition Into
+entities.auspicioushelper/TemplateFakewall.attributes.description.dontOnTransitionInto=Whether this template should play the disappearing animation or not if the player spawns inside this entity
+entities.auspicioushelper/TemplateFakewall.attributes.description.disappear_depth=The depth of this template as it's disappearing
+entities.auspicioushelper/TemplateFakewall.attributes.description.fade_speed=How fast this template disappears. (It takes 1/fadespeed seconds)
+entities.auspicioushelper/TemplateFakewall.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Falling Block
+entities.auspicioushelper/TemplateFallingblock.placements.name.main=Template Falling Block
+entities.auspicioushelper/TemplateFallingblock.placements.description.main=A falling block that can be made with a template
+entities.auspicioushelper/TemplateFallingblock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateFallingblock.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateFallingblock.attributes.description.direction=The direction to fall in
+entities.auspicioushelper/TemplateFallingblock.attributes.description.reverseChannel=If this channel is NOT 0, fall in the reverse direction
+entities.auspicioushelper/TemplateFallingblock.attributes.description.triggerChannel=If this channel is NOT 0, make the template fall automatically
+entities.auspicioushelper/TemplateFallingblock.attributes.description.gravity=How fast this template should accelerate (vanilla is 500)
+entities.auspicioushelper/TemplateFallingblock.attributes.description.max_speed=The maximum speed this template should fall (vanilla is 130)
+entities.auspicioushelper/TemplateFallingblock.attributes.description.impact_sfx=The sound to play when this template hits the ground
+entities.auspicioushelper/TemplateFallingblock.attributes.description.shake_sfx=The sound to play when this template gets triggered
+entities.auspicioushelper/TemplateFallingblock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Filler
+entities.auspicioushelper/templateFiller.placements.name.main=Template Filler
+entities.auspicioushelper/templateFiller.placements.description.main=Place this entity so that it's covering your desired group of objects, and then it can be used as a template (make sure the room name starts with "zztemplates-")
+entities.auspicioushelper/templateFiller.attributes.description.template_name=The name of this template. When using this template, specify it like <roomname>/<templatename>, assuming this template is placed in a room named "zztemplates-<roomname>"
+
+# Template Holdable
+entities.auspicioushelper/templateholdable.placements.name.main=Template Holdable
+entities.auspicioushelper/templateholdable.placements.description.main=A holdable that can be made with a template
+entities.auspicioushelper/templateholdable.attributes.name._loenn_display_template=[LÖNN] Display Template
+# hoo boy
+
+# Template Moon Block
+entities.auspicioushelper/TemplateMoonblock.placements.name.main=Template Moon Block
+entities.auspicioushelper/TemplateMoonblock.placements.description.main=A moon block that can be made with a template
+entities.auspicioushelper/TemplateMoonblock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateMoonblock.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateMoonblock.attributes.description.drift_frequency=How fast the template bobs up and down
+entities.auspicioushelper/TemplateMoonblock.attributes.description.drift_amplitude=How much distance the template bobs up and down
+entities.auspicioushelper/TemplateMoonblock.attributes.description.sink_amount=How much distance the template sinks
+entities.auspicioushelper/TemplateMoonblock.attributes.description.sink_speed=How fast the template sinks when stood on or grabbed
+entities.auspicioushelper/TemplateMoonblock.attributes.description.dash_influence=How far a dash will push this block
+entities.auspicioushelper/TemplateMoonblock.attributes.description.startphase=The floating phase this template should start on, in radians
+entities.auspicioushelper/TemplateMoonblock.attributes.description.useCustomStartphase=If this template should start its floating on some certain phase. Check this if "Start Phase" is specified
+entities.auspicioushelper/TemplateMoonblock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Move Block
+entities.auspicioushelper/TemplateMoveblock.placements.name.main=Template Move Block
+entities.auspicioushelper/TemplateMoveblock.placements.description.main=A move block that can be made with a template
+entities.auspicioushelper/TemplateMoveblock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateMoveblock.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateMoveblock.attributes.description.direction=The direction to move in
+entities.auspicioushelper/TemplateMoveblock.attributes.description.uncollidable_blocks= not quite sure
+entities.auspicioushelper/TemplateMoveblock.attributes.description.speed=The speed this template will move at
+entities.auspicioushelper/TemplateMoveblock.attributes.description.acceleration=How fast this template will accelerate to its top speed
+entities.auspicioushelper/TemplateMoveblock.attributes.description.respawning=Whether or not this template will respawn
+entities.auspicioushelper/TemplateMoveblock.attributes.description.respawn_timer=How long it takes this template to respawn
+entities.auspicioushelper/TemplateMoveblock.attributes.description.Max_stuck=How long this template can be stuck before it breaks
+entities.auspicioushelper/TemplateMoveblock.attributes.description.cansteer=If the player can steer this template
+entities.auspicioushelper/TemplateMoveblock.attributes.description.movesfx=The sound to play while this template is moving
+entities.auspicioushelper/TemplateMoveblock.attributes.description.max_leniency=The maximum amount of pixels this template can wiggle by to avoid being stuck
+entities.auspicioushelper/TemplateMoveblock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+#i dunno
+# Template Static Mover
+entities.auspicioushelper/TemplateStaticmover.placements.name.main=Template Staticmover
+entities.auspicioushelper/TemplateStaticmover.placements.description.main=A move block that can be made with a template
+entities.auspicioushelper/TemplateStaticmover.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateStaticmover.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateStaticmover.attributes.description.liftspeed_smear=
+entities.auspicioushelper/TemplateStaticmover.attributes.description.smear_average=
+entities.auspicioushelper/TemplateStaticmover.attributes.description.ridingTrigger=
+entities.auspicioushelper/TemplateStaticmover.attributes.description.EnableUnrooted=
+entities.auspicioushelper/TemplateStaticmover.attributes.description.channel=
+entities.auspicioushelper/TemplateStaticmover.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Swap Block
+entities.auspicioushelper/TemplateSwapblock.placements.name.main=Template Swap Block
+entities.auspicioushelper/TemplateSwapblock.placements.description.main=A swap block that can be made with a template
+entities.auspicioushelper/TemplateSwapblock.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateSwapblock.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateSwapblock.attributes.description.max_speed=The top speed of this template when it's swapping
+entities.auspicioushelper/TemplateSwapblock.attributes.description.max_return_speed=The speed of this template when it's returning
+entities.auspicioushelper/TemplateSwapblock.attributes.description.returning=If this template should act like a vanilla swap block or a toggle swap block
+entities.auspicioushelper/TemplateSwapblock.attributes.name._loenn_display_template=[LÖNN] Display Template
+
+# Template Zip Mover
+entities.auspicioushelper/TemplateZipmover.placements.name.main=Template Zip Mover
+entities.auspicioushelper/TemplateZipmover.placements.description.main=A zip mover that can be made with a template
+entities.auspicioushelper/TemplateZipmover.attributes.description.template=The name of the template to use. (<room>/<name>)
+entities.auspicioushelper/TemplateZipmover.attributes.description.depthoffset=How much to offset the depth of contained entities
+entities.auspicioushelper/TemplateZipmover.attributes.description.return_type=
+entities.auspicioushelper/TemplateZipmover.attributes.description.activation_type=
+entities.auspicioushelper/TemplateZipmover.attributes.description.channel=
+entities.auspicioushelper/TemplateZipmover.attributes.description.propegateRiding=
+entities.auspicioushelper/TemplateZipmover.attributes.description.lastNodeIsKnot=
+entities.auspicioushelper/TemplateZipmover.attributes.name._loenn_display_template=[LÖNN] Display Template
 
 ### silly
 

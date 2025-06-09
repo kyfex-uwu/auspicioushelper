@@ -11,13 +11,15 @@ entity.nodeLineRenderType = "line"
 
 entity.placements = {
   {
-    name = "Template Swapblock",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
       max_speed = 360,
       max_return_speed = 144,
       returning = false,
+      
+      _loenn_display_template = true,
     }
   }
 }
@@ -30,12 +32,6 @@ function entity.selection(room, entity)
     
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16), nodes
 end
-function entity.draw(room, entity, viewport)
-    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tswap"), {
-        x=entity.x,
-        y=entity.y,
-    }):draw()
-end
+entity.draw = aelperLib.get_entity_draw("tswap")
 
 return entity

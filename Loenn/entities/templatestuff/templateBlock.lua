@@ -26,24 +26,20 @@ entity.placements = {
       only_redbubble_or_summit_launch = false,
       persistent = false,
       canbreak = true,
-      breaksfx = "event:/game/general/wall_break_stone"
+      breaksfx = "event:/game/general/wall_break_stone",
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   breaksfx ={
     options = sfxs,
-  }
+  },
 }
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
-function entity.draw(room, entity, viewport)
-    aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tblk"), {
-        x=entity.x,
-        y=entity.y,
-    }):draw()
-end
+entity.draw = aelperLib.get_entity_draw("tblk")
 
 return entity
