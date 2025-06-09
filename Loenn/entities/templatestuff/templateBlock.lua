@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -27,20 +28,20 @@ entity.placements = {
       canbreak = true,
       propagateRiding = true,
       propagateShaking = true,
-      breaksfx = "event:/game/general/wall_break_stone"
+      breaksfx = "event:/game/general/wall_break_stone",
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   breaksfx ={
     options = sfxs,
-  }
+  },
 }
-entity.texture = "loenn/auspicioushelper/template/tblk"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
---entity.fillColor = {1,0.3,0.3}
+entity.draw = aelperLib.get_entity_draw("tblk")
 
 return entity

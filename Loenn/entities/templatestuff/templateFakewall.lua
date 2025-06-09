@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -8,23 +9,22 @@ entity.depth = -13000
 
 entity.placements = {
   {
-    name = "Template Fakewall",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
       freeze = false,
       dontOnTransitionInto = false,
       disappear_depth = -13000,
-      fadespeed = 1
+      fade_speed = 1,
+      
+      _loenn_display_template = true,
     }
   }
 }
-
-entity.texture = "loenn/auspicioushelper/template/tfake"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
---entity.fillColor = {1,0.3,0.3}
+entity.draw = aelperLib.get_entity_draw("tfake")
 
 return entity

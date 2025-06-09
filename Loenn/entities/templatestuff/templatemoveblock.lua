@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -27,21 +28,25 @@ entity.placements = {
       movesfx = "event:/game/04_cliffside/arrowblock_move",
       arrow_texture = "small",
       decal_depth = -10001,
-      max_leniency=4
+      max_leniency=4,
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   direction = {
-    options = directions
-  }
+    options = directions,
+    editable=false
+  },
+  movesfx = { options = {"event:/game/04_cliffside/arrowblock_move"} },
+  respawn_timer = {minimumValue=0},
+  max_leniency = {fieldType="integer"},
 }
 
-entity.texture = "loenn/auspicioushelper/template/tmovr"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
---entity.fillColor = {1,0.3,0.3}
+entity.draw = aelperLib.get_entity_draw("tmovr")
 
 return entity

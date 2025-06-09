@@ -2,6 +2,7 @@
 
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -41,6 +42,8 @@ entity.placements = {
       dangerous = false,
       voidDieOffset = 100,
       tutorial = false,
+      
+      _loenn_display_template = true,
     }
   }
 }

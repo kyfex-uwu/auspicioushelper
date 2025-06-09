@@ -180,6 +180,7 @@ public static class EntityParser{
       if (e.Has("texture")) movingPlatform.OverrideTexture = e.Attr("texture");
       return movingPlatform;
     });
+
     clarify("blackGem",Types.basic,HookVanilla.HeartGem);
     clarify("wire",Types.unwrapped,static(Level l, LevelData d, Vector2 o, EntityData e)=>new CWire(e,o));
     defaultModdedSetup();

@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -10,7 +11,7 @@ local directions = {"down","up","left","right"}
 
 entity.placements = {
   {
-    name = "Template Falling Block",
+    name = "main",
     data = {
       template = "",
       depthoffset=5,
@@ -20,21 +21,24 @@ entity.placements = {
       gravity = 500,
       max_speed = 130,
       impact_sfx = "event:/game/general/fallblock_impact",
-      shake_sfx = "event:/game/general/fallblock_shake"
+      shake_sfx = "event:/game/general/fallblock_shake",
+      
+      _loenn_display_template = true,
     }
   }
 }
 entity.fieldInformation = {
   direction = {
-    options = directions
-  }
+    options = directions,
+    editable=false
+  },
+  impact_sfx = {options = {"event:/game/general/fallblock_impact"}},
+  shake_sfx = {options = {"event:/game/general/fallblock_shake"}},
 }
 
-entity.texture = "loenn/auspicioushelper/template/tfall"
-
 function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-6, entity.y-6, 12, 12)
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
---entity.fillColor = {1,0.3,0.3}
+entity.draw = aelperLib.get_entity_draw("tfall")
 
 return entity
