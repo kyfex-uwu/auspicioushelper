@@ -39,6 +39,8 @@ entity.placements = {
       dontFlingOff = false,
       respawnDelay = 1.5,
       start_floating = false,
+      dangerous = false,
+      voidDieOffset = 100,
       tutorial = false,
     }
   }

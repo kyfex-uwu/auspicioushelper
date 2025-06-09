@@ -26,7 +26,7 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       _tryQuietShader = value;
     }
   }
-  private bool _hideHelperMaps = false;
+  /*private bool _hideHelperMaps = false;
   [SettingSubText("Choose rules for hiding maps below")]
   public bool HideHelperMaps {
     get=>_hideHelperMaps;
@@ -37,9 +37,9 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       }
       else if(MapHider.isHiding) MapHider.revealListed();
     }
-  }
+  }*/
   public List<string> hideRulesList {get; set;} = new(["/t$"]);
-  [SettingIgnore]
+  /*[SettingIgnore]
   [SettingSubText("Regex rules to match maps to hide")]
   public HideruleMenu HideRules {get;set;} = new();
   [SettingSubMenu]
@@ -79,5 +79,5 @@ public class auspicioushelperModuleSettings : EverestModuleSettings {
       rules.Add("");
       menu.Add(makePressHandler("",i));
     }
-  }
+  }*/
 }

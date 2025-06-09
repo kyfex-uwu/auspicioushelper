@@ -10,6 +10,7 @@ public class UpdateHook:Component{
   public Action beforeAction=null;
   public Action afterAction=null;
   public bool updatedThisFrame = false;
+  public static float TimeSinceTransMs=0;
   public UpdateHook(Action before=null, Action after=null):base(true,false){
     beforeAction=before;afterAction =after;
     hooks.enable();
@@ -26,6 +27,7 @@ public class UpdateHook:Component{
     }
     framenum+=1; //doesn't matter if this overflows or anything <3
     update(self);
+    if(TimeSinceTransMs<1000000)TimeSinceTransMs+=Engine.DeltaTime*1000;
     foreach(UpdateHook u in self.Tracker.GetComponents<UpdateHook>()){
       if(u.afterAction!=null)u.afterAction();
     }

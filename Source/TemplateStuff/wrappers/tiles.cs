@@ -77,6 +77,7 @@ internal class FgTiles:SolidTiles, ISimpleEnt, IBoundsHaver, IChildShaker{
     toffset = t.offset;
     Depth+=depthoffset;
     TileHooks.hooks.enable();
+    tileTypes = t.fgt;
     OnDashCollide = (Player p, Vector2 dir)=>((ITemplateChild) this).propegateDashHit(p,dir);
   }
   public void setOffset(Vector2 ppos){}
