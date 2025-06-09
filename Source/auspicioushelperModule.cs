@@ -41,6 +41,7 @@ public class auspicioushelperModule : EverestModule {
         Session.save();
         ChannelState.unwatchTemporary();
         tinyCleanup();
+        UpdateHook.TimeSinceTransMs=0;
 
         OnReset.run();
         OnNewScreen.run();
@@ -69,6 +70,7 @@ public class auspicioushelperModule : EverestModule {
         orig(l,playerIntro,isFromLoader);
     }
     static void OnEnter(Session session, bool fromSave){
+        UpdateHook.TimeSinceTransMs=0;
         try{
             ChannelState.unwatchAll();
 
@@ -93,7 +95,7 @@ public class auspicioushelperModule : EverestModule {
     static void OnReload(bool silent){
         //DebugConsole.Write($"reloaded {Everest.Content.Map.Count} {Settings.HideHelperMaps}");
         //foreach (ModAsset item in Everest.Content.Map.Values.Where((ModAsset asset) => asset.Type == typeof(AssetTypeMap)))
-        if(Settings.HideHelperMaps && !MapHider.isHiding)MapHider.hideListed();
+        //if(Settings.HideHelperMaps && !MapHider.isHiding)MapHider.hideListed();
         //DebugConsole.Write(Engine.Instance.scene.ToString());
         ChannelState.unwatchAll();
         if(Engine.Instance.scene is LevelLoader l){

@@ -29,16 +29,17 @@ public class ChannelBooster : ChannelBaseEntity, IMaterialObject, ISimpleEnt, IB
   public void relposTo(Vector2 pos, Vector2 liftspeed){
     Vector2 npos = pos+toffset;
     if(outline!=null) outline.Position = npos;
+    Vector2 poffset=insideplayer!=null?insideplayer.ExactPosition-Position:Vector2.Zero;
     if(!BoostingPlayer && sprite!=null && sprite.CurrentAnimationID != "pop") Position = npos;
     if(insideplayer!=null){
-      insideplayer.MoveTowardsX(npos.X,100);
-      insideplayer.MoveTowardsY(npos.Y,100);
+      insideplayer.MoveTowardsX(npos.X+poffset.X,100);
+      insideplayer.MoveTowardsY(npos.Y+poffset.Y,100);
       insideplayer.boostTarget = npos;
       if(givels)insideplayer.LiftSpeed = liftspeed;
     }
   }
   public bool hasRiders<T>() where T:Actor{
-    return insideplayer!=null;
+    return typeof(T)==typeof(Player) && insideplayer!=null;
   }
   public void destroy(bool particles){
     RemoveSelf();
