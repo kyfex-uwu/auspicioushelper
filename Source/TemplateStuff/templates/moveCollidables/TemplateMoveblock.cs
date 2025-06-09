@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Celeste.Mod.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,6 +23,8 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
   int maxleniency;
   Vector2 origpos;
   string moveevent = "event:/game/04_cliffside/arrowblock_move";
+  List<Vector2> decalOffset = new();
+  List<MTexture> arrows;
   public TemplateMoveBlock(EntityData d, Vector2 offset):this(d,offset,d.Int("depthoffset",0)){}
   public TemplateMoveBlock(EntityData d, Vector2 offset, int depthoffset)
   :base(d,offset+d.Position,depthoffset){
@@ -41,8 +44,16 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
     cansteer = d.Bool("cansteer", false);
     maxleniency = d.Int("max_leniency",4);
     moveevent = d.Attr("movesfx","event:/game/04_cliffside/arrowblock_move");
+    if(d.Nodes!=null) foreach(Vector2 node in d.Nodes){
+      decalOffset.Add(node-d.Position);
+    }
     origpos = Position;
     prop &= ~Propagation.Riding;
+    Depth = d.Int("decal_depth",-10001)+depthoffset;
+    if(decalOffset.Count>0) {
+      arrows = GFX.Game.GetAtlasSubtextures("objects/auspicioushelper/templates/movearrows/"+d.Attr("arrow_texture","small"));
+      Visible = true;
+    }
   }
   public override void Awake(Scene scene) {
     base.Awake(scene);
@@ -51,6 +62,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
   }
 
   SoundSource movesfx;
+  Vector2 lastmovevec;
   IEnumerator Sequence(){
     float stuckTimer;
     float speed;
@@ -84,6 +96,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
         } else {
           steerdelay=0.1f;
         }
+        lastmovevec = movevec;
         movevec.Normalize();
         ownLiftspeed = movevec*speed;
         collideflag = MoveHCollide(qs,speed*movevec.X*Engine.DeltaTime,maxleniency,ownLiftspeed);
@@ -99,6 +112,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
         } else {
           steerdelay=0.1f;
         }
+        lastmovevec=movevec;
         movevec.Normalize();
         ownLiftspeed = movevec*speed;
         collideflag = MoveVCollide(qs,speed*movevec.Y*Engine.DeltaTime,maxleniency,ownLiftspeed);
@@ -122,6 +136,7 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
       shake(0.2f);
       Audio.Play("event:/game/04_cliffside/arrowblock_break", Position);
       yield return 0.2f;
+      gone=true;
       if(!respawning){
         destroy(true);
         yield break;
@@ -134,9 +149,25 @@ public class TemplateMoveBlock:TemplateMoveCollidable{
       Scene = null;
       reconnect(origpos);
       addTo(old);
+      gone=false;
       yield return null;
       Audio.Play("event:/game/04_cliffside/arrowblock_reappear", Position);
       goto waiting;
+  }
+  bool gone;
+  public override void Update() {
+    lastmovevec = movedir;
+    base.Update();
+  }
+  public override void Render() {
+    base.Render();
+    if(gone) return;
+    float tau = MathF.PI * 2f;
+    int dir = (int)Math.Floor((0f - lastmovevec.Angle() + tau) % tau / tau * 8f + 0.5f);
+    Vector2 vec = virtLoc+gatheredShakeVec;
+    foreach(Vector2 o in decalOffset){
+      arrows[Calc.Clamp(dir, 0, 7)].DrawCentered(o+vec);
+    }
   }
   public override void Removed(Scene scene) {
     base.Removed(scene);

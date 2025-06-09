@@ -12,6 +12,8 @@ channelBooster.placements = {
     data = {
       state0 = "normal",
       state1 = "normal",
+      triggerTemplates = false,
+      give_liftspeed = false,
       channel = "",
       self_activating = false
     }

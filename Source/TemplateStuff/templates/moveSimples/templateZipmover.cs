@@ -194,6 +194,6 @@ public class TemplateZipmover:Template, ITemplateTriggerable, IChannelUser{
     if(upd.updatedThisFrame) triggered = true;
     else triggerNextFrame = true;
     if(channel != null) ChannelState.SetChannel(channel,1);
-    //if((prop&Propagation.Riding)!=0 && parent!=null)parent.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
+    if((prop&Propagation.Riding)!=0 && parent!=null)parent.GetFromTree<ITemplateTriggerable>()?.OnTrigger(sm);
   }
 }

@@ -25,7 +25,7 @@ public class FoundEntity:Component{
       DebugConsole.Write($"Failed to find the entity {d.Name} with id {id} - (maybe this entity adds itself non-standardly?)");
       return;
     }
-    DebugConsole.Write($"Found the entity {d.Name} with id {id}");
+    DebugConsole.Write($"Found the entity {d.Name} with id {id} - position {e.Position}");
     found[ident] = this;
     e.Add(this);
   }
@@ -37,7 +37,7 @@ public class FoundEntity:Component{
     base.Removed(entity);
     found.Remove(ident);
   }
-  public static int reflectGet(Entity e, List<string> path, List<int> args, int startidx = 2){
+  public static object reflectGet(Entity e, List<string> path, List<int> args, int startidx = 2){
     object o = e;
     int j=0;
     for(int i=startidx; i<path.Count; i++){
@@ -49,7 +49,7 @@ public class FoundEntity:Component{
           int k=0;
           o=null;
           foreach(object c in enumer){
-            if(k == args[j]){
+            if(k++ == args[j]){
               o=c; break;
             }
           }
@@ -65,16 +65,18 @@ public class FoundEntity:Component{
         //DebugConsole.Write($"Getting prop {path[i]} {o.ToString()}")
         o = prop.GetValue(o); continue;
       }
+      MethodInfo method = type.GetMethod(path[i], BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+      if (method != null) {
+          return method;
+      }
+
       DebugConsole.Write($"The reflection process on entity {e?.ToString()} failed at index {i} looking for {path[i]} on {o?.ToString()}");
       return 0;
     }
-    try {
-      return Convert.ToInt32(o);
-    } catch(Exception){
-      return o==null?0:1;
-    }
+    return o;
   }
-  public int reflectGet(List<string> path, List<int> args){
+  
+  public object reflectGet(List<string> path, List<int> args){
     return reflectGet(Entity,path,args);
   }
   public static void clear(Scene refill = null){
@@ -85,12 +87,27 @@ public class FoundEntity:Component{
       }
     }
   }
-  public static int sreflectGet(List<string> path, List<int> args){
+  public static object sreflectGet(List<string> path, List<int> args){
     if(!found.TryGetValue(path[1], out var f)){
       DebugConsole.Write($"Entity with attached identifier {path[1]} not found");
       return 0;
     }
-    return reflectGet(f.Entity, path, args);
+    return f.reflectGet(path,args);
+  }
+  public static object sreflectCall(List<string> path, List<int> args){
+    if(!found.TryGetValue(path[1], out var f)){
+      DebugConsole.Write($"Entity with attached identifier {path[1]} not found");
+      return 0;
+    }
+    object o = f.reflectGet(path,args);
+    if(o is MethodInfo m){
+      try{
+        return m.Invoke(f.Entity,null);
+      } catch(Exception ex){
+        DebugConsole.Write($"Method invocation on {path[1]} failed:\n {ex}");
+      }
+    }
+    return null;
   }
   public static FoundEntity find(string ident){
     return found.TryGetValue(ident, out var f)?f:null;

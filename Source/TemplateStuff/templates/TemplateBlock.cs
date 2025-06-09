@@ -38,8 +38,10 @@ class TemplateBlock:TemplateDisappearer{
         if(persistent) auspicioushelperModule.Session.brokenTempaltes.Add(fullpath);
         return DashCollisionResults.Rebound;
       };
+      prop &= ~Propagation.DashHit;
     }
-    prop &= ~Propagation.DashHit;
+    if(!d.Bool("propagateRiding",true))prop&=~Propagation.Riding;
+    if(!d.Bool("propagateShaking",true))prop&=~Propagation.Shake;
   }
   public override void addTo(Scene scene){
     if(persistent && auspicioushelperModule.Session.brokenTempaltes.Contains(fullpath)){

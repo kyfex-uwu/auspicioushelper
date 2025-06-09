@@ -6,6 +6,8 @@ local entity = {}
 
 entity.name = "auspicioushelper/TemplateMoveblock"
 entity.depth = -13000
+entity.nodeLimits = {0,100}
+entity.nodeLineRenderType = "line"
 
 local directions = {"down","up","left","right"}
 
@@ -24,6 +26,8 @@ entity.placements = {
       Max_stuck=0.15,
       cansteer=false,
       movesfx = "event:/game/04_cliffside/arrowblock_move",
+      arrow_texture = "small",
+      decal_depth = -10001,
       max_leniency=4,
       
       _loenn_display_template = true,
