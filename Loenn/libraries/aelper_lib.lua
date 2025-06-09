@@ -43,6 +43,7 @@ aelperLib.channel_color = {230/255, 167/255, 50/255}
 aelperLib.channel_color_halfopacity = {aelperLib.channel_color[1], aelperLib.channel_color[2], aelperLib.channel_color[3], 0.5}
 aelperLib.channel_color_dark = {aelperLib.channel_color[1]*dark_multiplier, aelperLib.channel_color[2]*dark_multiplier, aelperLib.channel_color[3]*dark_multiplier}
 aelperLib.channel_color_dark_halfopacity = {aelperLib.channel_color_dark[1], aelperLib.channel_color_dark[2], aelperLib.channel_color_dark[3], 0.5}
+aelperLib.channel_color_tint = {1-(1-aelperLib.channel_color[1])*0.5, 1-(1-aelperLib.channel_color[2])*0.5, 1-(1-aelperLib.channel_color[3])*0.5, 1}
 aelperLib.channel_spriteicon = function(x,y)
     return drawableSprite.fromTexture("loenn/auspicioushelper/channel_icon", {
         x=x, y=y
