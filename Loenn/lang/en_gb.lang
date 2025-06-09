@@ -152,3 +152,7 @@ entities.auspicioushelper/TemplateBlock.attributes.description.only_redbubble_or
 entities.auspicioushelper/TemplateBlock.attributes.description.persistent=If the template will respawn after being broken
 entities.auspicioushelper/TemplateBlock.attributes.description.canbreak=Whether or not you can dash into this template to break it
 entities.auspicioushelper/TemplateBlock.attributes.description.breaksfx=The sound effect to play when this template is broken
+
+### silly
+
+ui.menubar.auspicioushelper_legacyicons=Use Legacy Template Icons [Auspicious Helper]

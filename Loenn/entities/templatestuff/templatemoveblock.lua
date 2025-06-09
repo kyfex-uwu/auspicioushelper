@@ -39,7 +39,7 @@ function entity.rectangle(room, entity)
 end
 function entity.draw(room, entity, viewport)
     aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture("loenn/auspicioushelper/template/tmovr", {
+    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tmovr"), {
         x=entity.x,
         y=entity.y,
     }):draw()

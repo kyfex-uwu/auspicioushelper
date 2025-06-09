@@ -6,7 +6,7 @@ local entity = {}
 
 entity.name = "auspicioushelper/TemplateZipmover"
 entity.depth = -13000
-entity.nodeLimits = {1,100}
+entity.nodeLimits = {1,-1}
 entity.nodeLineRenderType = "line"
 
 local rtypes = {"loop","none", "normal"}
@@ -35,12 +35,17 @@ entity.fieldInformation = {
   }
 }
 
-function entity.rectangle(room, entity)
-    return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
+function entity.selection(room, entity)
+    local nodes = {}
+    for _,node in ipairs(entity.nodes) do
+        table.insert(nodes, utils.rectangle(node.x-8, node.y-8, 16, 16))
+    end
+    
+    return utils.rectangle(entity.x-8, entity.y-8, 16, 16), nodes
 end
 function entity.draw(room, entity, viewport)
     aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room)
-    drawableSprite.fromTexture("loenn/auspicioushelper/template/tzip", {
+    drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/tzip"), {
         x=entity.x,
         y=entity.y,
     }):draw()
