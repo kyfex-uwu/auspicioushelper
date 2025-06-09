@@ -24,14 +24,7 @@ end
 
 local dark_multiplier = 0.65
 
-local templates = nil
-function check_init()
-    if templates == nil then
-        templates={}
-        
-        state.clearRoomRenderCache()
-    end
-end
+local templates = {}
 function delete_template(entity, oldName)
     for k, v in ipairs(templates[oldName or entity.template_name] or {}) do
         if v == entity then
@@ -59,8 +52,6 @@ aelperLib.channel_spriteicon_entitycenter = function(entity)
     return aelperLib.channel_spriteicon(entity.x+(entity.width or 0)/2, entity.y+(entity.height or 0)/2)
 end
 aelperLib.update_template = function(entity, room, data)
-    check_init()
-    
     data = data or {}
     if data.deleting then 
         delete_template(entity)
@@ -74,7 +65,6 @@ aelperLib.update_template = function(entity, room, data)
     table.insert(templates[template_name], {entity, room})
 end
 aelperLib.draw_template_sprites = function(name, x, y, room)
-    check_init()
     local data = (templates[name] or {})[1]
     if data == nil then return {} end
     
