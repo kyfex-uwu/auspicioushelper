@@ -26,6 +26,8 @@ entity.placements = {
       only_redbubble_or_summit_launch = false,
       persistent = false,
       canbreak = true,
+      propagateRiding = true,
+      propagateShaking = true,
       breaksfx = "event:/game/general/wall_break_stone"
     }
   }

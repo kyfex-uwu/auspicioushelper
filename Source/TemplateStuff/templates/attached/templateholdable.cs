@@ -17,7 +17,6 @@ public class TemplateHoldable:Actor{
   TemplateDisappearer te;
   Vector2 hoffset;
   Vector2 lpos;
-  Vector2 exlpos;
   Vector2 prevLiftspeed;
   Vector2 Speed;
   Holdable Hold;
@@ -38,9 +37,11 @@ public class TemplateHoldable:Actor{
   bool hasBeenTouched = false;
   bool showTutorial = false;
   bool startFloating = false;
+  bool dangerous = false;
+  float voidDieOffset = 100;
   public TemplateHoldable(EntityData d, Vector2 offset):base(d.Position+offset){
     Position+=new Vector2(d.Width/2, d.Height);
-    hoffset = d.Nodes.Length>0?d.Nodes[0]-new Vector2(d.Width/2, d.Height):new Vector2(0,-d.Height/2);
+    hoffset = d.Nodes.Length>0?(d.Nodes[0]-new Vector2(d.Width/2, d.Height)-d.Position):new Vector2(0,-d.Height/2);
     Collider = new Hitbox(d.Width,d.Height,-d.Width/2,-d.Height);
     lpos = Position;
     Add(Hold = new Holdable(d.Float("cannot_hold_timer",0.1f)));
@@ -53,6 +54,9 @@ public class TemplateHoldable:Actor{
     Hold.OnPickup = OnPickup;
     Hold.OnRelease = OnRelease;
     Hold.OnHitSpring = HitSpring;
+    Hold.DangerousCheck = (HoldableCollider c)=>{
+      return dangerous && Hold.Holder == null && Speed!=Vector2.Zero;
+    };
     LiftSpeedGraceTime = 0.1f;
     Tag = Tags.TransitionUpdate;
     keepCollidableAlways = d.Bool("always_collidable",false);
@@ -73,6 +77,8 @@ public class TemplateHoldable:Actor{
     dontFlingOff = d.Bool("dontFlingOff",false);
     showTutorial = d.Bool("tutorial",false);
     startFloating = d.Bool("start_floating",false);
+    dangerous = d.Bool("dangerous",false);
+    voidDieOffset = d.Float("voidDieOffset",100);
     SquishCallback = OnSquish2;
   }
   HashSet<Platform> Mysolids;
@@ -168,7 +174,6 @@ public class TemplateHoldable:Actor{
     if (Speed != Vector2.Zero){
       noGravityTimer = 0.1f;
     }
-    exlpos = ExactPosition;
   }
   void OnCollideH(CollisionData data){
     if (data.Hit is DashSwitch){
@@ -204,7 +209,7 @@ public class TemplateHoldable:Actor{
     }
     resetting = true;
     Collidable = false;
-    Position = origpos;
+    Position = lpos =origpos;
     Speed = Vector2.Zero;
     te.destroy(true);
     Mysolids.Clear();
@@ -214,6 +219,7 @@ public class TemplateHoldable:Actor{
       yield break;
     }
     yield return respawndelay;
+    hasBeenTouched=false;
     if(Scene!=null)make(Scene);
     Collidable = true;
     resetting = false;
@@ -227,9 +233,9 @@ public class TemplateHoldable:Actor{
     base.Update();
     if(resetting) return;
 
-    evalLiftspeed(true);
     if (Hold.IsHeld){
       prevLiftspeed = Vector2.Zero;
+      te.ownLiftspeed = Hold.Holder?.Speed??Vector2.Zero;
     } else {
       te.setCollidability(false);
       //DebugConsole.Write($"out update: {Position}");
@@ -260,6 +266,7 @@ public class TemplateHoldable:Actor{
       }
       MoveH(Speed.X * Engine.DeltaTime, OnCollideH);
       MoveV(Speed.Y * Engine.DeltaTime, OnCollideV);
+      te.ownLiftspeed = Speed;
       te.setCollidability(true);
     }
     if(dietobarrier) foreach (SeekerBarrier entity in base.Scene.Tracker.GetEntities<SeekerBarrier>()){
@@ -278,11 +285,11 @@ public class TemplateHoldable:Actor{
         break;
       }
     }
+    if(Position.Y>SceneAs<Level>().Bounds.Bottom+voidDieOffset){
+      Add(new Coroutine(resetRoutine()));
+    }
 
     jumpthruMoving = 0;
-    var move = ExactPosition - exlpos;
-    pastLiftspeed[0]+=move/Math.Max(Engine.DeltaTime,0.005f);
-    exlpos = ExactPosition;
     if(lpos!=Position){
       touched();
       lpos = Position;
@@ -302,26 +309,9 @@ public class TemplateHoldable:Actor{
       Position = lpos;
     }
     lpos = Position;
+    Hold.CheckAgainstColliders();
   }
   bool inRelpos;
-  const int smearamount = 3;
-  Vector2[] pastLiftspeed = new Vector2[smearamount];
-
-  void evalLiftspeed(bool precess = true){
-    float mX=0;
-    float mY=0;
-    foreach(Vector2 v in pastLiftspeed){
-      if(MathF.Abs(v.X)>MathF.Abs(mX)) mX=v.X;
-      if(MathF.Abs(v.Y)>MathF.Abs(mY)) mY=v.Y;
-    } 
-    if(te!=null)te.ownLiftspeed = new Vector2(mX,mY);
-    else DebugConsole.Write($"te is null?");
-    if(!precess) return; 
-    for(int i=smearamount-1; i>=1; i--){
-      pastLiftspeed[i]=pastLiftspeed[i-1];
-    }
-    pastLiftspeed[0]=Vector2.Zero;
-  }
   static Player lastPickup;
   public static bool PickupHook(On.Celeste.Holdable.orig_Pickup orig, Holdable self, Player player){
     lastPickup = player;

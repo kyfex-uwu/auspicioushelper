@@ -41,7 +41,6 @@ public class ChannelMathController:Entity{
     }
     debug = d.Bool("debug",false);
     var bin=Convert.FromBase64String(d.Attr("compiled_operations",""));
-    DebugConsole.Write(bin.Length.ToString());
     if(bin.Length<2){
       DebugConsole.Write("Invalid instructions - too short");
       return;
@@ -252,6 +251,13 @@ public class ChannelMathController:Entity{
     }
     iopFuncs.Remove(identifier);
   }
+  public static int toInt(object o){
+    try {
+      return Convert.ToInt32(o);
+    } catch(Exception){
+      return o==null?0:1;
+    }
+  }
   public static void setupDefaultInterop(){
     registerInterop("print",(List<string> strs, List<int> ints)=>{
       string str = "From mathcontroller: ";
@@ -295,7 +301,7 @@ public class ChannelMathController:Entity{
         case "speedy": return (int)p.Speed.Y;
         case "posx": return (int)p.Position.X;
         case "posy": return (int)p.Position.Y;
-        default: return FoundEntity.reflectGet(p,strs,ints,1);
+        default: return toInt(FoundEntity.reflectGet(p,strs,ints,1));
       }
     });
     registerInterop("killPlayer",(List<string> strs, List<int> ints)=>{
@@ -305,7 +311,14 @@ public class ChannelMathController:Entity{
       return (p!=null && ints[0]!=0)?1:0;
     });
     registerInterop("reflectGet",(List<string> strs, List<int> ints)=>{
-      return FoundEntity.sreflectGet(strs, ints);
+      return toInt(FoundEntity.sreflectGet(strs, ints));
+    });
+    registerInterop("reflectCall",(List<string> strs, List<int> ints)=>{
+      if(ints.Count>0 && ints[0]==0) return 0;
+      return toInt(FoundEntity.sreflectCall(strs,ints));
+    });
+    registerInterop("timeSinceTrans",(List<string> strs, List<int> ints)=>{
+      return (int)UpdateHook.TimeSinceTransMs;
     });
   }
 

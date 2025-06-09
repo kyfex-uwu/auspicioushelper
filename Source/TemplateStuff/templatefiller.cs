@@ -124,7 +124,7 @@ public class templateFiller:Entity{
           }
         }
       } else {
-        ret.SpriteOverlay = new AnimatedTiles(0,0,intercept.bank);
+        ret.SpriteOverlay = new AnimatedTiles(intercept.w,intercept.h,intercept.bank);
       } 
       intercept = null;
       return ret;
