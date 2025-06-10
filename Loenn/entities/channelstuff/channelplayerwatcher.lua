@@ -24,11 +24,11 @@ channelplayerwatcher.placements = {
 channelplayerwatcher.fieldInformation = {
   op = {
     options=ops,
-    editabe=false,
+    editable=false,
   },
   action = {
     options = actions,
-    editabe=false,
+    editable=false,
   }
 }
 channelplayerwatcher.texture = "loenn/auspicioushelper/controllers/playerwatcher"
