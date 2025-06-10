@@ -16,16 +16,8 @@ entity.placements = {
     }
   }
 }
-function entity.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, 8, 8) 
-  sprite.color = color 
-  return sprite
-end
-
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, 8, 8)
+function entity.texture(room, entity)
+  return entity.mini and "objects/auspicioushelper/channelcrystal/crystalminifg00" or "objects/auspicioushelper/channelcrystal/crystalfg00"
 end
 
 return entity

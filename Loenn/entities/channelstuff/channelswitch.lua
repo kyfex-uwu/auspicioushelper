@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local channelswitch = {}
 
@@ -30,7 +31,16 @@ channelswitch.fieldInformation = {
     fieldType="integer"
   }
 }
-channelswitch.texture = "objects/coreFlipSwitch/o1"
 
+function channelswitch.sprite(room, entity)
+    return {
+        drawableSprite.fromTexture("objects/coreFlipSwitch/o1", {
+            x=entity.x,
+            y=entity.y,
+            color = aelperLib.channel_color_tint,
+        }),
+        aelperLib.channel_spriteicon(entity.x, entity.y),
+    }
+end
 
 return channelswitch

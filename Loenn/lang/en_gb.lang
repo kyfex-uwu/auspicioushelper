@@ -200,8 +200,9 @@ entities.auspicioushelper/ChannelTheo.attributes.description.channel=When nonzer
 entities.auspicioushelper/ChannelTheo.attributes.description.switch_thrown_momentum=Player and holdable switch momentum when throwing
 entities.auspicioushelper/ChannelTheo.attributes.description.swap_thrown_positions=Switch positions with holdable dangerously when throwing(may clip player)
 entities.auspicioushelper/ChannelTheo.attributes.description.swap_thrown_positions_nodie=Don't clip player into wall when switching positions
-entities.auspicioushelper/ChannelTheo.attributes.description.player_momentum_weight=Check template holdable for explanation don't wana write
-entities.auspicioushelper/ChannelTheo.attributes.description.theo_momentum_weight=check playermomentum
+entities.auspicioushelper/ChannelTheo.attributes.description.player_momentum_weight=When grabbed, how much the final player velocity should use the player's velocity
+entities.auspicioushelper/ChannelTheo.attributes.description.theo_momentum_weight=When grabbed, how much the final player velocity should use Theo's velocity
+
 
 #channelvfxspritechain
 entities.auspicioushelper/SpriteAnimChain.placements.description.main=This is an entity for emptynoise(tollab) and is not supported in other contexts
