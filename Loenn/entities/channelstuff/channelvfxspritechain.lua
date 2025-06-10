@@ -5,7 +5,7 @@ local channelspritechain = {}
 
 channelspritechain.name = "auspicioushelper/SpriteAnimChain"
 channelspritechain.depth = 2000
-channelspritechain.nodeLimits = {3,100}
+channelspritechain.nodeLimits = {3,-1}
 channelspritechain.nodeLineRenderType = "line"
 
 channelspritechain.placements = {
@@ -23,11 +23,11 @@ channelspritechain.placements = {
     }
   }
 }
-channelspritechain.fieldInformation = {
-  channel = {
-    depth="integer"
-  }
-}
+-- channelspritechain.fieldInformation = {
+--   channel = {
+--     depth="integer"
+--   }
+-- }
 function channelspritechain.sprite(room, entity)
   color = {1, 1, 1, 1}
   local sprite = drawableSprite.fromTexture("util/rect", nil)
