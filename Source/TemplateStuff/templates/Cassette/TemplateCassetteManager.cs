@@ -127,16 +127,6 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   public void declareLayers(){
     inimaterials();
   }
-  public static void unfrickMats(Scene s){
-    /*foreach(TemplateCassetteBlock c in Engine.Instance.scene.Tracker.GetEntities<TemplateCassetteBlock>()){
-      if(CassetteMaterialLayer.layers.TryGetValue(c.channel,out var layer)){
-        var l = new List<Entity>();
-        c.AddAllChildren(l);
-        layer.dump(l);
-        if(layer.fg!=null && c.getSelfCol()&&c.getParentCol())layer.fg.Add(c);
-      }
-    }*/
-  }
   public void setChVal(int val){
     if(!useChannel) return;
     bool nactive = val!=0;
