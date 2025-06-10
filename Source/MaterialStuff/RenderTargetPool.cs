@@ -58,6 +58,7 @@ public static class RenderTargetPool{
       } 
     }
   }
+  public static int InUse=>maxCanUse-available.Count;
   public static void Resize(int nwidth, int nheight, bool force=false){
     if(nwidth<=0 || nheight<=0 || nwidth>=1920 || nheight>=1080){
       DebugConsole.Write($"why the heck are you putting in these sizes {nwidth} {nheight}");

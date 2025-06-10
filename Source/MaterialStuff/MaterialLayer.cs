@@ -72,7 +72,6 @@ internal class LayerMarkingEntity:Entity{
   public override void Render() {
     base.Render();
     if(layer.enabled) layer.paste();
-    else DebugConsole.Write("Rendering a disabled layer. This should not persist");
   }
 }
 
@@ -131,11 +130,10 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
   public BasicMaterialLayer(VirtualShaderList passes, float depth):this(passes,new LayerFormat{depth=depth}){}
   public virtual void onEnable(){
     foreach(var h in handles)h.Claim();
-    DebugConsole.Write($"enabled layer {this}");
+    DebugConsole.Write($"enabled layer {this}. there are {RenderTargetPool.InUse} rendertargets active.");
   }
   public virtual void onRemove(){
     foreach(var h in handles)h.Free();
-    DebugConsole.Write($"disabled layer {this}");
   }
   public List<IMaterialObject> willdraw=new();
   public virtual bool checkdo(){

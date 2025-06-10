@@ -64,6 +64,11 @@ public static class MaterialPipe {
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
     foreach(IMaterialLayer l in layers){
+      if(l.markingEntity.Scene!=scene){
+        DebugConsole.Write("Weirdness occurred (should only happen from map reloading and debug menu use)");
+        l.markingEntity.RemoveSelf();
+        scene.Add(new LayerMarkingEntity(l));
+      }
       if(l.usesbg && !orderFlipped && Engine.Instance.scene is Level v){
         gd.SetRenderTarget(GameplayBuffers.Level);
         gd.Clear(v.BackgroundColor);
