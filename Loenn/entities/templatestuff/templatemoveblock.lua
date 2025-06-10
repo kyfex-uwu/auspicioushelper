@@ -6,8 +6,9 @@ local entity = {}
 
 entity.name = "auspicioushelper/TemplateMoveblock"
 entity.depth = -13000
-entity.nodeLimits = {0,100}
-entity.nodeLineRenderType = "line"
+entity.nodeLimits = {0,-1}
+entity.nodeLineRenderType = "fan"
+entity.nodeVisibility = "always"
 
 local directions = {"down","up","left","right"}
 
@@ -42,11 +43,22 @@ entity.fieldInformation = {
   movesfx = { options = {"event:/game/04_cliffside/arrowblock_move"} },
   respawn_timer = {minimumValue=0},
   max_leniency = {fieldType="integer"},
+  
+  arrow_texture = {
+      options = {
+          "small",
+          "big",
+          "huge",
+      }
+  }
 }
 
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
 entity.draw = aelperLib.get_entity_draw("tmovr")
+function entity.nodeTexture(room, entity)
+    return "objects/auspicioushelper/templates/movearrows/"..entity.arrow_texture.."00"
+end
 
 return entity

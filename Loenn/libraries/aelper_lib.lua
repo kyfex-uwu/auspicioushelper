@@ -8,9 +8,12 @@ local depths = require("consts.object_depths")
 local matrix = require("utils.matrix")
 local state = require("loaded_state")
 
+local templates = {}
+
 local settings = require("mods").getModSettings("auspicioushelper")
 local menubar = require("ui.menubar").menubar
 local viewMenu = $(menubar):find(menu -> menu[1] == "view")[2]
+local editMenu = $(menubar):find(menu -> menu[1] == "edit")[2]
 if not $(viewMenu):find(item -> item[1] == "auspicioushelper_legacyicons") then
     table.insert(viewMenu,{
         "auspicioushelper_legacyicons",
@@ -19,12 +22,22 @@ if not $(viewMenu):find(item -> item[1] == "auspicioushelper_legacyicons") then
         function() return settings.auspicioushelper_legacyicons or false end
     })
 end
+if false and not $(editMenu):find(item -> item[1] == "auspicioushelper_cleartemplatecache") then
+    table.insert(editMenu,{
+        "auspicioushelper_cleartemplatecache",
+        function() 
+            for k, _ in pairs(templates) do templates[k] = nil end
+            templates={}
+        end,
+        "checkbox",
+        function() return false end
+    })
+end
 
 --#####--
 
 local dark_multiplier = 0.65
 
-local templates = {}
 function delete_template(entity, oldName)
     for k, v in ipairs(templates[oldName or entity.template_name] or {}) do
         if v == entity then
@@ -92,6 +105,7 @@ aelperLib.draw_template_sprites = function(name, x, y, room)
             end
         end
     end
+    --todo: entity nodes
     for _,entity in ipairs(data[2].decalsBg) do
         if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
             entity.y >= data[1].y-(entity.height or 0) and entity.y <= data[1].y+data[1].height then
