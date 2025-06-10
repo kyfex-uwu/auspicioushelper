@@ -25,13 +25,6 @@ entity.placements = {
   }
 }
 
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-5,entity.y-5,10,10)
-end
-entity.fillColor = {0.3,0,0.6,0.5}
-entity.borderColor = {0.5,0,1,1}
-
-
-
+entity.texture = "/loenn/auspicioushelper/cassettemanager"
 
 return entity
