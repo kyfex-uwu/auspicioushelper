@@ -47,15 +47,10 @@ entity.fieldInformation = {
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
-function entity.nodeSprite(room, entity, node)
-    return {
-        drawableRectangle.fromRectangle("bordered", node.x-3, node.y-3, 6, 6, 
-            {195/255, 138/255, 255/255,0.3}, {195/255*0.65, 138/255*0.65, 255/255*0.65,1}), 
-        drawableLine.fromPoints({
-            entity.x, entity.y,
-            node.x, node.y
-        }, {195/255*0.65, 138/255*0.65, 255/255*0.65,1}, 1)
-    }
+function entity.nodeTexture(room, entity, node)
+  local base = "objects/auspicioushelper/templates/movearrows/"
+  local addr = entity.arrow_texture
+  return "objects/auspicioushelper/templates/movearrows/small00"
 end
 entity.draw = aelperLib.get_entity_draw("tmovr")
 
