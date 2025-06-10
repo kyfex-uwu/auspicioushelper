@@ -16,6 +16,7 @@ public class FgCassetteVisuals:BasicMaterialLayer{
   public HashSet<Template> templates=new();
   public List<Entity> todraw=new();
   public bool dirty=true;
+  public override bool autoManageRemoval=>false;
   public override void render(SpriteBatch sb, Camera c){
     if(dirty){
       todraw.Clear();

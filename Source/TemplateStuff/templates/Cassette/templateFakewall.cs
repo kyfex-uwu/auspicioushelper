@@ -13,13 +13,14 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
-class FadeMaterialLayer:BasicMaterialLayer{
+class FadeMaterialLayer:BasicMaterialLayer,IMaterialLayer{
   public float _alpha = 1;
   public float alpha => _alpha;
   List<Entity> todraw;
   public override bool drawMaterials=>true; 
   public FadeMaterialLayer(List<Entity> things, int depth):base([null],depth){
     todraw = things;
+    todraw.Sort(EntityList.CompareDepth);
   }
   public override void rasterMats(SpriteBatch sb, Camera c){
     SpriteBatch origsb = Draw.SpriteBatch;
@@ -85,6 +86,7 @@ public class TemplateFakewall:TemplateDisappearer{
     setVisCol(false,false);
     FadeMaterialLayer f = new FadeMaterialLayer(c,ddepth);
     MaterialPipe.addLayer(f);
+    MaterialPipe.indicateImmidiateAddition();
     yield return null;
     while((f._alpha = f._alpha-Engine.DeltaTime*fadespeed*1)>0){
       yield return null;

@@ -21,6 +21,7 @@ public interface IMaterialLayer{
   bool diddraw {get;set;}
   float alpha {get=>1;}
   bool drawInScene=>true;
+  bool autoManageRemoval=>true;
   float transalpha(bool leaving, float camAt){
     //DebugConsole.Write($"Roomchange: {leaving} {camAt}");
     return (this is IFadingLayer f)?f.getTransAlpha(leaving,camAt):1;
@@ -54,18 +55,18 @@ public interface IMaterialObject{
 internal class LayerMarkingEntity:Entity{
   IMaterialLayer layer;
   public LayerMarkingEntity(IMaterialLayer layer):base(Vector2.Zero){
-    AddTag(Tags.Persistent);
+    AddTag(Tags.Global);
     this.layer=layer;
     layer.markingEntity=this;
     Depth = (int)layer.depth;
   }
   public override void Added(Scene scene) {
     base.Added(scene);
-    DebugConsole.Write($"{this} with layer {layer} added to {scene}");
   }
   public override void Removed(Scene scene) {
-    DebugConsole.Write($"{this} with layer {layer} removed from {scene}");
-    if(layer.enabled && layer.markingEntity == this) throw new Exception("You are leaking materialLayers. Something has gone wrong.");
+    if(layer.enabled && layer.markingEntity == this){
+      DebugConsole.Write($"Layer is still active! is it ok {layer}!");
+    }
     base.Removed(scene);
   }
   public override void Render() {
@@ -110,6 +111,7 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
   public List<RenderTargetPool.RenderTargetHandle> handles=new();
   public LayerFormat layerformat;
   public virtual RenderTarget2D outtex=>handles[handles.Count-1];
+  public virtual bool autoManageRemoval=>true;
   public class LayerFormat{
     public float depth;
     public bool independent=true;

@@ -111,7 +111,7 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
     items.Clear();
   }
 
-  public override RenderTarget2D outtex=>handles[0];
+  //public override RenderTarget2D outtex=>handles[1];
   public override void render(SpriteBatch sb, Camera c){
     if(dirty){
       items.Sort(EntityList.CompareDepth);

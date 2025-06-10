@@ -1,26 +1,29 @@
-sampler2D TextureSamp : register(s0);
-texture2D materialTex : register(t1);
-sampler2D materialSamp : register(s1);
-texture2D particleTex : register(t2);
-sampler2D particleSamp : register(s2);
 
-float4 partAt(float2 pos) {
-    return tex2D(particleSamp, pos);
-}
 
-//This whole file is unoptimized asf, thank all that is holy that
-//we are rendering at below 240p haha
+sampler2D layerSamp : register(s0);
+texture2D particleTex : register(t1);
+sampler2D particleSamp : register(s1);
 
-uniform float time;
+uniform float4 edgecol;
+uniform float4 lowcol;
+uniform float4 highcol;
+uniform float4 pattern;
+uniform float stripecutoff;
+
 uniform float2 cpos;
+uniform float2 pscale;
+uniform float time;
 uniform float quiet;
 
 float4 matAt(float2 pos, float offsetx, float offsety){
-    return floor(tex2D(materialSamp,float2(pos.x+offsetx/320.,pos.y+offsety/180.))*255);
+    return floor(tex2D(layerSamp,pos+float2(offsetx,offsety)*pscale)*255);
+}
+float4 partAt(float2 pos){
+	return tex2D(particleSamp, pos);
 }
 
 float2 worldpos(float2 pos){
-    return floor(pos*float2(320.,180.)+cpos);
+    return floor(pos/pscale+cpos);
 }
 
 ////////////////// K.jpg's Smooth Re-oriented 8-Point BCC Noise //////////////////
@@ -159,15 +162,12 @@ float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 	float4 bg=partAt(pos);
 	float sparks=(sv>0.98)*(1-mod(time-pto,1));
 	if(matval.r == 1.){
-		bool centers = matAt(pos,1,0).r !=1 || matAt(pos,-1,0).r !=1 ||
-			matAt(pos, 0,1).r !=1 || matAt(pos, 0,-1).r !=1;
-		bool diags = matAt(pos, 1,1).r !=1 || matAt(pos, 1,-1).r !=1 ||
-			matAt(pos,-1,-1).r !=1|| matAt(pos, -1,1).r !=1;
-		if(centers || (diags && matval.g==0)){
+		bool centers = matAt(pos,1,0).r*matAt(pos,-1,0).r*matAt(pos, 0,1).r*matAt(pos, 0,-1).r;
+		bool diags = matAt(pos, 1,1).r*matAt(pos, 1,-1).r*matAt(pos,-1,-1).r*matAt(pos, -1,1).r;
+		if(centers!=1 || (diags!=1 && matval.g==0)){
 				return float4(1,1,1,1);
 		}
-		float alph = 0;
-		return float4((1-alph)*(bg.xyz+0.3*sr+sparks)+alph,1);
+		return float4(bg.xyz+0.3*sr+sparks,1);
 	}
 	if(matval.r>=16 && matval.r<=18){
 		return float4((matval.b-matval.g)*sr/255.+matval.g/255+(bg.xyz+sparks)*(17-matval.r),1);

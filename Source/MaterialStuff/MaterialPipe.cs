@@ -24,9 +24,11 @@ public static class MaterialPipe {
   public static GraphicsDevice gd;
   static bool orderFlipped;
   public static Camera camera;
+  static bool needsImmUpdate;
 
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orderFlipped = false;
+    //DebugConsole.Write($"{scene.Tracker.GetEntities<LayerMarkingEntity>().Count} {layers.Count}");
     if(transroutine!=null) transroutine.Update();
     if(layers.Count==0){
       orig(self, scene);
@@ -42,6 +44,10 @@ public static class MaterialPipe {
     }
     if(dirty) layers.Sort((a, b) => -a.depth.CompareTo(b.depth));
     dirty=false;
+    if(needsImmUpdate){
+      scene.Entities.UpdateLists();
+      needsImmUpdate=false;
+    }
 
     double curdepth = float.PositiveInfinity;
     bool sorted = true;
@@ -89,6 +95,9 @@ public static class MaterialPipe {
       leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
     );
   }
+  public static void indicateImmidiateAddition(){
+    needsImmUpdate=true;
+  }
 
   static float camAt;
   static float NextTransitionDuration = 0.65f;
@@ -98,7 +107,7 @@ public static class MaterialPipe {
   static void ontrans(On.Celeste.Level.orig_TransitionTo orig, Level self, LevelData next, Vector2 dir){
     camAt = 0;
     entering.Clear();
-    foreach(var l in layers) leaving.Add(l);
+    foreach(var l in layers) if(l.autoManageRemoval)leaving.Add(l);
     NextTransitionDuration = self.NextTransitionDuration;
     orig(self, next, dir);
     transroutine = new Coroutine(transitionRoutine());
@@ -138,7 +147,7 @@ public static class MaterialPipe {
     entering.Remove(l);
   }
   public static void onDie(){
-    foreach(var l in layers) leaving.Add(l);
+    foreach(var l in layers) if(l.autoManageRemoval)leaving.Add(l);
   }
   public static void remLeaving(){
     foreach(IMaterialLayer l in leaving) removeLayer(l);

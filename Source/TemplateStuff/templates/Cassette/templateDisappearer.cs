@@ -87,15 +87,19 @@ public class TemplateDisappearer:Template{
     return selfCol;
   }
   static List<TemplateDisappearer> unenforced = new();
+  public virtual bool enforceAsVis=>selfVis;
+  public virtual bool enforceAsCol=>selfCol;
+  public virtual bool enforceAsAct=>selfAct;
   void enforce(){
-    if(selfVis && selfCol && selfAct) return;
+    bool Vis = enforceAsVis; bool Col = enforceAsCol; bool Act=enforceAsAct;
+    if(Vis && Col && Act) return;
     List<Entity> cents=new();
     AddAllChildren(cents);
     foreach(var c in cents){
       if(c is TemplateDisappearer) continue;
-      if(!selfVis) c.Visible=false;
-      if(!selfCol) c.Collidable=false;
-      if(!selfAct) c.Active=false;
+      if(!Vis) c.Visible=false;
+      if(!Col) c.Collidable=false;
+      if(!Act) c.Active=false;
     }
   }
   static void enforceHook(On.Celeste.Level.orig_Update orig, Level self){

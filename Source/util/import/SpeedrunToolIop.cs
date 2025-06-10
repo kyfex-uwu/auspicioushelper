@@ -17,7 +17,6 @@ internal static class SpeedrunToolIop{
     try{
     ChannelState.unwatchAll();
     PortalGateH.intersections.Clear();
-    MaterialPipe.ClearLayers();
     foreach(Entity e in Engine.Instance.scene.Entities){
       if(e is IChannelUser e_){
         ChannelState.watch(e_);
@@ -62,6 +61,10 @@ internal static class SpeedrunToolIop{
       typeof(RenderTargetPool), new string[] { "available"}
     }, new object[]{
       typeof(MaterialPipe), new string[] {"layers", "leaving", "entering", "toremove"}
+    }, new object[]{
+      typeof(CassetteMaterialLayer), new string[] {"layers"}
+    }, new object[]{
+      typeof(ChannelBaseEntity), new string[] {"layerA"}
     }
   };
 

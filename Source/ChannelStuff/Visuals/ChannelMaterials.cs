@@ -11,8 +11,9 @@ public class ChannelMaterialsA:BasicMaterialLayer{
   private List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
   public bool enabled=>info.enabled;
-  public ChannelMaterialsA():base([auspicioushelperGFX.LoadShader("emptynoise/channelmats")],new LayerFormat{
-    clearWilldraw=true, depth = -10001
+  //public override RenderTarget2D outtex => bgtex;
+  public ChannelMaterialsA():base([null,auspicioushelperGFX.LoadShader("emptynoise/channelmats")],new LayerFormat{
+    clearWilldraw=true, depth = -13000
   }){
     bgtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
   }
@@ -22,12 +23,12 @@ public class ChannelMaterialsA:BasicMaterialLayer{
   public override void render(SpriteBatch sb, Camera c){
     MaterialPipe.gd.SetRenderTarget(bgtex);
     MaterialPipe.gd.Clear(Color.Transparent);
-    MaterialPipe.gd.Textures[2]=bgtex;
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
     foreach(IMaterialObject b in bgItemsDraw){
       b.renderMaterial(this, sb, c);
     }
     sb.End();
+    MaterialPipe.gd.Textures[1]=bgtex;
     bgItemsDraw.Clear();
     base.render(sb,c);
   }

@@ -23,7 +23,7 @@ public static class RenderTargetPool{
   }
   public static int currentWidth {get; private set;} = 320;
   public static int currentHeight {get; private set;} = 180;
-  public static Vector2 pixelSize=>new Vector2(1/currentWidth,1/currentHeight);
+  public static Vector2 pixelSize=>new Vector2(1/(float)currentWidth,1/(float)currentHeight);
   public static Vector2 size=>new Vector2(currentWidth,currentHeight);
   static int state =0;
   public class RenderTargetHandle {
