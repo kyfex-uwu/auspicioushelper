@@ -1,6 +1,5 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
-local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local entity = {}
 
@@ -34,5 +33,6 @@ function entity.draw(room, entity, viewport)
         y=entity.y,
     }):draw()
 end
+--entity.borderColor = {0.3,1,0.3}
 
 return entity

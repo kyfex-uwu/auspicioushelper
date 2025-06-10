@@ -1,22 +1,21 @@
-sampler2D TextureSamp : register(s0);
-texture2D materialTex : register(t1);
-sampler2D materialSamp : register(s1);
+sampler2D layerSamp : register(s0);
 
 uniform float4 edgecol;
 uniform float4 lowcol;
 uniform float4 highcol;
 uniform float4 pattern;
-
-uniform float2 cpos;
-uniform float time;
 uniform float stripecutoff;
 
+uniform float2 cpos;
+uniform float2 pscale;
+uniform float time;
+
 float4 valAt(float2 pos, float offsetx, float offsety){
-    return tex2D(materialSamp,float2(pos.x+offsetx/320.,pos.y+offsety/180.));
+    return tex2D(layerSamp,pos+float2(offsetx,offsety)*pscale);
 }
 
 float2 worldpos(float2 pos){
-    return floor(pos*float2(320.,180.)+cpos);
+    return floor(pos/pscale+cpos);
 }
 
 
@@ -25,7 +24,6 @@ float2 worldpos(float2 pos){
 
 float4 main(float4 color : COLOR0, float2 pos : TEXCOORD0) : SV_Target {
 	float4 matval = valAt(pos,0,0);
-	float2 wpos = worldpos(pos);
 	
   float alphacutoff = 0.2;
 	if(matval.a < alphacutoff){

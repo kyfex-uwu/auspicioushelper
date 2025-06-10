@@ -23,27 +23,31 @@ public static class MaterialPipe {
   public static bool dirty;
   public static GraphicsDevice gd;
   static bool orderFlipped;
+  public static Camera camera;
+  static bool needsImmUpdate;
 
   public static void GameplayRender(On.Celeste.GameplayRenderer.orig_Render orig, GameplayRenderer self, Scene scene){
     orderFlipped = false;
+    //DebugConsole.Write($"{scene.Tracker.GetEntities<LayerMarkingEntity>().Count} {layers.Count}");
     if(transroutine!=null) transroutine.Update();
-    if(GameplayRenderer.RenderDebug || Engine.Commands.Open || layers.Count==0){
-      orig(self, scene); // LOL JK gotya if this ends up screwing up someone's mod you can come to my address and drop a brick on my hand
-      //DebugConsole.Write("default rend");
+    if(layers.Count==0){
+      orig(self, scene);
       return;
     }
-    Engine.Instance.GraphicsDevice.Clear(Color.Transparent);
-    SpriteBatch sb = Draw.SpriteBatch;
+    camera = self.Camera;
     gd = Engine.Instance.GraphicsDevice;
-    RenderTarget2D t = GameplayBuffers.Gameplay;
     if(toRemove.Count>0){
       List<IMaterialLayer> nlist = new();
-      foreach(var i in layers) if(!toRemove.Contains(i) && i.enabled) nlist.Add(i);
+      foreach(var i in layers) if(!toRemove.Contains(i)) nlist.Add(i);
       layers = nlist;
       toRemove.Clear();
     }
     if(dirty) layers.Sort((a, b) => -a.depth.CompareTo(b.depth));
     dirty=false;
+    if(needsImmUpdate){
+      scene.Entities.UpdateLists();
+      needsImmUpdate=false;
+    }
 
     double curdepth = float.PositiveInfinity;
     bool sorted = true;
@@ -55,13 +59,17 @@ public static class MaterialPipe {
       curdepth=e.actualDepth;
     }
     //strawberries change their depth for the sole reason of making my life harder...;
-    if(!sorted){
-      scene.Entities.entities.Sort(EntityList.CompareDepth);
-    }
+    if(!sorted)scene.Entities.entities.Sort(EntityList.CompareDepth);
+    
     gd.SamplerStates[1] = SamplerState.PointClamp;
     gd.SamplerStates[2] = SamplerState.PointClamp;
     foreach(IMaterialLayer l in layers){
-      if(l.usesbg() && !orderFlipped && Engine.Instance.scene is Level v){
+      if(l.markingEntity.Scene!=scene){
+        DebugConsole.Write("Weirdness occurred (should only happen from map reloading and debug menu use)");
+        l.markingEntity.RemoveSelf();
+        scene.Add(new LayerMarkingEntity(l));
+      }
+      if(l.usesbg && !orderFlipped && Engine.Instance.scene is Level v){
         gd.SetRenderTarget(GameplayBuffers.Level);
         gd.Clear(v.BackgroundColor);
         v.Background.Render(v);
@@ -70,53 +78,30 @@ public static class MaterialPipe {
         bgReorderer.enable();
       }
       if(l.independent){
-        if(l.checkdo())l.render(self.Camera,sb);
+        if(l.checkdo()){
+          l.render();
+          l.diddraw = true;
+        }
         else l.diddraw = false;
       }
     }
-    
-    float ndepth = layers.Count>0?layers[0].depth:float.NegativeInfinity;
-    int ldx = 0;
-    begin(self.Camera, sb, t);
-    foreach(Entity e in scene.Entities.entities){
-      if(e.Visible && !e.TagCheck(Tags.HUD) && e.actualDepth>=ndepth){
-        e.Render();
-      } else {
-        while(ndepth>e.actualDepth){
-          rlayer(self.Camera, sb, t, layers[ldx]);
-          ldx++;
-          ndepth = layers.Count>ldx?layers[ldx].depth:float.NegativeInfinity;
-        }
-        if(e.Visible && !e.TagCheck(Tags.HUD))e.Render();
-      }
-    }
-    while(ldx<layers.Count){
-      rlayer(self.Camera, sb, t, layers[ldx++]);
-    }
-    //sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)self.Camera.Position.X,(int)self.Camera.Position.Y,10,10),Draw.Pixel.ClipRect,Color.White);
+    gd.SetRenderTarget(GameplayBuffers.Gameplay);
+    orig(self, scene);
     gd.SamplerStates[1]=SamplerState.LinearClamp;
     gd.SamplerStates[2]=SamplerState.LinearClamp;
-    sb.End();
   }
 
-  public static void begin(Camera c, SpriteBatch sb, RenderTarget2D t){
-    gd.SetRenderTarget(t);
-    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+  public static void continueDefault(){
+    gd.SetRenderTarget(GameplayBuffers.Gameplay);
+    Draw.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, camera.Matrix);
   }
-  public static void rlayer(Camera c, SpriteBatch sb, RenderTarget2D t, IMaterialLayer l){
-    if(l.checkdo()){
-      float alpha = transroutine == null? 1:(
-        leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
-      );
-      if(l.independent){
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
-      } else {
-        sb.End();
-        l.render(c,sb,t);
-        begin(c, sb, t);
-        sb.Draw(l.outtex, Vector2.Zero+c.Position,Color.White*alpha*l.alpha);
-      }
-    }
+  public static float GetTransitionAlpha(IMaterialLayer l){
+    return transroutine == null? 1:(
+      leaving.Contains(l) || entering.Contains(l)? l.transalpha(leaving.Contains(l),camAt):1
+    );
+  }
+  public static void indicateImmidiateAddition(){
+    needsImmUpdate=true;
   }
 
   static float camAt;
@@ -127,7 +112,7 @@ public static class MaterialPipe {
   static void ontrans(On.Celeste.Level.orig_TransitionTo orig, Level self, LevelData next, Vector2 dir){
     camAt = 0;
     entering.Clear();
-    foreach(var l in layers) leaving.Add(l);
+    foreach(var l in layers) if(l.autoManageRemoval)leaving.Add(l);
     NextTransitionDuration = self.NextTransitionDuration;
     orig(self, next, dir);
     transroutine = new Coroutine(transitionRoutine());
@@ -144,7 +129,12 @@ public static class MaterialPipe {
   public static void addLayer(IMaterialLayer l){
     if(!leaving.Remove(l)) entering.Add(l);
     toRemove.Remove(l);
+    if(l.enabled) return;
     l.enabled=true;
+    if(l.markingEntity!=null) throw new Exception("Layer marking entities are leaking");
+    if(Engine.Instance.scene is Level lv)lv.Add(new LayerMarkingEntity(l));
+    else if(Engine.Instance.scene is LevelLoader ld) ld.Level.Add(new LayerMarkingEntity(l));
+    else throw new Exception($"Cannot add layer outside level/levelloader. scene is {Engine.Instance.scene}"); 
     l.onEnable();
     if(layers.Contains(l)) return;
     dirty = true;
@@ -152,26 +142,21 @@ public static class MaterialPipe {
   }
   static HashSet<IMaterialLayer> toRemove = new();
   public static void removeLayer(IMaterialLayer l){
+    if(l.enabled==false) return;
     toRemove.Add(l);
     l.enabled = false;
     l.onRemove();
+    l.markingEntity.RemoveSelf();
+    l.markingEntity=null;
     leaving.Remove(l);
     entering.Remove(l);
   }
   public static void onDie(){
-    foreach(var l in layers) leaving.Add(l);
+    foreach(var l in layers) if(l.autoManageRemoval)leaving.Add(l);
   }
   public static void remLeaving(){
     foreach(IMaterialLayer l in leaving) removeLayer(l);
     leaving.Clear();
-  }
-  public static Rectangle obtainInvertedRectangle(Camera c){
-    Matrix m = Matrix.Invert(c.Matrix);
-    Vector2 c1 = Vector2.Transform(Vector2.Zero,m);
-    Vector2 c2 = Vector2.Transform(new Vector2(320,180),m);
-    return new Rectangle(
-      (int)c1.X, (int)c1.Y, (int)(c2.X-c1.X), (int)(c2.Y-c2.Y)
-    );
   }
 
   static void reorderBg(ILContext ctx){

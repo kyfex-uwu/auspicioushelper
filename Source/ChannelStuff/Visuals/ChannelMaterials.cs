@@ -10,28 +10,29 @@ namespace Celeste.Mod.auspicioushelper;
 public class ChannelMaterialsA:BasicMaterialLayer{
   private List<IMaterialObject> bgItemsDraw = new List<IMaterialObject>();
   public RenderTarget2D bgtex;
-  public ChannelMaterialsA():base(-10000, auspicioushelperGFX.LoadEffect("testshader2")){
-    quietShader = auspicioushelperGFX.LoadEffect("quietshader");
+  public bool enabled=>info.enabled;
+  //public override RenderTarget2D outtex => bgtex;
+  public ChannelMaterialsA():base([null,auspicioushelperGFX.LoadShader("emptynoise/channelmats")],new LayerFormat{
+    clearWilldraw=true, depth = -13000
+  }){
     bgtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
   }
-  public override bool checkdo()
-  {
-    return willDraw.Count>0 || diddraw;
-  }
   public void planDrawBG(IMaterialObject t){
-    if(enabled) bgItemsDraw.Add(t);
+    if(info.enabled) bgItemsDraw.Add(t);
   }
-  public override void render(Camera c, SpriteBatch sb, RenderTarget2D back){
+  public override void render(SpriteBatch sb, Camera c){
     MaterialPipe.gd.SetRenderTarget(bgtex);
     MaterialPipe.gd.Clear(Color.Transparent);
-    MaterialPipe.gd.Textures[2]=bgtex;
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
     foreach(IMaterialObject b in bgItemsDraw){
       b.renderMaterial(this, sb, c);
     }
     sb.End();
+    MaterialPipe.gd.Textures[1]=bgtex;
     bgItemsDraw.Clear();
-
-    base.render(c,sb,back);
+    base.render(sb,c);
+  }
+  public void planDraw(IMaterialObject o){
+    if(info.enabled) willdraw.Add(o);
   }
 }
