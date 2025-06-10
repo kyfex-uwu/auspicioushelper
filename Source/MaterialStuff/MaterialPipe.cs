@@ -19,7 +19,15 @@ namespace Celeste.Mod.auspicioushelper;
 
 public static class MaterialPipe {
   static List<IMaterialLayer> layers = new List<IMaterialLayer>();
-  public static void ClearLayers()=>layers.Clear();
+  static MaterialPipe(){
+    auspicioushelperModule.OnEnterMap.enroll(new ScheduledAction(()=>{
+      layers.Clear();
+      entering.Clear();
+      leaving.Clear();
+      toRemove.Clear();
+      return false;
+    }));
+  }
   public static bool dirty;
   public static GraphicsDevice gd;
   static bool orderFlipped;
