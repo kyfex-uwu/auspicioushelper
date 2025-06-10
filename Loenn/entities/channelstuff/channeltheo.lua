@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local channeltheo = {}
 
@@ -19,21 +20,16 @@ channeltheo.placements = {
     }
   }
 }
-channeltheo.fieldInformation = {
-  channel = {
-    fieldType="string"
-  }
-}
-function channeltheo.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(0, 0, entity.width, entity.height) 
-  sprite.color = color 
-  return sprite
-end
 
-function channeltheo.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, 16, 16)
+function channeltheo.sprite(room, entity)
+    return {
+        drawableSprite.fromTexture("characters/theoCrystal/idle00", {
+            x=entity.x,
+            y=entity.y-10,
+            color = aelperLib.channel_color_tint,
+        }),
+        aelperLib.channel_spriteicon(entity.x, entity.y-10),
+    }
 end
 
 return channeltheo
