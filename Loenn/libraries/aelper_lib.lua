@@ -119,13 +119,13 @@ aelperLib.draw_template_sprites = function(name, x, y, room)
             if (tx<=0 or ty<=0 or tx>data[1].width/8 or ty>data[1].height/8) == false then
                 if data[2].tilesFg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
                     table.insert(toDraw, {
-                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1]+0.5,(ty-1)*8+y+offset[2]+0.5, 7,7,
                             {0.8,0.8,0.8},{1,1,1}),
                         depth=depths.fgTerrain})
                 end
                 if data[2].tilesBg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
                     table.insert(toDraw, {
-                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1]+0.5,(ty-1)*8+y+offset[2]+0.5, 7,7,
                             {0.5,0.5,0.5},{0.6,0.6,0.6}),
                         depth=depths.bgTerrain})
                 end
