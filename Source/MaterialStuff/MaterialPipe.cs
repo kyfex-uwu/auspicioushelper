@@ -74,6 +74,7 @@ public static class MaterialPipe {
         else l.diddraw = false;
       }
     }
+    gd.SetRenderTarget(GameplayBuffers.Gameplay);
     orig(self, scene);
     gd.SamplerStates[1]=SamplerState.LinearClamp;
     gd.SamplerStates[2]=SamplerState.LinearClamp;
@@ -116,10 +117,10 @@ public static class MaterialPipe {
     toRemove.Remove(l);
     if(l.enabled) return;
     l.enabled=true;
-    if(Engine.Instance.scene is Level lv){
-      if(l.markingEntity!=null) throw new Exception("Layer marking entities are leaking");
-      lv.Add(new LayerMarkingEntity(l));
-    } else throw new Exception("Added layer during non-level. This is wrong.");
+    if(l.markingEntity!=null) throw new Exception("Layer marking entities are leaking");
+    if(Engine.Instance.scene is Level lv)lv.Add(new LayerMarkingEntity(l));
+    else if(Engine.Instance.scene is LevelLoader ld) ld.Level.Add(new LayerMarkingEntity(l));
+    else throw new Exception($"Cannot add layer outside level/levelloader. scene is {Engine.Instance.scene}"); 
     l.onEnable();
     if(layers.Contains(l)) return;
     dirty = true;

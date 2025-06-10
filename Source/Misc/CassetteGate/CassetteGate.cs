@@ -39,7 +39,7 @@ public class CassetteGate:Entity{
 
     id = d.ID;
     if(visuals == null){
-      visuals = new BasicMaterialLayer(-9001, auspicioushelperGFX.LoadEffect("CassetteGateShader"));
+      //visuals = new BasicMaterialLayer(-9001, auspicioushelperGFX.LoadEffect("CassetteGateShader"));
     }
     MaterialPipe.addLayer(visuals);
   }

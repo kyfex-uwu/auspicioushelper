@@ -28,7 +28,7 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
     public float alphacutoff = 0.1f;
     public float stripecutoff = 0f;
     public float depth = 9000;
-    public VirtualShaderList passes = vanillaPasses;
+    public VirtualShaderList passes;
     public CassetteMaterialFormat(){}
 
     public static CassetteMaterialFormat fromDict(Dictionary<string,string> dict){
@@ -59,7 +59,7 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
           case "stripecutoff":c.stripecutoff = float.Parse(pair.Value); break;
           case "style":
             switch(pair.Value){
-              case "vanilla": c.passes=vanillaPasses; break;
+              case "vanilla": c.passes=vanillaPasses;break;
               case "simple": c.passes=simplePasses;break;
               default:
                 var pass = Util.listparseflat(pair.Value,true,true);
@@ -80,6 +80,7 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
           case "fgsat": c.fgsat = float.Parse(pair.Value); break;
         }
       }
+      if(c.passes == null) c.passes=vanillaPasses;
       return c;
     }
     public int gethash(){
@@ -109,6 +110,8 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
     trying.Clear();
     items.Clear();
   }
+
+  public override RenderTarget2D outtex=>handles[0];
   public override void render(SpriteBatch sb, Camera c){
     if(dirty){
       items.Sort(EntityList.CompareDepth);
@@ -126,6 +129,7 @@ public class CassetteMaterialLayer:BasicMaterialLayer{
   bool lastdn = false;
   public override bool drawMaterials => true;
   public override void rasterMats(SpriteBatch sb, Camera c) {
+    //DebugConsole.Write($"rendering {items.Count} {Engine.Instance.scene.Tracker.GetEntities<LayerMarkingEntity>().Count}",info.markingEnt.Scene);
     if(ChannelState.readChannel(channel) == 0)foreach(Entity e in items){
       if(e.Scene != null && e.Depth<=info.depth) e.Render();
     }

@@ -59,8 +59,13 @@ internal class LayerMarkingEntity:Entity{
     layer.markingEntity=this;
     Depth = (int)layer.depth;
   }
+  public override void Added(Scene scene) {
+    base.Added(scene);
+    DebugConsole.Write($"{this} with layer {layer} added to {scene}");
+  }
   public override void Removed(Scene scene) {
-    if(layer.enabled) throw new Exception("You are leaking materialLayers. Something has gone wrong.");
+    DebugConsole.Write($"{this} with layer {layer} removed from {scene}");
+    if(layer.enabled && layer.markingEntity == this) throw new Exception("You are leaking materialLayers. Something has gone wrong.");
     base.Removed(scene);
   }
   public override void Render() {
@@ -74,8 +79,8 @@ internal class LayerMarkingEntity:Entity{
 
 public class MaterialLayerInfo{
   public bool enabled;
-  public bool independent;
-  public bool usesbg;
+  public bool independent=true;
+  public bool usesbg=false;
   public bool diddraw;
   public float depth;
   public Entity markingEnt;
@@ -102,9 +107,9 @@ public interface IMaterialLayerSimple:IMaterialLayer{
 public class BasicMaterialLayer:IMaterialLayerSimple{
   public MaterialLayerInfo info {get;}
   public VirtualShaderList passes;
-  List<RenderTargetPool.RenderTargetHandle> handles;
-  LayerFormat format;
-  public RenderTarget2D outtex=>handles[handles.Count-1];
+  public List<RenderTargetPool.RenderTargetHandle> handles=new();
+  public LayerFormat layerformat;
+  public virtual RenderTarget2D outtex=>handles[handles.Count-1];
   public class LayerFormat{
     public float depth;
     public bool independent=true;
@@ -112,23 +117,27 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
     public bool quadfirst=false;
     public bool useBg=false;
     public bool clearWilldraw=false;
+    public bool drawInScene=true;
   }
+  bool IMaterialLayer.drawInScene=>layerformat.drawInScene;
   public BasicMaterialLayer(VirtualShaderList passes, LayerFormat l){
     info = new(l.independent,l.depth,l.useBg);
-    format = l;
+    layerformat = l;
     this.passes=passes;
     foreach(var pass in passes) handles.Add(new RenderTargetPool.RenderTargetHandle(false));
   }
   public BasicMaterialLayer(VirtualShaderList passes, float depth):this(passes,new LayerFormat{depth=depth}){}
   public virtual void onEnable(){
     foreach(var h in handles)h.Claim();
+    DebugConsole.Write($"enabled layer {this}");
   }
   public virtual void onRemove(){
     foreach(var h in handles)h.Free();
+    DebugConsole.Write($"disabled layer {this}");
   }
-  List<IMaterialObject> willdraw=new();
+  public List<IMaterialObject> willdraw=new();
   public virtual bool checkdo(){
-    return format.alwaysRender || willdraw.Count>0;
+    return layerformat.alwaysRender || willdraw.Count>0;
   }
   public static void StartSb(SpriteBatch sb, Effect e=null, Camera c=null){
     sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, e, c?.Matrix??Matrix.Identity);
@@ -136,7 +145,7 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
   public virtual void rasterMats(SpriteBatch sb,Camera c){
     foreach(var o in willdraw) o.renderMaterial(this,sb,c);
   }
-  public virtual bool drawMaterials => format.quadfirst || willdraw.Count!=0;
+  public virtual bool drawMaterials => layerformat.quadfirst || willdraw.Count!=0;
   public virtual void render(SpriteBatch sb, Camera c){
     passes.setbaseparams();
     GraphicsDevice gd = MaterialPipe.gd;
@@ -146,7 +155,7 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
       if(i==0){
         if(!drawMaterials) continue;
         StartSb(sb,passes[i],c);
-        if(format.quadfirst){
+        if(layerformat.quadfirst){
           Vector2 tlc = c.ScreenToCamera(Vector2.Zero);
           Vector2 size = c.CameraToScreen(RenderTargetPool.size)-tlc;
           sb.Draw(Draw.Pixel.Texture.Texture_Safe, new Rectangle((int)tlc.X,(int)tlc.Y,(int)size.X,(int)size.Y),Color.White);
@@ -159,6 +168,6 @@ public class BasicMaterialLayer:IMaterialLayerSimple{
         sb.End();
       }
     }
-    if(format.clearWilldraw) willdraw.Clear();
+    if(layerformat.clearWilldraw) willdraw.Clear();
   }
 }

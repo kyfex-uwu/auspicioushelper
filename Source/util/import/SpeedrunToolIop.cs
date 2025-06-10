@@ -36,15 +36,15 @@ internal static class SpeedrunToolIop{
         }
         if(info!=null) info.addOthersider();
       }
-      if(e is IDeclareLayers idl){
-        if(idl is MaterialController ma) DebugConsole.Write($"material controlner {ma.identifier}");
-        idl.declareLayers();
-      }
+      // if(e is IDeclareLayers idl){
+      //   if(idl is MaterialController ma) DebugConsole.Write($"material controlner {ma.identifier}");
+      //   idl.declareLayers();
+      // }
     }
     foreach(ChannelTracker t in Engine.Instance.scene.Tracker.GetComponents<ChannelTracker>()){
       ChannelState.watch(t);
     }
-    TemplateCassetteManager.unfrickMats(level);
+    //TemplateCassetteManager.unfrickMats(level);
     FoundEntity.clear(Engine.Instance.scene);
     }catch(Exception ex){
       DebugConsole.Write($"Auspicioushelper speedruntool failed: \n {ex}");
@@ -61,7 +61,7 @@ internal static class SpeedrunToolIop{
     }, new object[] {
       typeof(RenderTargetPool), new string[] { "available"}
     }, new object[]{
-      typeof(MaterialPipe), new string[] {"layers", "leaving", "entering"}
+      typeof(MaterialPipe), new string[] {"layers", "leaving", "entering", "toremove"}
     }
   };
 

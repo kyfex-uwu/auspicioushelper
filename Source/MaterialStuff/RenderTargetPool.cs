@@ -10,7 +10,7 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
-internal static class RenderTargetPool{
+public static class RenderTargetPool{
   static List<RenderTarget2D> Pool = new();
   public const int maxCanUse = 128;
   public static Stack<int> available = new();

@@ -13,6 +13,7 @@ namespace Celeste.Mod.auspicioushelper;
 public class VirtualShader{
   Effect shader;
   Effect quiet;
+  public bool isnull=>shader==null;
   public VirtualShader(Effect shader, Effect quiet = null){
     this.shader=shader; this.quiet=quiet;
   }
@@ -21,13 +22,13 @@ public class VirtualShader{
     p["cpos"]?.SetValue(MaterialPipe.camera.Position);
     p["pscale"]?.SetValue(RenderTargetPool.pixelSize);
     p["time"]?.SetValue(((Engine.Scene as Level)?.TimeActive??0)+2);
-    p["quiet"].SetValue(Settings.Instance.DisableFlashes? 1f:0f);
+    p["quiet"]?.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
     if(quiet!=null){
       p=quiet.Parameters;
       p["cpos"]?.SetValue(MaterialPipe.camera.Position);
       p["pscale"]?.SetValue(RenderTargetPool.pixelSize);
       p["time"]?.SetValue(((Engine.Scene as Level)?.TimeActive??0)+2);
-      p["quiet"].SetValue(Settings.Instance.DisableFlashes? 1f:0f);
+      p["quiet"]?.SetValue(Settings.Instance.DisableFlashes? 1f:0f);
     }
   }
   public void setparamvalex(string key, bool t) {
@@ -54,12 +55,15 @@ public class VirtualShader{
     shader.Parameters[key]?.SetValue(t);
     if(quiet!=null)quiet.Parameters[key]?.SetValue(t);
   }
-  public static implicit operator Effect(VirtualShader v)=>v.quiet!=null&&auspicioushelperModule.Settings.UseQuietShader?v.quiet:v.shader;
+  public static implicit operator Effect(VirtualShader v){
+    if(v==null) return null;
+    return v.quiet!=null&&auspicioushelperModule.Settings.UseQuietShader?v.quiet:v.shader;
+  }
   public static implicit operator VirtualShader(Effect eff)=>new VirtualShader(eff);
 }
 
 public class VirtualShaderList:IEnumerable<VirtualShader>{
-  List<VirtualShader> shaders;
+  List<VirtualShader> shaders = new();
   public void setparamvalex(string key, bool t){
     foreach(var s in shaders) s?.setparamvalex(key, t);
   }
@@ -104,5 +108,5 @@ public class VirtualShaderList:IEnumerable<VirtualShader>{
   public VirtualShader this[int x]{
     get=>shaders[x];
   }
-  public void Add(VirtualShader n)=>shaders.Add(n);
+  public void Add(VirtualShader n)=>shaders.Add(n==null||n.isnull?null:n);
 }
