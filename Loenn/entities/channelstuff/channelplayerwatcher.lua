@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local channelplayerwatcher = {}
 
@@ -21,26 +22,15 @@ channelplayerwatcher.placements = {
   }
 }
 channelplayerwatcher.fieldInformation = {
-  channel = {
-    fieldType="string"
-  },
   op = {
-    options=ops
+    options=ops,
+    editabe=false,
   },
   action = {
-    options = actions
+    options = actions,
+    editabe=false,
   }
 }
-function channelplayerwatcher.sprite(room, entity)
-  color = {1, 1, 1, 1}
-  local sprite = drawableSprite.fromTexture("util/rect", nil)
-  sprite.useRelativeQuad(-4, -4, 8,8) 
-  sprite.color = color 
-  return sprite
-end
-
-function channelplayerwatcher.rectangle(room, entity)
-  return utils.rectangle(entity.x-4, entity.y-4, 8,8)
-end
+channelplayerwatcher.texture = "loenn/auspicioushelper/controllers/playerwatcher"
 
 return channelplayerwatcher
