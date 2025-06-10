@@ -182,6 +182,7 @@ public static class EntityParser{
     });
     clarify("blackGem",Types.basic,HookVanilla.HeartGem);
     clarify("wire",Types.unwrapped,static(Level l, LevelData d, Vector2 o, EntityData e)=>new CWire(e,o));
+    clarify("lightningBlock",Types.unwrapped,(Level l, LevelData d, Vector2 o, EntityData e)=>new LightningBreakerW(e,o));
     defaultModdedSetup();
   }
   public static Level.EntityLoader getLoader(string name){
