@@ -26,15 +26,6 @@ channelhotcoldwatcher.fieldInformation = {
   }
 }
 
-function channelhotcoldwatcher.sprite(room, entity)
-    return {
-        drawableSprite.fromTexture("objects/coreFlipSwitch/switch01", {
-            x=entity.x,
-            y=entity.y,
-            color = aelperLib.channel_color_tint,
-        }),
-        aelperLib.channel_spriteicon(entity.x, entity.y),
-    }
-end
+channelhotcoldwatcher.texture="loenn/auspicioushelper/hotcoldwatcher"
 
 return channelhotcoldwatcher
