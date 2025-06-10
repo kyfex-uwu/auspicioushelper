@@ -63,7 +63,7 @@ public class TemplateCassetteBlock:TemplateDisappearer, IMaterialObject, IChanne
   }
   public override bool enforceAsVis {get{
     bool inlayer = CassetteMaterialLayer.layers.TryGetValue(channel,out var layer);
-    return base.enforceAsVis && !inlayer || layer.fg==null;
+    return base.enforceAsVis && (!inlayer || layer.fg==null);
   }}
   public void tryManifest(){
     Player p = Scene?.Tracker.GetEntity<Player>();
