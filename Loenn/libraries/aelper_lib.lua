@@ -6,6 +6,7 @@ local utils = require("utils")
 local logging = require("logging")
 local depths = require("consts.object_depths")
 local matrix = require("utils.matrix")
+local state = require("loaded_state")
 
 local settings = require("mods").getModSettings("auspicioushelper")
 local menubar = require("ui.menubar").menubar
@@ -42,6 +43,7 @@ aelperLib.channel_color = {230/255, 167/255, 50/255}
 aelperLib.channel_color_halfopacity = {aelperLib.channel_color[1], aelperLib.channel_color[2], aelperLib.channel_color[3], 0.5}
 aelperLib.channel_color_dark = {aelperLib.channel_color[1]*dark_multiplier, aelperLib.channel_color[2]*dark_multiplier, aelperLib.channel_color[3]*dark_multiplier}
 aelperLib.channel_color_dark_halfopacity = {aelperLib.channel_color_dark[1], aelperLib.channel_color_dark[2], aelperLib.channel_color_dark[3], 0.5}
+aelperLib.channel_color_tint = {1-(1-aelperLib.channel_color[1])*0.5, 1-(1-aelperLib.channel_color[2])*0.5, 1-(1-aelperLib.channel_color[3])*0.5, 1}
 aelperLib.channel_spriteicon = function(x,y)
     return drawableSprite.fromTexture("loenn/auspicioushelper/channel_icon", {
         x=x, y=y
@@ -117,13 +119,13 @@ aelperLib.draw_template_sprites = function(name, x, y, room)
             if (tx<=0 or ty<=0 or tx>data[1].width/8 or ty>data[1].height/8) == false then
                 if data[2].tilesFg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
                     table.insert(toDraw, {
-                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1]+0.5,(ty-1)*8+y+offset[2]+0.5, 7,7,
                             {0.8,0.8,0.8},{1,1,1}),
                         depth=depths.fgTerrain})
                 end
                 if data[2].tilesBg.matrix:getInbounds(tx+data[1].x/8, ty+data[1].y/8) ~= "0" then
                     table.insert(toDraw, {
-                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1],(ty-1)*8+y+offset[2], 8,8,
+                        func=drawableRectangle.fromRectangle("bordered", (tx-1)*8+x+offset[1]+0.5,(ty-1)*8+y+offset[2]+0.5, 7,7,
                             {0.5,0.5,0.5},{0.6,0.6,0.6}),
                         depth=depths.bgTerrain})
                 end

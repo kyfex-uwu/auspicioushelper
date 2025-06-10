@@ -24,7 +24,8 @@ entity.placements = {
 }
 entity.fieldInformation = {
   edge_type = {
-    options = edge_types
+    options = edge_types,
+    editable=false
   },
   cases = {
     fieldType="integer"
@@ -40,9 +41,5 @@ entity.fieldInformation = {
   }
 }
 entity.texture = "loenn/auspicioushelper/controllers/sprite"
-
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x, entity.y, 8, 8)
-end
 
 return entity

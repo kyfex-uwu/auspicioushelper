@@ -17,10 +17,12 @@ entity.placements = {
     }
   }
 }
-function entity.rectangle(room, entity)
-  return utils.rectangle(entity.x-5,entity.y-5,10,10)
-end
-entity.fillColor = {0.6,0.8,0,0.5}
-entity.borderColor = {0.8,1,0,1}
+entity.fieldInformation = {
+    compiled_operations = {
+        options = {"https://cloudsbelow.neocities.org/celestestuff/mathcompiler"}
+    }
+}
+
+entity.texture = "loenn/auspicioushelper/controllers/math"
 
 return entity

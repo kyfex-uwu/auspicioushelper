@@ -1,5 +1,6 @@
 local drawableSprite = require("structs.drawable_sprite")
 local utils = require("utils")
+local aelperLib = require("mods").requireFromPlugin("libraries.aelper_lib")
 
 local channelJelly = {}
 channelJelly.name = "auspicioushelper/ChannelJelly"
@@ -18,20 +19,25 @@ channelJelly.placements = {
 local jellyTypes = {"normal","platform", "fallable", "falling", "withplatform"}
 channelJelly.fieldInformation = {
   state0 ={
-    options = jellyTypes
+    options = jellyTypes,
+    editable=false,
   },
   state1 = {
-    options = jellyTypes
-  },
-  channel = {
-    fieldType="string"
+    options = jellyTypes,
+    editable=false,
   }
 }
 
-channelJelly.texture = "objects/auspicioushelper/channeljelly/idle0"
 
-function channelJelly.rectangle(room, entity)
-  return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
+function channelJelly.sprite(room, entity)
+    return {
+        drawableSprite.fromTexture("objects/auspicioushelper/channeljelly/idle0", {
+            x=entity.x,
+            y=entity.y,
+            color = aelperLib.channel_color_tint,
+        }),
+        aelperLib.channel_spriteicon(entity.x, entity.y-10),
+    }
 end
 
 return channelJelly
