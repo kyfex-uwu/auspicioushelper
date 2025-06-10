@@ -26,8 +26,5 @@ channelclearcontroller.fieldInformation = {
   }
 }
 channelclearcontroller.texture = "loenn/auspicioushelper/controllers/clear"
-function channelclearcontroller.rectangle(room, entity)
-  return utils.rectangle(entity.x-4, entity.y-4, 8,8)
-end
 
 return channelclearcontroller
