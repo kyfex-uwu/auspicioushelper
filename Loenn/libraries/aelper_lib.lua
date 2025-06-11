@@ -217,7 +217,7 @@ aelperLib.get_entity_draw = function(icon_name)
         if not shouldError and entity._loenn_display_template then shouldError = aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
             false, viewport and viewport.__auspicioushelper_alreadyDrawn).recursiveError end--todo: replace false with whether or not this entity is slected
             
-        drawableSprite.fromTexture(aelperLib.getIcon(shouldError and "loenn/auspicioushelper/template/error" or ("loenn/auspicioushelper/template/"..icon_name)), {
+        drawableSprite.fromTexture(shouldError and "loenn/auspicioushelper/template/error" or aelperLib.getIcon("loenn/auspicioushelper/template/"..icon_name), {
             x=entity.x,
             y=entity.y,
         }):draw()
