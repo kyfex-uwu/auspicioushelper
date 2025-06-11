@@ -89,6 +89,7 @@ public class FoundEntity:Component{
           fieldInfo.SetValue(previousObj, args[0]);
         }
       } catch (Exception ignored) {
+        DebugConsole.Write($"Could not write int to field {lastInfo?.Name} on {previousObj?.GetType()}");
         return 0;
       }
       return 1;
