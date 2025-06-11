@@ -317,6 +317,9 @@ public class ChannelMathController:Entity{
       if(ints.Count>0 && ints[0]==0) return 0;
       return toInt(FoundEntity.sreflectCall(strs,ints));
     });
+    registerInterop("reflectSetInt",(List<string> strs, List<int> ints)=>{
+      return toInt(FoundEntity.sreflectSet(strs, ints));
+    });
     registerInterop("timeSinceTrans",(List<string> strs, List<int> ints)=>{
       return (int)UpdateHook.TimeSinceTransMs;
     });
