@@ -88,7 +88,10 @@ aelperLib.draw_template_sprites = function(name, x, y, room, selected, alreadyDr
     
     local data = (templates[name] or {})[1]
     if data == nil then return {} end
-    if alreadyDrawn[data[1]._id] then return end
+    if alreadyDrawn[data[1]._id] then 
+        alreadyDrawn.recursiveError=true
+        return alreadyDrawn
+    end
     
     local toDraw = {}
     local offset = {
@@ -189,23 +192,24 @@ aelperLib.draw_template_sprites = function(name, x, y, room, selected, alreadyDr
     for _,v in ipairs(toDraw) do
         v.func:draw() 
     end
+
+    return alreadyDrawn
 end
 aelperLib.templateID_from_entity = function(entity, room)
     return string.sub(room.name, #"zztemplates-"+1).."/"..entity.template_name
 end
-local selected={}
 aelperLib.get_entity_draw = function(icon_name)
     return function(room, entity, viewport)
         if entity._loenn_display_template == nil then entity._loenn_display_template = true end
         
-        if entity._loenn_display_template then aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
-            false, viewport and viewport.__auspicioushelper_alreadyDrawn) end--todo: replace false with whether or not this entity is slected
+        local shouldError = false
+        if entity._loenn_display_template then shouldError = aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
+            false, viewport and viewport.__auspicioushelper_alreadyDrawn).recursiveError end--todo: replace false with whether or not this entity is slected
             
-        drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/"..icon_name), {
+        drawableSprite.fromTexture(aelperLib.getIcon(shouldError and "loenn/auspicioushelper/template/error" or ("loenn/auspicioushelper/template/"..icon_name)), {
             x=entity.x,
             y=entity.y,
         }):draw()
-        selected[entity]=false
     end
 end
 
