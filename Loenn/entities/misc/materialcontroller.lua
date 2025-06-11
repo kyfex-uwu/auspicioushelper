@@ -18,10 +18,11 @@ materialcontroller.placements = {
       Fade_in = "Linear",
       fadeOut = "Linear",
       independent = true,
-      simple = false,
-      always = false,
+      quadFirst = true,
+      always = true,
       useprev = false,
       usebg = false,
+      drawInScene = true,
       reload=false
     }
   }

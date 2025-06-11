@@ -56,6 +56,11 @@ entity.fieldInformation = {
 function entity.rectangle(room, entity)
     return utils.rectangle(entity.x-8, entity.y-8, 16, 16)
 end
+function entity.nodeTexture(room, entity, node)
+  local base = "objects/auspicioushelper/templates/movearrows/"
+  local addr = entity.arrow_texture
+  return "objects/auspicioushelper/templates/movearrows/small00"
+end
 entity.draw = aelperLib.get_entity_draw("tmovr")
 function entity.nodeTexture(room, entity)
     return "objects/auspicioushelper/templates/movearrows/"..entity.arrow_texture.."00"

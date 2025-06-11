@@ -278,7 +278,7 @@ public class ChannelMathController:Entity{
       return ints[0];
     });
     registerInterop("getCounter",(List<string> strs, List<int> ints)=>{
-      if(Engine.Scene is Level l) return l.Session.GetCounter(strs[0]);
+      if(Engine.Scene is Level l) return l.Session.GetCounter(strs[1]);
       return 0;
     });
     registerInterop("setCounter",(List<string> strs, List<int> ints)=>{
