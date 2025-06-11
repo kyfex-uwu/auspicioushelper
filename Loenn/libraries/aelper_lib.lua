@@ -78,9 +78,17 @@ aelperLib.update_template = function(entity, room, data)
     
     table.insert(templates[template_name], {entity, room})
 end
-aelperLib.draw_template_sprites = function(name, x, y, room)
+local template_entity_names = {}
+aelperLib.register_template_name = function(name)
+    template_entity_names[name]=true
+    return name
+end
+aelperLib.draw_template_sprites = function(name, x, y, room, selected, alreadyDrawn)
+    alreadyDrawn = alreadyDrawn or {}
+    
     local data = (templates[name] or {})[1]
     if data == nil then return {} end
+    if alreadyDrawn[data[1]._id] then return end
     
     local toDraw = {}
     local offset = {
@@ -88,13 +96,23 @@ aelperLib.draw_template_sprites = function(name, x, y, room)
         data[1].y - (data[1].nodes or {{y=data[1].y}})[1].y,
     }
     for _,entity in ipairs(data[2].entities) do
-        if entity.x > data[1].x-(entity.width or 0.01) and entity.x < data[1].x+data[1].width and
+        if not alreadyDrawn[entity._id] and 
+            entity.x > data[1].x-(entity.width or 0.01) and entity.x < data[1].x+data[1].width and
             entity.y > data[1].y-(entity.height or 0.01) and entity.y < data[1].y+data[1].height then
+                
+            alreadyDrawn[entity._id]=true
     
             local movedEntity = utils.deepcopy(entity)
             movedEntity.x=x + (entity.x - data[1].x) + offset[1]
             movedEntity.y=y + (entity.y - data[1].y) + offset[2]
-            local toInsert = ({entities.getEntityDrawable(movedEntity._name, nil, room, movedEntity, nil)})[1]
+            if movedEntity.nodes then
+                for _,node in ipairs(movedEntity.nodes) do
+                    node.x = x + (node.x - data[1].x) + offset[1]
+                    node.y = y + (node.y - data[1].y) + offset[2]
+                end
+            end
+            local toInsert = ({entities.getEntityDrawable(movedEntity._name, nil, room, movedEntity, 
+                {__auspicioushelper_alreadyDrawn=alreadyDrawn})})[1]
             if toInsert.draw == nil then 
                 for _,v in ipairs(toInsert) do table.insert(toDraw, {
                     func=v,
@@ -103,9 +121,26 @@ aelperLib.draw_template_sprites = function(name, x, y, room)
                 func=toInsert,
                 depth=(type(entity.depth) == "func" and entity.depth(room, movedEntity, nil) or entity.depth) or 0})
             end
+        
+            if movedEntity.nodes then
+                for index,node in ipairs(movedEntity.nodes) do
+                    local visibility = entities.nodeVisibility(nil, movedEntity)
+                    if visibility == "always" or (visibility == "selected" and selected) then 
+                    
+                        toInsert = ({entities.getNodeDrawable(movedEntity._name, nil, room, movedEntity, node, index, nil)})[1]
+                        if toInsert.draw == nil then 
+                            for _,v in ipairs(toInsert) do table.insert(toDraw, {
+                                func=v,
+                                depth=(type(entity.depth) == "func" and entity.depth(room, movedEntity, nil) or entity.depth) or 0}) end
+                        else table.insert(toDraw, {
+                            func=toInsert,
+                            depth=(type(entity.depth) == "func" and entity.depth(room, movedEntity, nil) or entity.depth) or 0})
+                        end
+                    end
+                end
+            end
         end
     end
-    --todo: entity nodes
     for _,entity in ipairs(data[2].decalsBg) do
         if entity.x >= data[1].x-(entity.width or 0) and entity.x <= data[1].x+data[1].width and
             entity.y >= data[1].y-(entity.height or 0) and entity.y <= data[1].y+data[1].height then
@@ -158,17 +193,22 @@ end
 aelperLib.templateID_from_entity = function(entity, room)
     return string.sub(room.name, #"zztemplates-"+1).."/"..entity.template_name
 end
+local selected={}
 aelperLib.get_entity_draw = function(icon_name)
-    return function(room, entity)
+    return function(room, entity, viewport)
         if entity._loenn_display_template == nil then entity._loenn_display_template = true end
         
-        if entity._loenn_display_template then aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room) end
+        if entity._loenn_display_template then aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
+            false, viewport and viewport.__auspicioushelper_alreadyDrawn) end--todo: replace false with whether or not this entity is slected
+            
         drawableSprite.fromTexture(aelperLib.getIcon("loenn/auspicioushelper/template/"..icon_name), {
             x=entity.x,
             y=entity.y,
         }):draw()
+        selected[entity]=false
     end
 end
+
 aelperLib.getIcon = function(name)
     return settings.auspicioushelper_legacyicons and (name.."_legacy") or name
 end
