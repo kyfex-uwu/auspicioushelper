@@ -203,7 +203,18 @@ aelperLib.get_entity_draw = function(icon_name)
         if entity._loenn_display_template == nil then entity._loenn_display_template = true end
         
         local shouldError = false
-        if entity._loenn_display_template then shouldError = aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
+        if "zztemplates-"..string.sub(entity.template,1,#room.name-#"zztemplates-") == room.name then
+            for _,maybeFiller in pairs(room.entities) do
+                if maybeFiller._name == "auspicioushelper/templateFiller" and
+                    entity.x>=maybeFiller.x and entity.y>=maybeFiller.y and
+                    entity.x<maybeFiller.x+maybeFiller.width and entity.y<maybeFiller.y+maybeFiller.height and
+                    entity.template == string.sub(room.name,#"zztemplates-"+1).."/"..maybeFiller.template_name then
+                        
+                    shouldError=true
+                end
+            end
+        end
+        if not shouldError and entity._loenn_display_template then shouldError = aelperLib.draw_template_sprites(entity.template, entity.x, entity.y, room, 
             false, viewport and viewport.__auspicioushelper_alreadyDrawn).recursiveError end--todo: replace false with whether or not this entity is slected
             
         drawableSprite.fromTexture(aelperLib.getIcon(shouldError and "loenn/auspicioushelper/template/error" or ("loenn/auspicioushelper/template/"..icon_name)), {
