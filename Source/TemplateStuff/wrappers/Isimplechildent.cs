@@ -24,7 +24,7 @@ public interface ISimpleEnt:ITemplateChild{
   void ITemplateChild.destroy(bool particles){
     ((Entity) this).RemoveSelf();
   }
-  public Vector2 toffset {get;set;}
+  Vector2 toffset {get;set;}
   void ITemplateChild.parentChangeStat(int vis, int col, int act){
     Entity s = (Entity)this;
     if(vis!=0) s.Visible=vis>0;

@@ -111,7 +111,7 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   }
   public void inimaterials(){
     if(material != null) foreach(var pair in material){
-      var format = CassetteMaterialLayer.CassetteMaterialFormat.fromDict(Util.kvparseflat(Util.stripEnclosure(pair.Value)));
+      var format = CassetteMaterialLayer.CassetteMaterialFormat.fromDict(Util.kvparseflat(pair.Value,true));
       CassetteMaterialLayer other;
       if(CassetteMaterialLayer.layers.TryGetValue(pair.Key, out other)){
         if(other.format.gethash() != format.gethash()){
@@ -126,16 +126,6 @@ public class TemplateCassetteManager:Entity, IChannelUser, IDeclareLayers{
   }
   public void declareLayers(){
     inimaterials();
-  }
-  public static void unfrickMats(Scene s){
-    foreach(TemplateCassetteBlock c in Engine.Instance.scene.Tracker.GetEntities<TemplateCassetteBlock>()){
-      if(CassetteMaterialLayer.layers.TryGetValue(c.channel,out var layer)){
-        var l = new List<Entity>();
-        c.AddAllChildren(l);
-        layer.dump(l);
-        if(layer.fg!=null && c.getSelfCol()&&c.getParentCol())layer.fg.Add(c);
-      }
-    }
   }
   public void setChVal(int val){
     if(!useChannel) return;

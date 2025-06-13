@@ -12,15 +12,7 @@ using Monocle;
 
 namespace Celeste.Mod.auspicioushelper;
 
-public class CassetteMaterialLayer:IMaterialLayer{
-  public bool independent{get;} = true;
-  public bool diddraw {get;set;}
-  public bool removeNext {get;set;}
-  public bool enabled {get;set;}
-  public RenderTarget2D outtex {get; private set;}
-  RenderTarget2D mattex;
-  RenderTarget2D pretex;
-  public float depth {get;set;}
+public class CassetteMaterialLayer:BasicMaterialLayer{
   public CassetteMaterialFormat format;
   string channel;
   public struct CassetteMaterialFormat{
@@ -36,13 +28,12 @@ public class CassetteMaterialLayer:IMaterialLayer{
     public float alphacutoff = 0.1f;
     public float stripecutoff = 0f;
     public float depth = 9000;
-    public string shader = "__default__";
-    public string preshader = "";
-    public bool usepreshader = false;
+    public VirtualShaderList passes;
     public CassetteMaterialFormat(){}
 
     public static CassetteMaterialFormat fromDict(Dictionary<string,string> dict){
       CassetteMaterialFormat c = new CassetteMaterialFormat();
+      resources.enable();
       foreach(var pair in dict){
         switch(pair.Key){
           case "border": c.border=Util.hexToColor(pair.Value.Trim()); break;
@@ -66,18 +57,18 @@ public class CassetteMaterialLayer:IMaterialLayer{
           case "depth":c.depth = float.Parse(pair.Value); break;
           case "alphacutoff":c.alphacutoff = float.Parse(pair.Value); break;
           case "stripecutoff":c.stripecutoff = float.Parse(pair.Value); break;
-          case "shader": c.shader = pair.Value; break;
-          case "preshader": c.preshader = pair.Value; break;
           case "style":
             switch(pair.Value){
-              case "vanilla": 
-                c.shader = "vanilla";
-                c.preshader = "prevanilla";
-              break;
-              case "simple": default:
-                c.shader = "simple";
-                c.preshader = "";
-              break;
+              case "vanilla": c.passes=vanillaPasses;break;
+              case "simple": c.passes=simplePasses;break;
+              default:
+                var pass = Util.listparseflat(pair.Value,true,true);
+                c.passes=new();
+                foreach(string p in pass){
+                  if(string.IsNullOrWhiteSpace(p)||p=="null") c.passes.Add(null);
+                  else c.passes.Add(auspicioushelperGFX.LoadShader(p));
+                }
+                break;
             }
           break;
           case "fg": 
@@ -89,11 +80,7 @@ public class CassetteMaterialLayer:IMaterialLayer{
           case "fgsat": c.fgsat = float.Parse(pair.Value); break;
         }
       }
-      if(c.shader == "__default__"){
-        c.shader = "vanilla";
-        c.preshader = "prevanilla";
-      }
-      if(!string.IsNullOrWhiteSpace(c.preshader)) c.usepreshader = true;
+      if(c.passes == null) c.passes=vanillaPasses;
       return c;
     }
     public int gethash(){
@@ -103,86 +90,58 @@ public class CassetteMaterialLayer:IMaterialLayer{
     }
   }
   public static Dictionary<string, CassetteMaterialLayer> layers = new Dictionary<string,CassetteMaterialLayer>();
-  Effect shader;
-  Effect preshader;
   public FgCassetteVisuals fg = null;
-  public CassetteMaterialLayer(CassetteMaterialFormat format, string channel){
+  public CassetteMaterialLayer(CassetteMaterialFormat format, string channel):base(format.passes,format.depth){
     this.channel = channel;
-    this.depth = format.depth;
     this.format = format;
-    outtex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
-    mattex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
     resources.enable();
-    switch(format.shader){
-      case"simple": shader = simpleShader; break;
-      case "vanilla": shader = vanillaShader; break;
-      default: shader = auspicioushelperGFX.LoadEffect("cassette/"+format.shader)??simpleShader; break;
-    }
-    if(format.usepreshader){
-      pretex = new RenderTarget2D(Engine.Instance.GraphicsDevice, 320, 180);
-      switch(format.preshader){
-        case "prevanilla": preshader = vanillaPreshader; break;
-        default: preshader = auspicioushelperGFX.LoadEffect("cassette/"+format.preshader);break;
-      }
-    }
     if(format.hasfg) fg = new FgCassetteVisuals(format);
   }
   List<Entity> items = new List<Entity>();
   bool dirty;
-  public void onEnable(){
+  public override void onEnable(){
+    base.onEnable();
     if(fg!=null) MaterialPipe.addLayer(fg);
   }
-  public void render(Camera c, SpriteBatch sb, RenderTarget2D back){
+  public override void onRemove(){
+    base.onRemove();
+    if(layers.TryGetValue(channel, out var l) && l==this) layers.Remove(channel);
+    if(fg!=null) MaterialPipe.removeLayer(fg);
+    trying.Clear();
+    items.Clear();
+  }
+
+  //public override RenderTarget2D outtex=>handles[1];
+  public override void render(SpriteBatch sb, Camera c){
     if(dirty){
       items.Sort(EntityList.CompareDepth);
       dirty = false;
     }
-    EffectParameterCollection prm = shader.Parameters;
-    prm["edgecol"]?.SetValue(format.border.ToVector4());
-    prm["lowcol"]?.SetValue(format.innerlow.ToVector4());
-    prm["highcol"]?.SetValue(format.innerhigh.ToVector4());
-    prm["pattern"]?.SetValue(format.patternvec);
-    prm["cpos"]?.SetValue(c.Position);
-    prm["time"]?.SetValue((Engine.Scene as Level)?.TimeActive??0);
-    prm["stripecutoff"]?.SetValue(format.stripecutoff);
-    MaterialPipe.gd.SetRenderTarget(mattex);
-    MaterialPipe.gd.Clear(Color.Transparent);
-    sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, null, c.Matrix);
+    
+    passes.setparamvalex("edgecol",format.border.ToVector4());
+    passes.setparamvalex("lowcol",format.innerlow.ToVector4());
+    passes.setparamvalex("highcol",format.innerhigh.ToVector4());
+    passes.setparamvalex("pattern",format.patternvec);
+    passes.setparamvalex("stripecutoff",format.stripecutoff);
+    passes.setbaseparams();
+    base.render(sb,c);
+  }
+  bool lastdn = false;
+  public override bool drawMaterials => true;
+  public override void rasterMats(SpriteBatch sb, Camera c) {
+    //DebugConsole.Write($"rendering {items.Count} {Engine.Instance.scene.Tracker.GetEntities<LayerMarkingEntity>().Count}",info.markingEnt.Scene);
     if(ChannelState.readChannel(channel) == 0)foreach(Entity e in items){
-      if(e.Scene != null && e.Depth<=depth) e.Render();
-      //DebugConsole.Write($"{e.Position} {e}");
+      if(e.Scene != null && e.Depth<=info.depth) e.Render();
     }
     foreach(IMaterialObject e in trying){
       e.renderMaterial(this, sb, c);
     }
-    sb.End();
-    MaterialPipe.gd.Textures[1] = mattex;
-    if(format.usepreshader && preshader!=null){
-      MaterialPipe.gd.SetRenderTarget(pretex);
-      MaterialPipe.gd.Clear(Color.Transparent);
-      sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, preshader, Matrix.Identity);
-      sb.Draw(mattex,Vector2.Zero,Color.White);
-      sb.End();
-      MaterialPipe.gd.Textures[2] = pretex;
-    }
-    MaterialPipe.gd.SetRenderTarget(outtex);
-    MaterialPipe.gd.Clear(Color.Transparent);
-    sb.Begin(SpriteSortMode.Immediate, BlendState.Opaque, SamplerState.PointWrap, DepthStencilState.None, RasterizerState.CullNone, shader, Matrix.Identity);
-    sb.Draw(mattex,Vector2.Zero,Color.White);
-    sb.End();
-    diddraw = true;
   }
-  bool lastdn = false;
-  public bool checkdo(){
+  public override bool checkdo(){
     bool drawnormal = ChannelState.readChannel(channel) == 0;
     if(drawnormal && !lastdn) Util.RemovePred(trying, a=>a is TemplateCassetteBlock);
     lastdn = drawnormal;
     return drawnormal || trying.Count>0;
-  }
-  public void onRemove(){
-    trying.Clear();
-    if(layers.TryGetValue(channel, out var l) && l==this) layers.Remove(channel);
-    if(fg!=null)MaterialPipe.removeLayer(fg);
   }
   public void dump(List<Entity> l){
     foreach(Entity e in l){
@@ -198,14 +157,16 @@ public class CassetteMaterialLayer:IMaterialLayer{
     trying.Remove(o);
   }
   
-  static Effect simpleShader;
-  static Effect vanillaShader;
-  static Effect vanillaPreshader;
+  static VirtualShaderList simplePasses;
+  static VirtualShaderList vanillaPasses;
   static HookManager resources = new HookManager(()=>{
     //totally a hook (this is a good api)
-    simpleShader = auspicioushelperGFX.LoadEffect("cassette/simple");
-    vanillaShader = auspicioushelperGFX.LoadEffect("cassette/vanilla");
-    vanillaPreshader = auspicioushelperGFX.LoadEffect("cassette/prevanilla");
+    simplePasses = new VirtualShaderList{
+      null,auspicioushelperGFX.LoadShader("cassette/simple")
+    };
+    vanillaPasses = new VirtualShaderList{
+      null, auspicioushelperGFX.LoadShader("cassette/prevanilla"), auspicioushelperGFX.LoadShader("cassette/vanilla")
+    };
   },bool ()=>{
     foreach(var pair in layers){
       List<Entity> keep = new List<Entity>();

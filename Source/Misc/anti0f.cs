@@ -399,6 +399,7 @@ public class Anti0fZone:Entity{
     float length = Math.Max(Math.Abs(dist.X), Math.Abs(dist.Y)); //L1 distance obviously
     Vector2 step = dist/length;
     ClearRasters();
+    oldSolids = p.Scene.Tracker.Entities[typeof(Solid)];
     if(!rast.Fill(p,step,length,true)){
       orig(a,dist);
       return;
@@ -415,6 +416,7 @@ public class Anti0fZone:Entity{
       if((lpos+step*magn - p.ExactPosition).LengthSquared()>0.25) goto exit;
     }
     exit:
+      p.Scene.Tracker.Entities[typeof(Solid)] = oldSolids;
       ClearRasters();
   }
 

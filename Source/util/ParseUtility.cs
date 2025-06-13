@@ -62,7 +62,8 @@ public static class Util{
   static Dictionary<char,char> escape = new Dictionary<char, char>{
     {'{','}'}, {'[',']'}, {'(',')'},
   };
-  public static Dictionary<string,string> kvparseflat(string str){
+  public static Dictionary<string,string> kvparseflat(string str, bool strip=false){
+    if(strip) str=stripEnclosure(str);
     Stack<char> unescaped = new Stack<char>();
     var o = new Dictionary<string,string>();
     string k="";
@@ -116,6 +117,53 @@ public static class Util{
       o.Add(k.Trim(),v.Trim());
       k=""; v="";
       goto parsekey;
+  }
+  public static List<string> listparseflat(string str,bool strip=false,bool stripout=false){
+    if(strip) str=stripEnclosure(str);
+    Stack<char> unescaped = new Stack<char>();
+    var o = new List<string>();
+    string v="";
+    int idx=0;
+    bool escapeNext = false;
+    parsevalue:
+      if((idx >= str.Length||str[idx] == ',') && unescaped.Count ==0){
+        idx++; goto fent;
+      }
+      if(idx >= str.Length){
+        DebugConsole.Write("PARSE ERROR: "+str);
+        return null;
+      }
+      if(escape.TryGetValue(str[idx], out var esc)){
+        unescaped.Push(esc);
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      if(unescaped.Count>0 && unescaped.Peek()==str[idx]){
+        unescaped.Pop(); 
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      if(str[idx]=='"'){
+        v+=str[idx]; idx++; goto parsestring;
+      }
+      v+=str[idx]; idx++; goto parsevalue;
+
+    parsestring:
+      if(idx == str.Length){
+        DebugConsole.Write("PARSE ERROR: "+str);
+      }
+      if(escapeNext){
+        escapeNext = false; 
+        v+=str[idx]; idx++; goto parsestring;
+      }
+      if(str[idx] == '"'){
+        v+=str[idx]; idx++; goto parsevalue;
+      }
+      v+=str[idx]; idx++; goto parsestring;
+
+    fent:
+      if(stripout) o.Add(stripEnclosure(v.Trim()));
+      else o.Add(v.Trim());
+      v="";
+      goto parsevalue;
   }
   public static string stripEnclosure(string str){
     if(str == "") return "";
