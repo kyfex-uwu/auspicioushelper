@@ -95,8 +95,8 @@ aelperLib.draw_template_sprites = function(name, x, y, room, selected, alreadyDr
     
     local toDraw = {}
     local offset = {
-        data[1].x - (data[1].nodes or {{x=data[1].x}})[1].x,
-        data[1].y - (data[1].nodes or {{y=data[1].y}})[1].y,
+        data[1].x - ((data[1].nodes or {{x=data[1].x}})[1] or {x=0}).x,
+        data[1].y - ((data[1].nodes or {{y=data[1].y}})[1] or {x=0}).y,
     }
     for _,entity in ipairs(data[2].entities) do
         if not alreadyDrawn[entity._id] and 
